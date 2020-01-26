@@ -1,0 +1,416 @@
+%! TEX root = CS_tips.tex
+
+\documentclass[a4paper,12pt,%
+              final%
+              %draft%
+              ]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fancyvrb}
+
+\usepackage{xcolor}
+\definecolor{BlueX}{RGB}{0,62,92}
+
+\usepackage[top=2cm, bottom=2cm, left=1cm, right=1cm]{geometry}
+
+\usepackage{hyperref}
+
+\usepackage{enumitem}
+%
+\begin{document}
+
+% Title
+\begin{center}
+\bfseries \scshape \Huge \color{BlueX}%
+Tips \& stuff
+\end{center}
+%
+\vspace*{\baselineskip}
+
+\section{\texttt{valgrind}}
+Some useful options:
+\begin{itemize}
+  \item Check and track memory leaks: \verb|--leak-check=full| \verb|--track-origins=yes|
+  \item Log file: \verb|--log-file=<filename>|
+  \item Reachable / possibly-lost: \verb!--show-reachable=yes|no --show-possibly-lost=yes|no!
+\end{itemize}
+
+\section{\texttt{gdb}}
+\label{sec:gdb}
+\begin{itemize}
+  \item Calling functions such as \texttt{fabs}, \texttt{sin},...: \texttt{((double(*)(double))<foo>)(x)}
+  \item Setting watchpoints which stay after the end of the current function:
+\begin{verbatim}
+  $ print pt
+    (double *) 0x75e12
+  $ watch *(double *) 0x75e12
+\end{verbatim}
+  \item Print all current variables: \texttt{info args} (try also \texttt{info locals})
+  \item Logging output \href{https://sourceware.org/gdb/onlinedocs/gdb/Logging-Output.html}{here}
+    \begin{itemize}
+      \item Enable/Disable logging: \verb!$ set logging on|off!
+      \item Change name of the log file (default is \texttt{gdb.txt}): \verb|$ set logging file <name>|
+      \item Overwrite: \verb!$ set logging overwrite on|off!
+      \item Redirect only to file: \verb!$ set logging redirect on|off!
+    \end{itemize}
+\end{itemize}
+
+\section{\texttt{git}}
+\label{sec:git}
+A nice, user-friendly introduction to \texttt{git} is available \href{https://www.atlassian.com/git/tutorials/learn-git-with-bitbucket-cloud}{here}.
+
+Intro: for those who do not know, \texttt{SHA1} is either the ID (long or short, it does not matter) of the commit, which one can get via a \texttt{git log}, or a tree-path relative to the \texttt{HEAD} (e.g.: latest commit=\texttt{HEAD}, second to last=\verb|HEAD^| or \verb|HEAD~1|, ($n+1$)-th to last=\verb|HEAD~n|). More info \href{https://git-scm.com/docs/git-cherry-pick}{here}.
+
+For inexperienced users who want to perform simple tasks, such as looking at the changelogs and commit history, or creating commits, the user-friendly, GUI programs of \texttt{git-cola} (manage the current status of your git repository) and \texttt{gitk} (looking at the commit tree and moving around it) are advisable.
+\begin{itemize}
+  \item Run \verb|git| commands from another directory: \verb|git -C <path> <cmd>| (mnemonic: as in \verb|make|). Originally it was: \verb|--git-dir=<path> --work-dir=<path>|.
+  \item \verb|git add <file_name>|: move the modifications in \verb|file_name| to commit stage (that is, they will be include in the next commit)
+    \begin{itemize}
+      \item The option \texttt{-p}, aka cherry-picking, splits the \verb|file_name| into chucks, so that you can choose which modifications are to be staged. For each of them, you will have to tell \texttt{git} what to do with it: if it is to keep, answer \texttt{y}; if not, \texttt{n}. Other answers are possible, for example use \texttt{s} (for split) reduce the chunk size / split the current chunk into sub-chunks. \href{https://stackoverflow.com/questions/1122210/can-i-modify-git-adds-hunk-size}{Here} you can find the meaning of all of the possible answers. This could be done easily with \texttt{git-cola}.
+    \end{itemize}
+  \item \texttt{git commit}: creates a new commit with the staged modifications. This operation is easily done in \texttt{git-cola}.
+    \begin{itemize}
+      \item \verb|-m "Commit title"|: a simple and fast way to create a commit;
+      \item \texttt{-a}: all the modified files, even those which are not staged yet are added to the commit;
+      \item Forgot a file in your last commit or want to modify it? \verb|git commit --amend| add the staged modifications to the last commit.
+      \item Commit with the same message as the original (after a reset, or with the \verb|--amend| option): \verb|git commit -c ORIG_HEAD|.
+    \end{itemize}
+  \item For all merging-related commands (\texttt{am}, \texttt{merge}, \texttt{cherry-pick}, \texttt{rebase}, \verb|pull --rebase|...), if errors occur, you can use
+    \begin{itemize}
+      \item \verb|git <command> --continue|: the problems have been solved, tells \texttt{git} to continue what it was doing,
+      \item \verb|git <command> --abort|: cancel the operation and return to the pre-sequence state, the situation before \texttt{git <command>} was called,
+      \item \verb|git <command> --quit|: similar to \texttt{abort}, but do not reset the \texttt{HEAD} back to the original branch. The index and working tree are also left unchanged,
+      \item \verb|git <command> --skip|: in some commands, e.g. the \texttt{rebase}-related ones, skip (do not apply) the current commit, and continue.
+    \end{itemize}
+  \item \verb|git reset [options] SHA1|, \href{https://git-scm.com/docs/git-reset}{here}:
+    \begin{itemize}
+      \item \verb|--soft|, Does not touch the index or the working tree at all, but resets the \texttt{HEAD} to \texttt{SHA1},
+      \item \verb|--mixed|, (default) Resets the index but not the working tree (the files do not change),
+      \item \verb|--hard|, Resets the index \emph{and} the working tree;
+    \end{itemize}
+  \item \verb|git rebase -i SHA1|: (\texttt{-i} stands for interactive) enables to modify (delete, move up or down the log tree, fix up, squash, reword) the commits from \texttt{SHA1} to \texttt{HEAD};
+  \item Modify an old commit (for which \verb|--amend| would not work): use a \texttt{rebase -i}
+    \begin{itemize}
+      \item For basic modifications: look \href{https://stackoverflow.com/questions/1186535/how-to-modify-a-specified-commit}{here};
+      \item For splitting a commit or complex modifications: follow \href{https://stackoverflow.com/questions/6217156/break-a-previous-commit-into-multiple-commits}{here} (I suggest to \texttt{rebase} to one commit before the one you want to modify).
+    \end{itemize}
+  \item (Re)set the remote reference (from where git pulls) for the branch \verb|branch_name|
+\begin{verbatim}
+  git branch [<branch_name>] --set-upstream-to new_remote/branch_on_remote
+\end{verbatim}
+    If \verb|branch_name| is not provided, the current branch will be used as default;
+  \item Rename a branch:
+    \begin{itemize}
+      \item If on the branch to rename: \verb|git branch -m <new_name>|
+      \item If on another branch: \verb|git branch -m <old_name> <new_name>|
+    \end{itemize}
+  \item \href{https://git-scm.com/docs/git-format-patch}{Create patches} from \texttt{SHA1} to most recent commit: \verb|git format-patch [options] <SHA1>|
+    \begin{itemize}
+      \item \texttt{-<n>}: create only \texttt{n} patches (always starting from \texttt{SHA1});
+      \item \verb|--start-number <n>|: the patches are numbered starting from \texttt{n};
+      \item \texttt{-N}: commits are unnumbered.
+    \end{itemize}
+  \item \href{https://git-scm.com/docs/git-am}{Apply a patch}: \verb|git am [options] path/to/patch|
+    \begin{itemize}
+      \item \texttt{-3}: if the patch does not apply cleanly for a certain file, falls back to the version of the most recent common commit between the current tree and the one coming with the patch, and propose a 3-way merge (current, patch, and ancestor),
+      \item \verb|--reject|: when the application fails, tells \texttt{git} to apply as many modifications as possible and to temporarily skip the impossible ones. The rejected modification will be stored in \texttt{*.rej} files. The application has to be completed manually (you will have to personally modify the files)
+    \end{itemize}
+  \item \texttt{git log}: show the commit logs. \href{https://git-scm.com/docs/git-log}{Manual}
+    \begin{itemize}
+      \item \texttt{-<n>}, \texttt{-n <n>}: limit the number of commits to output
+      \item \verb|--since=<date>|, \verb|--after=<date>|: show commits more recent than \texttt{date}
+      \item \verb|--until=<date>|, \verb|--before=<date>|: show commits older than \texttt{date}
+      \item \verb|-L <start>,<end>:<file>|: show commits which modified the zone of \texttt{file} delimited by the line numbers \texttt{start} and \texttt{end}
+      \item \verb|-L:<function>:<file>|: show commits which modified function \texttt{function} of \texttt{file}
+      \item \verb!--<path>|<path/to/filename>!: show commits which modified the files in \texttt{path} (resp. the file \verb|path/to/filename|). To be put after all other options;
+      \item \verb|--pretty[=<format>]|, \verb|--format=<format>|: customize the format of your output. You may want to choose predefined styles, then \texttt{format} can be chosen in \texttt{oneline}, \texttt{short}, \texttt{medium}, \texttt{full}, \texttt{fuller}, ...
+    \end{itemize}
+  \item Commit cherry-picking (\href{https://git-scm.com/docs/git-cherry-pick}{manual}): apply a specific commit from another branch
+\begin{verbatim}
+  git cherry-picking <commit>
+\end{verbatim}
+    \begin{itemize}
+      \item Example: apply to the current branch the third-to-last commit of branch \verb|branch_name|:
+        \begin{verbatim}
+          git cherry-picking <branch_name>~4
+        \end{verbatim}
+    \end{itemize}
+  \item Show config: 
+    \begin{itemize}
+      \item Have a look at the global or local config file: \verb|~/.gitconfig| or \verb|repository/root/.git/config|
+      \item List everything: \verb|git config [--global] --list|
+      \item Specific key: \verb|git config [--global] --get <key_name>|
+      \item Search: \verb|git config [--global] --get-regexp <pattern>|
+    \end{itemize}
+  \item Aliases: as for bash, one can create custom aliases to shortcut some common commands. In order to to that simply use
+\begin{verbatim}
+$ git config [options] alias.<shortcut> '<cmd>'
+\end{verbatim}
+        for instance
+\begin{verbatim}
+$ git config [--global] alias.pr 'pull ---rebase'
+\end{verbatim}
+  \item Proxy: some info are given \href{https://gist.github.com/evantoli/f8c23a37eb3558ab8765}{here}. Try to simply run (from wherever)
+\begin{verbatim}
+  $ git config --global http.proxy <server>:<port>
+\end{verbatim}
+
+\end{itemize}
+
+\section{Shell}
+\label{sec:shell}
+\begin{itemize}
+  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign.
+  \item Pipes: \verb!|! connects standard output of one command to standard input of another.
+  \item File descriptors:
+    \begin{enumerate}[start=0]
+      \item Standard input
+      \item Standard output
+      \item Standard error
+    \end{enumerate}
+  \item Redirection: use \verb|>| to redirect, \verb|>&| to duplicate and redirect
+    \begin{itemize}
+      \item Redirect stdout to stderr: \verb|<cmd> >&2|
+      \item Redirect stdout and stderr to file: first we redirect stdout to a file then we tell to copy stderr to stdout
+\begin{verbatim}
+  <cmd> > file.log 2>&1
+\end{verbatim}
+      \item Discard output: \texttt{<cmd> > /dev/null}.
+      \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \texttt{>>}.
+    \end{itemize}
+  \item Extract from path: \texttt{dirname} (root) and \texttt{basename}
+\end{itemize}
+
+\section{\texttt{sed}}
+\begin{itemize}
+  \item Some info could be found in the \href{https://www.gnu.org/software/sed/manual/sed.html}{manual} or in \href{http://www.grymoire.com/Unix/Sed.html}{this tutorial};
+  \item A general knowledge of the regex could be very useful. Take a look at this \href{https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285}{chetsheet}
+    \begin{itemize}
+      \item \verb|^pattern|: matches any string that starts with \texttt{pattern}. \verb|pattern$|: matches any string that ends with \texttt{pattern}
+    \end{itemize}
+  \item General usage: \verb|sed [options] "command" old_file new_file|. The quotes \texttt{"..."} may be replaced by \texttt{'...'}
+  \item The option \verb|-i|, \verb|--in-place| allows to overwrite the file once it is modified;
+    \begin{itemize}
+      \item \verb|-i.bak| creates a backup file,
+      \item The option \verb|--follow-symlinks|, available only with \verb|-i| activated, enables to modify the original file;
+    \end{itemize}
+  \item Search and replace:
+\begin{verbatim}
+  sed -i "s/<pattern>/<replaced>/" file
+\end{verbatim}
+  \begin{itemize}
+    \item If in one line there are more occurrences, only the first one is matched. Appending \texttt{g} will make \texttt{sed} match all the occurrences.
+\begin{verbatim}
+  sed -i "s/<pattern>/<replaced>/g" file
+\end{verbatim}
+    \item Match exactly the word: from regex, \verb|\b| delimits boundaries of the word. Hence, (although \verb|\<word\>| seems to work, as well (\texttt{vim}, anyone?)):
+\begin{verbatim}
+$ echo "bar embarassment" | sed "s/\bbar\b/no bar/g"
+no bar embarassment
+\end{verbatim}
+  \end{itemize}
+  \item Full lines searches:
+    \begin{itemize}
+    \item Replace all the lines matching \texttt{pattern} with \verb|new_line|: \verb|sed -i "/pattern/c\new_line/" file|,
+    \item Delete all lines containing \texttt{pattern}: \verb|sed -i "/pattern/d" file|;
+    \end{itemize}
+\end{itemize}
+
+\section{\texttt{grep}}
+\verb|grep [options] <pattern> [files]|
+Some useful options:
+\begin{itemize}
+  \item \texttt{-r}: recursive, then \texttt{files} can be a directory;
+  \item \texttt{-R}: as above, but follow links;
+  \item \texttt{-w}: match only complete \emph{w}ords;
+  \item \texttt{-c}: just print the \emph{c}ount of the lines with a match;
+  \item \texttt{-v}, \verb|--invert-match|: get lines with that do \emph{not} match the \texttt{pattern};
+  \item \texttt{-e}, \verb|--regexp=<pattern>|: look for \texttt{pattern}. This can be used, for example if \texttt{pattern} starts with a dash (\texttt{-}); similar options are \verb!-E|F|G|P!
+  \item \texttt{-i}, \verb|--ignore-case|: search is case-\emph{i}nsensitive;
+  \item \texttt{-h}: without filename (mnemonic: \emph{h}ead)
+  \item \texttt{-H}: with filename (mnemonic: \emph{H}ead)
+  \item \texttt{-n}: show line number;
+  \item \texttt{-m <n>}: print only the first \texttt{n} occurrences of the \texttt{pattern};
+  \item \texttt{-B <n>}: print \texttt{<n>} lines \emph{B}efore the match (included);
+  \item \texttt{-A <n>}: print \texttt{<n>} lines \emph{A}fter the match (included);
+  \item \texttt{-C <n>}: print \texttt{<n>} lines of the \emph{C}ontext of the match;
+  \item \texttt{-l}, \verb|--files-with-matches|: \emph{l}ist only the file names in which at least one match is found;
+  \item \texttt{-L}, \verb|--files-without-matches|: \emph{L}ist only the file names in which no match is found;
+  \item start from the end: \verb!tac <files> | grep [options] pattern! (Add a pipe to \texttt{tac} to recover the original order).
+\end{itemize}
+
+\section{\texttt{find}}
+It allows to find files in a tree and apply a command to them:
+\begin{verbatim}
+  find [options] <path> <command>
+\end{verbatim}
+If no command is given, \texttt{-print} is executed. Some examples and options:
+\begin{itemize}
+  \item Check if file \texttt{filename} is in \texttt{mydir} or one of its subdirectories (\texttt{-print} is considered, thus it works similarly to \texttt{ls})
+\begin{verbatim}
+  find <mydir> -name <filename>
+\end{verbatim}
+  \begin{itemize}
+    \item \verb|--regex|: similar to \texttt{name} but one can use regex syntax to write the pattern. The type can be chosen with \verb|--regextype| (ex. \texttt{sed}). Notice that \texttt{find} always prepends \verb|./| to the path so you may want to start your pattern with something like \verb|.*/|
+  \end{itemize}
+  \item Filter on the file type: option \verb|--type <t>| where \texttt{<t>} can be, for example, \texttt{d} (directory), \texttt{f} (regular file), \texttt{l} (symbolic link)\dots
+  \item \texttt{!}, \texttt{-not}: negation of the expression that follows. E.g.: \texttt{find . -not -name foo} print all the files in the current directory with a name different than \texttt{too}.
+  \item Exclude a path: e.g. avoid matching the current directory
+\begin{verbatim}
+  find . -not -name notmyfile -not -path .
+\end{verbatim}
+  \item Delete all the matching files: e.g. delete all the \texttt{.log} files \texttt{find . -name *.log -delete}
+  \item Apply a command to all the matching files: e.g. run a bash script, grep only certain files
+\begin{verbatim}
+  find . -name *.log -exec script.sh {} \;
+  find . -name *.log -exec script.sh {} +
+  find . -name *.log -exec grep -Hn --color "pattern" {} +
+\end{verbatim}
+  \verb|{}| stands for the matching files; the first version will execute as many calls as the numbers of matching files, the second (try to) append all the files in an single list of arguments
+  \begin{itemize}
+    \item \verb|--ok|: like \texttt{exec} but ask the permission first
+    \item \verb|--execdir|: like \texttt{exec} but run the command from the subdirectory that contains the matched file.
+  \end{itemize}
+\end{itemize}
+
+\section{\texttt{tar}}
+\texttt{tar} is a utility which creates archives
+\begin{itemize}
+  \item Basic usage:
+    \begin{itemize}
+      \item \verb|c|, \verb|-c|, \verb|--create|: create. Remember to put all the files that you want in your archive in one go.
+\begin{verbatim}
+  tar -cf archived.tar file/to/archive
+\end{verbatim}
+      \item \verb|x|, \verb|-x|, \verb|--extract|, \verb|--get|: extract
+\begin{verbatim}
+  tar -xf archived.tar
+\end{verbatim}
+      \item As you have already understood, \verb|-f| stands for file(name).
+    \end{itemize}
+  \item Additional options:
+    \begin{itemize}
+      \item Zip (compress), \verb|-z|: use compression algorithms. The option has to be used also when extracting compressed archived. Usually, compressed archived have \verb|.tar.gz| or \verb|.tgz| as extension. 
+      \item \verb|t|, \verb|-t|, \verb|--list|: list the files.
+      \item \verb|r|, \verb|-r|, \verb|--append|: add files to an existing archive.
+      \item \verb|u|, \verb|-u|, \verb|--update|: add to the archive only the files which are already present and which have been modified.
+      \item \verb|A|, \verb|-A|, \verb|--catenate|, \verb|--concatenate|: concatenate archives.
+    \end{itemize}
+\end{itemize}
+
+\section{\texttt{awk}}
+\texttt{awk} is a text-processing utility that allows to perform easily operations line-by-line with column manipulations. A tutorial is given \href{https://www.tutorialspoint.com/awk/index.htm}{here}.
+\begin{itemize}
+  \item Basis: \verb|awk [opt] 'BEGIN{[...]} {[...]} END{[...]}' <file>|
+    \begin{itemize}
+      \item The commands in the curly brackets after \texttt{BEGIN} are executed before starting the reading of the file,
+      \item The commands in the unnamed curly brackets are executed at each line,
+      \item The commands in the curly brackets after \texttt{END} are executed once the file has been read,
+      \item Each of these three sections is optional;
+    \end{itemize}
+  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g. print the third row: \verb|awk 'NR==3{print;exit}' file.txt|, print lines containing "apple": \verb|awk '/apple/' file.txt| (print is implied)
+  \item Useful options:
+    \begin{itemize}
+      \item The file name is given as argument of the command or with \verb|-f <file>|, or \verb|--file=<file>|.
+      \item \verb|-F <char>|, \verb|--field-separator="<char>"|: \verb|char| is the column separator;
+      \item Select the \texttt{n}-th column: \verb|$<n>|. Remark: it is 1-based (first column is indexed by 1), and \verb|$0| expands to the whole line.
+      \item Pass an argument: \verb|-v var_name=<value>|
+    \end{itemize}
+  \item Built-in variable:
+    \begin{itemize}
+      \item \verb|NF|: number of fields / columns in the current row (hence \verb|$NF| is the last column of the row)
+      \item \verb|NR|: row number, mind that it is incremented if several files are read (1 based).
+      \item \verb|FNR|: row number relative to current file. It resets to 1 every time a new file is read. 
+      \item \verb|FS|: field separator
+      \item \verb|FILENAME|
+      \item \verb|ENVIRON|: array with environment variables (e.g. try \verb|ENVIRON["USER"|).
+    \end{itemize}
+\end{itemize}
+
+\section{\texttt{C}}
+\label{sec:c}
+Just some tricks.
+\begin{itemize}
+  \item Operator \verb|?|: it is a shortcut for a simple \texttt{if} statement. 
+\begin{verbatim}
+  /* binary condition */ ? /* if true, do this */ : /* otherwise, do this */ 
+\end{verbatim}
+    For instance it could be useful when one wants to define a \texttt{const} variable which however depends on a certain condition.
+\begin{verbatim}
+  const int max = (n > m) ? n : m;
+\end{verbatim}
+    Notice that in this case, if \verb|m| or \verb|n| are calls to functions, they are evaluated twice, one for the comparison, and one for the assignment. Hence, if the calls are time-consuming, you might want to use temporary variables.
+  \item Memory / arrays tricks
+    \begin{itemize}
+      \item Fastest (?, possibly if one runs sequentially) to reset an array:
+\begin{verbatim}
+memset(dest, 0, dest_len*sizeof(<dest_type>)) 
+\end{verbatim}
+        (destination, value to copy, number of bits to consider). Notice that since it works on the single bits, this works only with zero, namely that would not work to fill an array with ones (or any value, indeed). Mnemonic: \verb|dest = 0|. 
+      \item Fastest (?, possibly if one runs sequentially) to copy an array into another: structure similar to the one above. Mnemonic: \verb|receive = send|
+\begin{verbatim}
+memcpy(receive, send, <n_element_to_copy>*sizeof(<send_type>))
+\end{verbatim}
+    \end{itemize}
+    
+\end{itemize}
+
+\section{\texttt{python}}
+\label{sec:python}
+\begin{itemize}
+  \item Debugging, info \href{https://docs.python.org/2/library/pdb.html}{here}: \texttt{python -m pdb script.py}.
+    Commands are similar to \texttt{gdb} (\ref{sec:gdb}).
+  \item \texttt{pip}: allows you to download and update python libraries
+    \begin{itemize}
+      \item Typical call: \verb|pip install <package>|. Add options \verb!--upgrade|-U! to upgrade.
+      \item You'll need access to some directories, thus it is advised to have a local install: pass option \verb|--user|.
+      \item Proxy: pass the option \verb|--proxy=user@server.dom:port|. 
+      \item Get list of outdated packages: \verb|pip list --outdated|.
+      \item When installing/upgrading problems may occur with older versions of the \texttt{C} compiler, \texttt{GCC}: try and force \texttt{C99} standard by setting \texttt{CFLAGS} before installing: \verb|export CFLAGS='-std=c99'|
+    \end{itemize}
+\end{itemize}
+
+\section{\texttt{markdown}}
+\begin{itemize}
+  \item \texttt{markdown} files are usually used for \texttt{README} and such.
+  \item Common extension: \texttt{.md}, \texttt{.markdown}
+  \item Compile them with \texttt{pandoc} in order to get an \texttt{html}, for instance, that you can open with a browser.
+\begin{verbatim}
+pandoc --from=markdown --to=html -o out.html in.md
+\end{verbatim}
+  \item Guides, cheat-sheet and tutorial: on \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{Git-Hub}}, quick \href{https://commonmark.org/help/}{cheat-sheet} and a \href{https://agea.github.io/tutorial.md/}{tutorial}.
+\end{itemize}
+
+\section{\texttt{gnuplot}}
+\begin{itemize}
+  \item Keep the plot after closing the platform / having run the script: \verb|gnuplot --persist|
+\end{itemize}
+
+\section{Miscellaneous}
+\begin{itemize}
+  \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
+\begin{verbatim}
+  echo "Message Body Here" | mailx -s "Subject Here" -a attachment.txt user@example.com
+  echo "Message Body Here" | mail -s "Subject Here" -A attachment.txt user@example.com
+\end{verbatim}
+  \item \texttt{PETSc} \href{https://www.mcs.anl.gov/petsc/petsc-current/docs/manual.pdf}{manual}
+    \begin{itemize}
+      \item Use \verb|MatView(Mat a, PETSC_VIEWER_DRAW_WORLD)| or with any another \texttt{PetscViewer} to draw the nonzero structure of a matrix.
+    \end{itemize}
+  \item \texttt{wc}: \texttt{shell} command to perform some basic counting operations on a file (mnemonic: \emph{w}ord \emph{c}ount):
+\begin{verbatim}
+wc [options] <file>
+\end{verbatim}
+    \begin{itemize}
+      \item \verb|-c|: print number of bytes;
+      \item \verb|-w|: print number of words;
+      \item \verb|-l|: print number of lines;
+      \item \verb|-m|: print number of characters;
+      \item \verb|-L|: print max line length;
+    \end{itemize}
+\end{itemize}
+
+\end{document}
+
