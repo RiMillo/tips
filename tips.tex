@@ -29,6 +29,31 @@ Tips \& stuff
 %
 \vspace*{\baselineskip}
 
+\section{Shell}
+\label{sec:shell}
+\begin{itemize}
+  \item Operator \texttt{*} expands to all the files whose name does not start with "\texttt{.}". Hence, hidden files (as well as current directory "\texttt{.}", and parent directory "\texttt{..}" are not included).
+  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign.
+  \item Pipes: \verb!|! connects standard output of one command to standard input of another.
+  \item File descriptors:
+    \begin{enumerate}[start=0]
+      \item Standard input
+      \item Standard output
+      \item Standard error
+    \end{enumerate}
+  \item Redirection: use \verb|>| to redirect, \verb|>&| to duplicate and redirect
+    \begin{itemize}
+      \item Redirect stdout to stderr: \verb|<cmd> >&2|
+      \item Redirect stdout and stderr to file: first we redirect stdout to a file then we tell to copy stderr to stdout
+\begin{verbatim}
+  <cmd> > file.log 2>&1
+\end{verbatim}
+      \item Discard output: \texttt{<cmd> > /dev/null}.
+      \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \texttt{>>}.
+    \end{itemize}
+  \item Extract from path: \texttt{dirname} (root) and \texttt{basename}
+\end{itemize}
+
 \section{\texttt{valgrind}}
 Some useful options:
 \begin{itemize}
@@ -156,31 +181,12 @@ $ git config [--global] alias.pr 'pull ---rebase'
 \begin{verbatim}
   $ git config --global http.proxy <server>:<port>
 \end{verbatim}
-
-\end{itemize}
-
-\section{Shell}
-\label{sec:shell}
-\begin{itemize}
-  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign.
-  \item Pipes: \verb!|! connects standard output of one command to standard input of another.
-  \item File descriptors:
-    \begin{enumerate}[start=0]
-      \item Standard input
-      \item Standard output
-      \item Standard error
-    \end{enumerate}
-  \item Redirection: use \verb|>| to redirect, \verb|>&| to duplicate and redirect
+  \item Ignore files from the syncing:
     \begin{itemize}
-      \item Redirect stdout to stderr: \verb|<cmd> >&2|
-      \item Redirect stdout and stderr to file: first we redirect stdout to a file then we tell to copy stderr to stdout
-\begin{verbatim}
-  <cmd> > file.log 2>&1
-\end{verbatim}
-      \item Discard output: \texttt{<cmd> > /dev/null}.
-      \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \texttt{>>}.
+      \item Add them to \texttt{.gitignore}. Since \texttt{.gitignore} itself is synchronized, the exclusion is global and will stay in the tree, meaning that any new clone of the repository will see it;
+      \item Add them to \texttt{.git/info/exclude}. This is local and impacts only the local directory and clone of the repository.
     \end{itemize}
-  \item Extract from path: \texttt{dirname} (root) and \texttt{basename}
+
 \end{itemize}
 
 \section{\texttt{sed}}
@@ -297,6 +303,7 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
       \item \verb|r|, \verb|-r|, \verb|--append|: add files to an existing archive.
       \item \verb|u|, \verb|-u|, \verb|--update|: add to the archive only the files which are already present and which have been modified.
       \item \verb|A|, \verb|-A|, \verb|--catenate|, \verb|--concatenate|: concatenate archives.
+      \item Symbolic links: by default, \texttt{tar} keeps the links. If in the archive one wants a \emph{copy} of the \emph{original} file to which the link points to, option \verb!-h|--deeference! should be used.
     \end{itemize}
 \end{itemize}
 
@@ -410,6 +417,10 @@ wc [options] <file>
       \item \verb|-m|: print number of characters;
       \item \verb|-L|: print max line length;
     \end{itemize}
+  \item \texttt{pdfjam}: extract and/or merge pdf by command line
+\begin{verbatim}
+pdfjam [options] -- file_1.pdf [<page_range>] [file_2.pdf [<page_range>] ...] 
+\end{verbatim}
 \end{itemize}
 
 \end{document}
