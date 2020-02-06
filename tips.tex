@@ -258,6 +258,7 @@ Some useful options:
   \item \texttt{-C <n>}: print \texttt{<n>} lines of the \emph{C}ontext of the match;
   \item \texttt{-l}, \verb|--files-with-matches|: \emph{l}ist only the file names in which at least one match is found;
   \item \texttt{-L}, \verb|--files-without-matches|: \emph{L}ist only the file names in which no match is found;
+  \item \texttt{-q}: \emph{q}uiet, return just the exit status code (0 or 1 corresponding to, respectively, true or false) according to whether it have found a match or not;
   \item start from the end: \verb!tac <files> | grep [options] pattern! (Add a pipe to \texttt{tac} to recover the original order).
 \end{itemize}
 
@@ -331,7 +332,7 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
       \item The commands in the curly brackets after \texttt{END} are executed once the file has been read,
       \item Each of these three sections is optional;
     \end{itemize}
-  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g. print the third row: \verb|awk 'NR==3{print;exit}' file.txt|, print lines containing "apple": \verb|awk '/apple/' file.txt| (print is implied)
+  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g. print the third row: \verb|awk 'NR==3{print;exit}' file.txt|, print lines containing "apple": \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
   \item Useful options:
     \begin{itemize}
       \item The file name is given as argument of the command or with \verb|-f <file>|, or \verb|--file=<file>|.
@@ -431,6 +432,7 @@ wc [options] <file>
       \item \verb|-m|: print number of characters;
       \item \verb|-L|: print max line length;
     \end{itemize}
+  \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. An quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one.
   \item \texttt{pdfjam}: extract and/or merge pdf by command line
 \begin{verbatim}
 pdfjam [options] -- file_1.pdf [<page_range>] [file_2.pdf [<page_range>] ...] 
