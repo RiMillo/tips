@@ -407,7 +407,18 @@ pandoc --from=markdown --to=html -o out.html in.md
 
 \section{\texttt{gnuplot}}
 \begin{itemize}
-  \item Keep the plot after closing the platform / having run the script: \verb|gnuplot --persist|
+  \item Keep the plot-windows open after closing the platform / having run the script: \verb|gnuplot --persist|
+  \item Basic plotting from file: e.g. use column 1 as x and 3 as y (mind \texttt{u} is equivalent to \texttt{using})
+\begin{verbatim}
+  plot "file.dat" using 1:2 [options], "file2.dat" u 1:3
+\end{verbatim}
+\end{itemize}
+Useful options:
+\begin{itemize}
+  \item \verb!linecolor|lc!: e.g. \verb|lc "black"|. For more advance setting: \verb|linetype rgb "<parameters>"|
+  \item \verb!with|w!: lines and marks \verb|linespoints|, lines/marks only \verb!lines|points!
+  \item \verb|title "<legend_entry>"|
+  \item \verb!linewidth|w!
 \end{itemize}
 
 \section{Miscellaneous}
