@@ -29,6 +29,15 @@ Tips \& stuff
 %
 \vspace*{\baselineskip}
 
+Some tips about terminal commands (\texttt{sed}, \texttt{grep}\ldots) and languages (\texttt{C}, \texttt{python}\ldots) are given here. For terminal commands, mind that you can access the related \emph{man}ual/help page by running
+\begin{verbatim}
+man <cmd>
+\end{verbatim}
+or sometimes
+\begin{verbatim}
+<cmd> --help
+\end{verbatim}
+
 \section{Shell}
 \label{sec:shell}
 \begin{itemize}
@@ -50,6 +59,11 @@ Tips \& stuff
 \end{verbatim}
       \item Discard output: \texttt{<cmd> > /dev/null}.
       \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \texttt{>>}.
+    \end{itemize}
+  \item Use braces (curly brackets) \verb|{ }| to save typing. Examples
+    \begin{itemize}
+      \item \verb|cp file_{orig,bkp}| expands to \verb|cp file_orig file_bkp|
+      \item \verb|evince work{1,2,3}.pdf| expands to \verb|evince work1.pdf work2.pdf work3.pdf|
     \end{itemize}
   \item Extract from path: \texttt{dirname} (root) and \texttt{basename}
 \end{itemize}
@@ -421,6 +435,12 @@ wc [options] <file>
 \begin{verbatim}
 pdfjam [options] -- file_1.pdf [<page_range>] [file_2.pdf [<page_range>] ...] 
 \end{verbatim}
+  \item Job management:
+    \begin{itemize}
+      \item \verb|pgrep [options] <pattern>|: print info, especially the job-IDs, of all the jobs matching \verb|<pattern>|. Option \verb|-l| lists the names as well (and not only the IDs).
+      \item \verb|kill [options] <job_ID>|: kill (send \texttt{SIGTERM} to) the job denoted by \verb|<job_ID>|.
+      \item \verb|pkill [options] <pattern>|: as \verb|kill| but looks for matches in job names before (as \verb|pgrep|).
+    \end{itemize}
 \end{itemize}
 
 \end{document}
