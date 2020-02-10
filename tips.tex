@@ -355,8 +355,8 @@ To deflate, run \verb|unzip <compressed_file>.zip|
       \item \verb|NR|: row number, mind that it is incremented if several files are read (1 based).
       \item \verb|FNR|: row number relative to current file. It resets to 1 every time a new file is read. 
       \item \verb|FS|: field separator
-      \item \verb|FILENAME|
-      \item \verb|ENVIRON|: array with environment variables (e.g. try \verb|ENVIRON["USER"|).
+      \item \verb|FILENAME|: should I explain?
+      \item \verb|ENVIRON|: array with environment variables (e.g. try \verb|ENVIRON["USER"]|).
     \end{itemize}
 \end{itemize}
 
@@ -453,9 +453,9 @@ wc [options] <file>
       \item \verb|-L|: print max line length;
     \end{itemize}
   \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. An quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one.
-  \item \texttt{pdfjam}: extract and/or merge pdf by command line
+  \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: extract and/or merge pdf by command line
 \begin{verbatim}
-pdfjam [options] -- file_1.pdf [<page_range>] [file_2.pdf [<page_range>] ...] 
+pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...] 
 \end{verbatim}
   \item Job management:
     \begin{itemize}
