@@ -452,10 +452,15 @@ wc [options] <file>
       \item \verb|-m|: print number of characters;
       \item \verb|-L|: print max line length;
     \end{itemize}
-  \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. An quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one.
+  \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one.
+  \item \verb|touch <file>|: modify the file access and/or modification date. If the file doesn't exist, an empty one will be created (unless specif options are given). For more details and all the options, have a look at its \texttt{man} page.
+  \item Why should one use it?
+    \begin{itemize}
+      \item Changing the modification date of a file will force a smart compiler such as \verb|make| to re-run the compilation.
+    \end{itemize}
   \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: extract and/or merge pdf by command line
 \begin{verbatim}
-pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...] 
+pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...]
 \end{verbatim}
   \item Job management:
     \begin{itemize}
