@@ -475,6 +475,14 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
       \item \verb|kill [options] <job_ID>|: kill (send \texttt{SIGTERM} to) the job denoted by \verb|<job_ID>|.
       \item \verb|pkill [options] <pattern>|: as \verb|kill| but looks for matches in job names before (as \verb|pgrep|).
     \end{itemize}
+  \item \texttt{du}: shows the space used by the directories (and files) (mnemonic: \emph{d}isc \emph{u}sage)
+    \begin{itemize}
+      \item \verb!-a|--all!: show the space of every files, not only the directories
+      \item \verb!-h|--human-readable!: use convenient units (MB,GB,\ldots)
+      \item \verb!-d|--max-depth=<n>!: how many levels down the directory-tree \texttt{du} should search
+      \item \verb|--exlude=<pattern>|: well, I think you get it
+    \end{itemize}
+  \item \texttt{time}: run programs and summarize system resource usage (from \texttt{man}). \verb|time my_script.sh|; get the execution time of the script. More insight \here{https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1/556411#556411}{here}.
 \end{itemize}
 
 \end{document}
