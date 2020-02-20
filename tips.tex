@@ -365,6 +365,14 @@ To deflate, run \verb|unzip <compressed_file>.zip|
       \item \verb|FILENAME|: should I explain?
       \item \verb|ENVIRON|: array with environment variables (e.g. try \verb|ENVIRON["USER"]|).
     \end{itemize}
+  \item Tricks:
+    \begin{itemize}
+      \item \href{https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html}{String-Manipulation functions}
+      \item Operator "match", \verb|~| (tilde): \verb|<string>~<pattern>| true if \verb|string| matches \verb|pattern|. The negation is \verb|!~|. Hence, the following emulates \texttt{grep }(well, not exactly since we search in the second column only, but you get the idea)
+\begin{verbatim}
+awk '/$2~<pattern>/{print $0}' file.txt
+\end{verbatim}
+    \end{itemize}
 \end{itemize}
 
 \section{\texttt{C}}
@@ -482,7 +490,9 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
       \item \verb!-d|--max-depth=<n>!: how many levels down the directory-tree \texttt{du} should search
       \item \verb|--exlude=<pattern>|: well, I think you get it
     \end{itemize}
+  \item \texttt{df}: check disk space info about the system (mnemonic: \emph{d}isk \emph{f}ree / \emph{f}ilesystem)
   \item \texttt{time}: run programs and summarize system resource usage (from \texttt{man}). \verb|time my_script.sh|; get the execution time of the script. More insight \href{https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1/556411#556411}{here}.
+  \item \texttt{uname}: print system info
 \end{itemize}
 
 \end{document}
