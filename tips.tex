@@ -402,6 +402,12 @@ memset(dest, 0, dest_len*sizeof(<dest_type>))
 memcpy(receive, send, <n_element_to_copy>*sizeof(<send_type>))
 \end{verbatim}
     \end{itemize}
+  \item Booleans:
+    \begin{itemize}
+      \item Originally, \verb|0| means false and \verb|1| (well, actually, any integer different than zero) means true.
+      \item Since \verb|C99|, the type \verb|_Bool| is introduced.
+      \item The standard library \verb|stdbool.h| introduces \verb|bool| (which expands to \verb|_Bool|), \verb|false| (expands to \verb|0|) and \verb|true| (expands to \verb|1|).
+    \end{itemize}
   \item Loops:
     \begin{itemize}
       \item \texttt{break} exits the innermost loop only (\texttt{for} or \texttt{while}). If one wants to exit all of them, a flag (a \verb|_Bool|/\verb|bool|) should be used.
