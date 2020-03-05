@@ -40,6 +40,7 @@ or sometimes
 
 \section{Shell}
 \label{sec:shell}
+There are different version of shell scripting, such as \texttt{bash}, \texttt{sh}, \texttt{zsh}; they have some differences in commands and syntax (but I do not know them \verb|\o/|).
 \begin{itemize}
   \item Operator \texttt{*} expands to all the files whose name does not start with "\texttt{.}". Hence, hidden files (as well as current directory "\texttt{.}", and parent directory "\texttt{..}" are not included).
   \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign.
@@ -58,15 +59,15 @@ or sometimes
   <cmd> > file.log 2>&1
 \end{verbatim}
       \item Discard output: \texttt{<cmd> > /dev/null}.
-      \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \texttt{>>}.
+      \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \verb|>>|.
     \end{itemize}
   \item Use braces (curly brackets) \verb|{ }| to save typing. Examples
     \begin{itemize}
       \item \verb|cp file_{orig,bkp}| expands to \verb|cp file_orig file_bkp|
       \item \verb|evince work{1,2,3}.pdf| expands to \verb|evince work1.pdf work2.pdf work3.pdf|
     \end{itemize}
-  \item Extract from path: \texttt{dirname} (root) and \texttt{basename}.
   \item Extract substring: \verb|${string:position:length}|. For more details have a look \href{https://stackoverflow.com/questions/1405611/how-to-extract-the-first-two-characters-of-a-string-in-shell-scripting}{here}.
+  \item In a script, adding at the beginning \verb|set -e| will make the script exit immediately as soon as one of its commands finishes with a non-zero status (when it fails).
 \end{itemize}
 
 \section{\texttt{valgrind}}
@@ -511,6 +512,7 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
       \item \verb|cat [<opt>] file [file2 [...]]|
       \item \verb|tac [<opt>] file [file2 [...]]| as above but reverse order of the lines
     \end{itemize}
+  \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}.
   \item Create QR-codes: \href{https://www.qrcode-monkey.com/}{here} is a pretty simple, 100\% free and highly customazible QR-code generator.
 \end{itemize}
 
