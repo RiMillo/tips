@@ -214,7 +214,7 @@ $ git config [--global] alias.pr 'pull ---rebase'
       \item \verb|^pattern|: matches any string that starts with \texttt{pattern}. \verb|pattern$|: matches any string that ends with \texttt{pattern}
     \end{itemize}
   \item General usage: \verb|sed [options] "command" old_file new_file|. The quotes \texttt{"..."} may be replaced by \texttt{'...'}
-  \item The option \verb|-i|, \verb|--in-place| allows to overwrite the file once it is modified;
+  \item The option \verb|-i[<suffix>]|, \verb|--in-place=[<suffix>]| allows to overwrite the file once it is modified. If \verb|suffix| is provided a backup is created with the chosen extension;
     \begin{itemize}
       \item \verb|-i.bak| creates a backup file,
       \item The option \verb|--follow-symlinks|, available only with \verb|-i| activated, enables to modify the original file;
@@ -234,10 +234,16 @@ $ echo "bar embarassment" | sed "s/\bbar\b/no bar/g"
 no bar embarassment
 \end{verbatim}
   \end{itemize}
+\item Parentheses used in regex syntax (for groups \verb|(.)|, repetitions \verb|{.}|) should be escaped by a backslash: e.g. \verb|\(agroup\)|. Or, add option \verb|-E|.
   \item Full lines searches:
     \begin{itemize}
     \item Replace all the lines matching \texttt{pattern} with \verb|new_line|: \verb|sed -i "/pattern/c\new_line/" file|,
     \item Delete all lines containing \texttt{pattern}: \verb|sed -i "/pattern/d" file|;
+    \end{itemize}
+  \item Multiple commands:
+    \begin{itemize}
+      \item Separate them with semicolons: \verb|sed 'cmd1 ; cmd2' file|
+      \item Separate them with \verb|-e|: \verb|sed -e 'cmd1' -e 'cmd2' file|
     \end{itemize}
 \end{itemize}
 
