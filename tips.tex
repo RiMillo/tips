@@ -364,6 +364,7 @@ To deflate, run \verb|unzip <compressed_file>.zip|
       \item \verb|-F <char>|, \verb|--field-separator="<char>"|: \verb|char| is the column separator;
       \item Select the \texttt{n}-th column: \verb|$<n>|. Remark: it is 1-based (first column is indexed by 1), and \verb|$0| expands to the whole line.
       \item Pass an argument: \verb|-v var_name=<value>|
+      \item When using \texttt{gawk} (the GNU implementation of \texttt{awk}) one can asks for in-place replacement: \verb|-i inplace|.
     \end{itemize}
   \item Built-in variable:
     \begin{itemize}
@@ -379,7 +380,7 @@ To deflate, run \verb|unzip <compressed_file>.zip|
       \item \href{https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html}{String-Manipulation functions}
       \item Operator "match", \verb|~| (tilde): \verb|<string>~<pattern>| true if \verb|string| matches \verb|pattern|. The negation is \verb|!~|. Hence, the following emulates \texttt{grep }(well, not exactly since we search in the second column only, but you get the idea)
 \begin{verbatim}
-awk '/$2~<pattern>/{print $0}' file.txt
+awk '$2~/<pattern>/{print $0}' file.txt
 \end{verbatim}
     \end{itemize}
 \end{itemize}
