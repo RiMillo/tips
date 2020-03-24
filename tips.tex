@@ -235,7 +235,11 @@ $ echo "bar embarassment" | sed "s/\bbar\b/no bar/g"
 no bar embarassment
 \end{verbatim}
   \end{itemize}
-\item Parentheses used in regex syntax (for groups \verb|(.)|, repetitions \verb|{.}|) should be escaped by a backslash: e.g. \verb|\(agroup\)|. Or, add option \verb|-E|.
+  \item Parentheses used in regex syntax (for groups \verb|(.)|, repetitions \verb|{.}|) should be escaped by a backslash: e.g. \verb|\(agroup\)|. Or, add option \verb|-E|.
+  \item Use \texttt{bash} variables: prefer the double-quotes \verb|"| instead of the single ones \verb|'|: 
+\begin{verbatim}
+sed "s/${pattern}/${replaced}/" file
+\end{verbatim}
   \item Full lines searches:
     \begin{itemize}
     \item Replace all the lines matching \texttt{pattern} with \verb|new_line|: \verb|sed -i "/pattern/c\new_line/" file|,
@@ -549,6 +553,12 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
 \end{verbatim}
     \begin{itemize}
       \item Print to screen \& pipe: \verb!./script | tee /dev/tty | ./script_with_pipe!
+    \end{itemize}
+  \item \texttt{tr}: \emph{tr}anslate, squeeze and/or delete characters from standard input. Basically performs string operations on standard input. Some options and examples
+    \begin{itemize}
+      \item \verb!echo Maaan | tr a e!: change \texttt{a}'s into \texttt{e}'s, hence the result is \texttt{Meeen}.
+      \item \verb|-d|: \emph{d}elete. \verb!echo Maaan | tr -d a! gives \texttt{Mn}
+      \item \verb|-s|: \emph{s}queeze. \verb!echo Maaan | tr -s a e! replaces each sequence of repeated \texttt{a}'s with a single occurrence of \texttt{e}, hence it gives \texttt{Men}.
     \end{itemize}
   \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}.
   \item Create QR-codes: \href{https://www.qrcode-monkey.com/}{here} is a pretty simple, 100\% free and highly customazible QR-code generator.
