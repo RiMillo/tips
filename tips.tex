@@ -60,6 +60,7 @@ There are different version of shell scripting, such as \texttt{bash}, \texttt{s
 \end{verbatim}
       \item Discard output: \texttt{<cmd> > /dev/null}.
       \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \verb|>>|.
+      \item You lay want to check out \texttt{tee} in \ref{sec:misc}.
     \end{itemize}
   \item Use braces (curly brackets) \verb|{ }| to save typing. Examples
     \begin{itemize}
@@ -296,6 +297,7 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
   find . -not -name notmyfile -not -path .
 \end{verbatim}
   \item Delete all the matching files: e.g. delete all the \texttt{.log} files \texttt{find . -name *.log -delete}
+  \item \verb|-maxdepth <n>|: limit the tree descent level of the search
   \item Apply a command to all the matching files: e.g. run a bash script, grep only certain files
 \begin{verbatim}
   find . -name *.log -exec script.sh {} \;
@@ -467,6 +469,7 @@ Useful options:
 \end{itemize}
 
 \section{Miscellaneous}
+\label{sec:misc}
 \begin{itemize}
   \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
 \begin{verbatim}
@@ -518,6 +521,20 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
     \begin{itemize}
       \item \verb|cat [<opt>] file [file2 [...]]|
       \item \verb|tac [<opt>] file [file2 [...]]| as above but reverse order of the lines
+    \end{itemize}
+  \item \verb|cp [source] [dest]|: copy \texttt{source} into \texttt{dest}
+    \begin{itemize}
+      \item \verb|-t|: target. \verb|cp -t dest -- [source]| is equivalent to \verb|cp [source] [dest]|
+      \item \verb|-r|: recursive, useful for directories
+      \item \verb|-u|: copy only if there is no file with the same name in \texttt{dest} or if \texttt{source} is newer
+      \item \verb|-p|: preserve mode, ownership, and time-stamps
+    \end{itemize}
+  \item \texttt{tee}: read from standard input and write to standard output \textbf{\&} files. Useful when you want to save the output of a command to file but you still want to read it on screen. E.g.
+\begin{verbatim}
+  echo "This'll be printed to screen and inside file.txt" | tee file.txt
+\end{verbatim}
+    \begin{itemize}
+      \item Print to screen \& pipe: \verb!./script | tee /dev/tty | ./script_with_pipe!
     \end{itemize}
   \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}.
   \item Create QR-codes: \href{https://www.qrcode-monkey.com/}{here} is a pretty simple, 100\% free and highly customazible QR-code generator.
