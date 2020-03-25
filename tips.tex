@@ -242,8 +242,14 @@ sed "s/${pattern}/${replaced}/" file
 \end{verbatim}
   \item Full lines searches:
     \begin{itemize}
-    \item Replace all the lines matching \texttt{pattern} with \verb|new_line|: \verb|sed -i "/pattern/c\new_line/" file|,
-    \item Delete all lines containing \texttt{pattern}: \verb|sed -i "/pattern/d" file|;
+    \item Replace all the lines matching \texttt{pattern} with \verb|new_line|: 
+\begin{verbatim}
+sed -i "/pattern/c\new_line/" file,
+\end{verbatim}
+    \item Delete all lines containing \texttt{pattern}:
+\begin{verbatim}
+sed -i "/pattern/d" file;
+\end{verbatim}
     \end{itemize}
   \item Multiple commands:
     \begin{itemize}
@@ -363,7 +369,11 @@ To deflate, run \verb|unzip <compressed_file>.zip|
       \item The commands in the curly brackets after \texttt{END} are executed once the file has been read,
       \item Each of these three sections is optional;
     \end{itemize}
-  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g. print the third row: \verb|awk 'NR==3{print;exit}' file.txt|, print lines containing "apple": \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
+  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g. 
+    \begin{itemize}
+      \item print the third row: \verb|awk 'NR==3{print;exit}' file.txt|
+      \item print lines containing \texttt{apple}: \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
+    \end{itemize}
   \item Useful options:
     \begin{itemize}
       \item The file name is given as argument of the command or with \verb|-f <file>|, or \verb|--file=<file>|.
@@ -491,8 +501,10 @@ Useful options:
 \begin{itemize}
   \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
 \begin{verbatim}
-  echo "Message Body Here" | mailx -s "Subject Here" -a attachment.txt user@example.com
-  echo "Message Body Here" | mail -s "Subject Here" -A attachment.txt user@example.com
+  echo "Message Body Here" | \
+      mailx -s "Subject Here" -a attachment.txt user@example.com
+  echo "Message Body Here" | \
+      mail -s "Subject Here" -A attachment.txt user@example.com
 \end{verbatim}
   \item \texttt{PETSc} \href{https://www.mcs.anl.gov/petsc/petsc-current/docs/manual.pdf}{manual}
     \begin{itemize}
