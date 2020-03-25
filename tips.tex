@@ -374,6 +374,23 @@ To deflate, run \verb|unzip <compressed_file>.zip|
       \item print the third row: \verb|awk 'NR==3{print;exit}' file.txt|
       \item print lines containing \texttt{apple}: \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
     \end{itemize}
+  \item Printing: it is usually achieved by command \texttt{print}. Some notes
+    \begin{itemize}
+      \item Columns are accessed with a dollar \verb|$|, for variables just use their name
+\begin{verbatim}
+awk '{print $NF}' file # Print last column only
+awk -v T=8 'END{print "T = " T}' file # Print T = 8
+\end{verbatim}
+      \item One can use redirection such as \verb|>|, \verb|>>| as explained in \autoref{sec:shell} to write to file. E.g.
+\begin{verbatim}
+awk 'BEGIN{print Ciao > "ciao.txt"}' file
+\end{verbatim}
+      \item \texttt{print} it also prints a new line stamp at the end
+      \item \texttt{printf}, very similar to the \texttt{C} function, it can be used to choose the format. Differently from \texttt{print}, it does not insert a new line. E.g. (mind the \verb|\n|)
+\begin{verbatim}
+awk '{printf "I want %5.2f bananas\n" 1.652}' file
+\end{verbatim}
+    \end{itemize}
   \item Useful options:
     \begin{itemize}
       \item The file name is given as argument of the command or with \verb|-f <file>|, or \verb|--file=<file>|.
