@@ -60,7 +60,7 @@ There are different version of shell scripting, such as \texttt{bash}, \texttt{s
 \end{verbatim}
       \item Discard output: \texttt{<cmd> > /dev/null}.
       \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \verb|>>|.
-      \item You lay want to check out \texttt{tee} in \ref{sec:misc}.
+      \item You may want to check out \texttt{tee} in \ref{sec:misc}.
     \end{itemize}
   \item Use braces (curly brackets) \verb|{ }| to save typing. Examples
     \begin{itemize}
@@ -516,6 +516,17 @@ Useful options:
 \section{Miscellaneous}
 \label{sec:misc}
 \begin{itemize}
+  \item \texttt{echo}: print a line to standard output. E.g. \verb|echo "Ciao World"|. It includes a newline at the end. It could be used via piping to provide an input parameter to a command.
+    \begin{itemize}
+      \item Variables can be used. Suppose you have \verb|what="cute puppy"|, then one can use
+\begin{verbatim}
+echo "I want a ${what}"
+\end{verbatim}
+      \item For redirection to files have a look at \autoref{sec:shell}.
+      \item \verb|-n|: do not to insert a new line at the end.
+      \item \verb|-e|: interpret a backslashed character, e.g. \verb|\n| will be considered as newline
+      \item Overwrite: use \verb|\b| (needs option \verb|-e|) to go back a character. For entire lines, have a look \href{https://stackoverflow.com/questions/11283625/overwrite-last-line-on-terminal}{here}.
+    \end{itemize}
   \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
 \begin{verbatim}
   echo "Message Body Here" | \
