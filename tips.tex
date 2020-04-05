@@ -205,6 +205,11 @@ $ git config [--global] alias.pr 'pull ---rebase'
       \item Add them to \texttt{.git/info/exclude}. This is local and impacts only the local directory and clone of the repository.
     \end{itemize}
   \item Push a new project to \href{https://github.com/}{GitHub} for the first time: follow \href{https://help.github.com/en/github/importing-your-projects-to-github/adding-an-existing-project-to-github-using-the-command-line}{this}.
+  \item \verb|git grep| (\href{https://git-scm.com/docs/git-grep}{Manual}): as \verb|grep| (\autoref{sec:grep}) but on tracked files: \verb|git grep 'time_t' -- '*.[ch]'|. Some bonus options:
+    \begin{itemize}
+      \item Notice that \verb|--| marks the end of the options.
+      \item \verb|--and|, \verb|--or|, \verb|--not|. Option \verb|-e| should be used.
+    \end{itemize}
 
 \end{itemize}
 
@@ -260,6 +265,7 @@ sed -i "/pattern/d" file;
 \end{itemize}
 
 \section{\texttt{grep}}
+\label{sec:grep}
 \verb|grep [options] <pattern> [files]|
 Some useful options:
 \begin{itemize}
