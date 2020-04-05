@@ -52,14 +52,18 @@ There are different version of shell scripting, such as \texttt{bash}, \texttt{s
       \item Standard output
       \item Standard error
     \end{enumerate}
-  \item Redirection: use \verb|>| to redirect, \verb|>&| to duplicate and redirect
+  \item \href{https://www.gnu.org/software/bash/manual/bash.html#Redirections}{Redirection}: use \verb|>| to redirect, \verb|>&| to duplicate and redirect
     \begin{itemize}
-      \item Redirect stdout to stderr: \verb|<cmd> >&2|
-      \item Redirect stdout and stderr to file: first we redirect stdout to a file then we tell to copy stderr to stdout
+      \item Redirect \texttt{stdout} to \texttt{stderr}: \verb|<cmd> 1>&2|
+      \item Redirect \texttt{stdout} and \texttt{stderr} to file: first we redirect \texttt{stdout} to a file then we tell to copy \texttt{stderr} to \texttt{stdout}
 \begin{verbatim}
   <cmd> > file.log 2>&1
 \end{verbatim}
       \item Discard output: \texttt{<cmd> > /dev/null}.
+      \item Pipe \texttt{stderr}. Aim: discard \texttt{stdout} and pipe \texttt{stderr}. \href{https://stackoverflow.com/questions/2342826/how-can-i-pipe-stderr-and-not-stdout}{Actions}: redirect \texttt{stderr} to \texttt{stdout}, discard \texttt{stdout}, pipe.
+\begin{verbatim}
+cmd 2>&1 >/dev/null | pipe_receiver
+\end{verbatim}
       \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \verb|>>|.
       \item You may want to check out \texttt{tee} in \ref{sec:misc}.
     \end{itemize}
