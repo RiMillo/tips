@@ -271,6 +271,7 @@ sed -i "/pattern/d" file;
 \section{\texttt{grep}}
 \label{sec:grep}
 \verb|grep [options] <pattern> [files]|
+
 Some useful options:
 \begin{itemize}
   \item \texttt{-r}: recursive, then \texttt{files} can be a directory;
@@ -290,11 +291,26 @@ Some useful options:
   \item \texttt{-l}, \verb|--files-with-matches|: \emph{l}ist only the file names in which at least one match is found;
   \item \texttt{-L}, \verb|--files-without-matches|: \emph{L}ist only the file names in which no match is found;
   \item \texttt{-q}: \emph{q}uiet, return just the exit status code (0 or 1 corresponding to, respectively, true or false) according to whether it have found a match or not;
+  \item \verb|--include=<pattern>|: consider only files matching \texttt{pattern}. For example for only \TeX{} sources
+\begin{verbatim}
+grep --include=\*.tex -r "O Bella Ciao" .
+\end{verbatim}
+  \item \verb|--exclude=<pattern>|: do not consider files matching \texttt{pattern};
+  \item \verb|--exclude-dir=<dir>|: exclude files in directory \texttt{dir};
 \end{itemize}
+
 Tricks:
 \begin{itemize}
   \item Start from the end: \verb!tac <files> | grep [options] <pattern>! (Add a pipe to \texttt{tac} to recover the original order).
   \item Print even if the match is not found \verb!grep -E '^|<pattern>' <file>!. Special character \verb|^| means "beginning of the line", hence it is always found. Why should one use it? with the option \verb|--color| (usually enabled by default) \verb|grep| highlights the matches. Here, the command find the beginning of the line, which cannot be highlighted, hence it prints the line, if it finds the pattern as well it will highlight it.
+\end{itemize}
+
+Types:
+\begin{itemize}
+  \item \texttt{-G}, \verb|--basic-regexp|, simple regexp, default
+  \item \texttt{-E}, \verb|--extended-regexp|
+  \item \texttt{-P}, \verb|--perl-regexp|
+  \item \texttt{-F}, \verb|--fixed-strings|, exclude regexp
 \end{itemize}
 
 \section{\texttt{find}}
