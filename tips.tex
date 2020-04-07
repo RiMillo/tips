@@ -15,6 +15,8 @@
 
 \usepackage[top=2cm, bottom=2cm, left=1cm, right=1cm]{geometry}
 
+\usepackage{listings}
+
 \usepackage{hyperref}
 
 \usepackage{enumitem}
@@ -74,6 +76,7 @@ cmd 2>&1 >/dev/null | pipe_receiver
     \end{itemize}
   \item Extract substring: \verb|${string:position:length}|. For more details have a look \href{https://stackoverflow.com/questions/1405611/how-to-extract-the-first-two-characters-of-a-string-in-shell-scripting}{here}.
   \item In a script, adding at the beginning \verb|set -e| will make the script exit immediately as soon as one of its commands finishes with a non-zero status (when it fails).
+  \item For option management \verb|getopts| is recommended, see \autoref{sec:misc}, 
 \end{itemize}
 
 \section{\texttt{valgrind}}
@@ -266,6 +269,7 @@ sed -i "/pattern/d" file;
       \item Separate them with semicolons: \verb|sed 'cmd1 ; cmd2' file|
       \item Separate them with \verb|-e|: \verb|sed -e 'cmd1' -e 'cmd2' file|
     \end{itemize}
+  \item \verb|$| means last line.
 \end{itemize}
 
 \section{\texttt{grep}}
@@ -627,9 +631,54 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
       \item \verb|-d|: \emph{d}elete. \verb!echo Maaan | tr -d a! gives \texttt{Mn}
       \item \verb|-s|: \emph{s}queeze. \verb!echo Maaan | tr -s a e! replaces each sequence of repeated \texttt{a}'s with a single occurrence of \texttt{e}, hence it gives \texttt{Men}.
     \end{itemize}
+  \item \texttt{getopts}: built-in command of \texttt{bash} which allows to parse options and arguments passed to a script. Two quick and well-done tutorials can be found \href{https://www.computerhope.com/unix/bash/getopts.htm}{here} and \href{https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/}{here}. We provide a hand-made example: \autoref{lst:getopt_ex}.
+    \begin{itemize}
+      \item Typically, one calls \verb|while getopts ":<option_list>" opt; do [...] done|. One may want to use a \verb|case| environment to deal with the options.
+      \item Here above, \verb|option_list| contains the list of accepted options. If the option is followed by a \verb|:| (colon) it means that it requires arguments. The argument is stored in the macro \verb|$OPTARG|.
+      \item \verb|\?| stands for an invalid/unknown option, \verb|:| (colon) for an option for which an argument is required but not provided.
+    \end{itemize}
   \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}.
   \item Create QR-codes: \href{https://www.qrcode-monkey.com/}{here} is a pretty simple, 100\% free and highly customazible QR-code generator.
 \end{itemize}
+
+\begin{lstlisting}[language=bash,numbers=left,float,frame=single,caption={script.sh, an example for \texttt{getopts}},label={lst:getopt_ex},numberfirstline=true,stepnumber=5,firstnumber=1]
+#!/bin/bash
+
+usage () {
+  echo "Usage: script.sh [ -p prefix ] [ -s suffix ]"
+}
+
+prfx=""
+sffx=""
+
+while getopts ":hp:s:" opt; do
+  case "${opt}" in
+    h )
+      usage
+      exit 0
+      ;;
+    p )
+      prfx=${OPTARG}
+      ;;
+    s )
+      sffx=${OPTARG}
+      ;;
+    : )
+      echo "-${OPTARG}: An argument is required" 1>&2
+      usage
+      exit 1
+      ;;
+    \? )
+      echo "-${OPTARG}: Unknown option" 1>&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+echo "PFX = ${prfx}"
+echo "SFX = ${sffx}"
+\end{lstlisting}
 
 \end{document}
 
