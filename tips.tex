@@ -46,7 +46,7 @@ There are different version of shell scripting, such as \texttt{bash}, \texttt{s
 \begin{itemize}
   \item Of course I'm not the first to write tips, and certainly not the one which knows the most, so here a couples of tips lists, especially about shortcuts: \href{https://www.techrepublic.com/article/20-terminal-shortcuts-developers-need-to-know/}{here} and \href{https://www.howtogeek.com/howto/ubuntu/keyboard-shortcuts-for-bash-command-shell-for-ubuntu-debian-suse-redhat-linux-etc/}{here}.
   \item Operator \texttt{*} expands to all the files whose name does not start with "\texttt{.}". Hence, hidden files (as well as current directory "\texttt{.}", and parent directory "\texttt{..}" are not included).
-  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign.
+  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[[| (cf. \autoref{sec:misc}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{sec:awk}) or \texttt{python} (\autoref{sec:python}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
   \item Pipes: \verb!|! connects standard output of one command to standard input of another.
   \item File descriptors:
     \begin{enumerate}[start=0]
@@ -74,9 +74,16 @@ cmd 2>&1 >/dev/null | pipe_receiver
       \item \verb|cp file_{orig,bkp}| expands to \verb|cp file_orig file_bkp|
       \item \verb|evince work{1,2,3}.pdf| expands to \verb|evince work1.pdf work2.pdf work3.pdf|
     \end{itemize}
-  \item Extract substring: \verb|${string:position:length}|. For more details have a look \href{https://stackoverflow.com/questions/1405611/how-to-extract-the-first-two-characters-of-a-string-in-shell-scripting}{here}.
+  \item Manipulating strings:
+    \begin{itemize}
+      \item A quick \href{https://sookocheff.com/post/bash/bash-string-operators/}{guide}, or the official \href{https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html}{manual}.
+      \item Extract substring: \verb|${string:position:length}|. For more details have a look \href{https://stackoverflow.com/questions/1405611/how-to-extract-the-first-two-characters-of-a-string-in-shell-scripting}{here}.
+      \item Operator \verb|=~|: \verb|${string} =~ ${regex}| gives true if \verb|string| matches the provided regex syntax.
+    \end{itemize}
   \item In a script, adding at the beginning \verb|set -e| will make the script exit immediately as soon as one of its commands finishes with a non-zero status (when it fails).
-  \item For option management \verb|getopts| is recommended, see \autoref{sec:misc}, 
+  \item For option management \verb|getopts| is recommended, see \autoref{sec:misc}.
+  \item Arrays: have a look \href{https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays}{here}.
+  \item For loops: have a look \href{https://www.cyberciti.biz/faq/bash-for-loop/}{here}.
 \end{itemize}
 
 \section{\texttt{valgrind}}
@@ -187,7 +194,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
           git cherry-picking <branch_name>~4
         \end{verbatim}
     \end{itemize}
-  \item Show config: 
+  \item Show config:
     \begin{itemize}
       \item Have a look at the global or local config file: \verb|~/.gitconfig| or \verb|repository/root/.git/config|
       \item List everything: \verb|git config [--global] --list|
@@ -221,55 +228,83 @@ $ git config [--global] alias.pr 'pull ---rebase'
 \end{itemize}
 
 \section{\texttt{sed}}
+Bases:
 \begin{itemize}
-  \item Some info could be found in the \href{https://www.gnu.org/software/sed/manual/sed.html}{manual} or in \href{http://www.grymoire.com/Unix/Sed.html}{this tutorial};
+  \item Some info could be found in the \href{https://www.gnu.org/software/sed/manual/sed.html}{manual} or in \href{http://www.grymoire.com/Unix/Sed.html}{this tutorial}; \href{https://www.tutorialspoint.com/unix/unix-regular-expressions.htm}{this} could be useful as well.
   \item A general knowledge of the regex could be very useful. Take a look at this \href{https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285}{chetsheet}
     \begin{itemize}
       \item \verb|^pattern|: matches any string that starts with \texttt{pattern}. \verb|pattern$|: matches any string that ends with \texttt{pattern}
     \end{itemize}
-  \item General usage: \verb|sed [options] "command" old_file new_file|. The quotes \texttt{"..."} may be replaced by \texttt{'...'}
+  \item General usage: \verb|sed [options] "[range] <command>" old_file new_file|. Double quotes \texttt{"..."} may be replaced by single quotes \texttt{'...'}.
+    \begin{itemize}
+      \item If no \verb|new_file| is given, the result is printed to \texttt{stdout}.
+    \end{itemize}
+\end{itemize}
+
+Commands:
+\begin{itemize}
+  \item Common commands may be found \href{https://www.gnu.org/software/sed/manual/sed.html#Common-Commands}{here}, less common ones \href{https://www.gnu.org/software/sed/manual/sed.html#Other-Commands}{here}
+  \item Search and replace:
+\begin{verbatim}
+  sed -i "s/<pattern>/<replaced>/" file
+\end{verbatim}
+  \item Replace all the lines matching \verb|pattern| with \verb|new_line| - this works on the entire line:
+\begin{verbatim}
+sed -i "/pattern/c\new_line/" file,
+\end{verbatim}
+  \item Delete all lines containing \verb|pattern| - this works on the entire line:
+\begin{verbatim}
+sed -i "/pattern/d" file;
+\end{verbatim}
+  \item Apply multiple commands at the same time:
+    \begin{itemize}
+      \item Separate them with semicolons: \verb|sed 'cmd1 ; cmd2' file|
+      \item Separate them with \verb|-e|: \verb|sed -e 'cmd1' -e 'cmd2' file|
+    \end{itemize}
+\end{itemize}
+
+Ranges: ranges are optional and it is the way to tell \verb|sed| to apply the provided commands only to those lines specified by the range. Some examples
+\begin{itemize}
+  \item \verb|4,10|: lines 4 to 10
+  \item \verb|4,+6|: line 4 and the following 6 lines
+  \item \verb|4,10!|: everything except lines 4 to 10
+  \item \verb|4~3|: starting from line 4, every 3 lines
+  \item \verb|/pattern/|: all the lines matching \verb|pattern|
+\end{itemize}
+
+Options and tricks:
+\begin{itemize}
   \item The option \verb|-i[<suffix>]|, \verb|--in-place=[<suffix>]| allows to overwrite the file once it is modified. If \verb|suffix| is provided a backup is created with the chosen extension;
     \begin{itemize}
       \item \verb|-i.bak| creates a backup file,
       \item The option \verb|--follow-symlinks|, available only with \verb|-i| activated, enables to modify the original file;
     \end{itemize}
-  \item Search and replace:
-\begin{verbatim}
-  sed -i "s/<pattern>/<replaced>/" file
-\end{verbatim}
-  \begin{itemize}
-    \item If in one line there are more occurrences, only the first one is matched. Appending \texttt{g} will make \texttt{sed} match all the occurrences.
+  \item If in one line there are more occurrences, only the first one is matched. Appending \texttt{g} will make \texttt{sed} match all the occurrences.
 \begin{verbatim}
   sed -i "s/<pattern>/<replaced>/g" file
 \end{verbatim}
-    \item Match exactly the word: from regex, \verb|\b| delimits boundaries of the word. Hence, (although \verb|\<word\>| seems to work, as well (\texttt{vim}, anyone?)):
+  \item Character \verb|&| expands to matched string.
+  \item Match exactly the word: from regex, \verb|\b| delimits boundaries of the word. Hence, (although \verb|\<word\>| seems to work, as well (\texttt{vim}, anyone?)):
 \begin{verbatim}
 $ echo "bar embarassment" | sed "s/\bbar\b/no bar/g"
 no bar embarassment
 \end{verbatim}
-  \end{itemize}
-  \item Parentheses used in regex syntax (for groups \verb|(.)|, repetitions \verb|{.}|) should be escaped by a backslash: e.g. \verb|\(agroup\)|. Or, add option \verb|-E|.
-  \item Use \texttt{bash} variables: prefer the double-quotes \verb|"| instead of the single ones \verb|'|: 
+  \item Parentheses used in regex syntax (for groups \verb|(.)|, repetitions \verb|{.}|) should be escaped by a backslash: e.g. \verb|\(agroup\)|. Access groups content with \verb|\<n>| where \verb|n| is the number of the group. Or, add option \verb|-E|.
+  \item Use \texttt{bash} variables: prefer the double-quotes \verb|"| instead of the single ones \verb|'|:
 \begin{verbatim}
 sed "s/${pattern}/${replaced}/" file
 \end{verbatim}
-  \item Full lines searches:
-    \begin{itemize}
-    \item Replace all the lines matching \texttt{pattern} with \verb|new_line|: 
-\begin{verbatim}
-sed -i "/pattern/c\new_line/" file,
-\end{verbatim}
-    \item Delete all lines containing \texttt{pattern}:
-\begin{verbatim}
-sed -i "/pattern/d" file;
-\end{verbatim}
-    \end{itemize}
-  \item Multiple commands:
-    \begin{itemize}
-      \item Separate them with semicolons: \verb|sed 'cmd1 ; cmd2' file|
-      \item Separate them with \verb|-e|: \verb|sed -e 'cmd1' -e 'cmd2' file|
-    \end{itemize}
   \item \verb|$| means last line.
+  \item Mind that command \verb|d| erases the entire line, if you want to delete only the pattern, you can replace it with an empty string.
+  \item Write at the beginning of the line: match the beginning (special character \verb|^|) and replace. For instance, in \texttt{C} comments all the lines containing \texttt{Comment} (mind that we have to escape character \verb|/|)
+\begin{verbatim}
+sed '/Comment/ s/^/\/\//' test.c
+\end{verbatim}
+  \item Replace only the first occurrence of \verb|pattern|: a bit tricky, find the right range (from line zero to first occurrence) then replace
+\begin{verbatim}
+sed '0,/pattern/ s/pattern/new pattern/' file
+\end{verbatim}
+  \item Replace only the last occurrence of pattern: I'm still working on that. A long and dirty workaround may be to use \verb|tac|, then replace \emph{first} occurrence and finally \verb|tac| again.
 \end{itemize}
 
 \section{\texttt{grep}}
@@ -372,7 +407,7 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
     \end{itemize}
   \item Additional options:
     \begin{itemize}
-      \item Zip (compress), \verb|-z|: use compression algorithms. The option has to be used also when extracting compressed archived. Usually, compressed archived have \verb|.tar.gz| or \verb|.tgz| as extension. 
+      \item Zip (compress), \verb|-z|: use compression algorithms. The option has to be used also when extracting compressed archived. Usually, compressed archived have \verb|.tar.gz| or \verb|.tgz| as extension.
       \item \verb|t|, \verb|-t|, \verb|--list|: list the files.
       \item \verb|r|, \verb|-r|, \verb|--append|: add files to an existing archive.
       \item \verb|u|, \verb|-u|, \verb|--update|: add to the archive only the files which are already present and which have been modified.
@@ -391,6 +426,7 @@ By default it adds links as hard-files (and not as links). Option \verb|-r| (mne
 To deflate, run \verb|unzip <compressed_file>.zip|
 
 \section{\texttt{awk}}
+\label{sec:awk}
 \texttt{awk} is a text-processing utility that allows to perform easily operations line-by-line with column manipulations. A tutorial is given \href{https://www.tutorialspoint.com/awk/index.htm}{here}.
 \begin{itemize}
   \item Basis: \verb|awk [opt] 'BEGIN{[...]} {[...]} END{[...]}' <file>|
@@ -400,7 +436,7 @@ To deflate, run \verb|unzip <compressed_file>.zip|
       \item The commands in the curly brackets after \texttt{END} are executed once the file has been read,
       \item Each of these three sections is optional;
     \end{itemize}
-  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g. 
+  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g.
     \begin{itemize}
       \item print the third row: \verb|awk 'NR==3{print;exit}' file.txt|
       \item print lines containing \texttt{apple}: \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
@@ -434,7 +470,7 @@ awk '{printf "I want %5.2f bananas\n" 1.652}' file
     \begin{itemize}
       \item \verb|NF|: number of fields / columns in the current row (hence \verb|$NF| is the last column of the row)
       \item \verb|NR|: row number, mind that it is incremented if several files are read (1 based).
-      \item \verb|FNR|: row number relative to current file. It resets to 1 every time a new file is read. 
+      \item \verb|FNR|: row number relative to current file. It resets to 1 every time a new file is read.
       \item \verb|FS|: field separator
       \item \verb|FILENAME|: should I explain?
       \item \verb|ENVIRON|: array with environment variables (e.g. try \verb|ENVIRON["USER"]|).
@@ -453,9 +489,9 @@ awk '$2~/<pattern>/{print $0}' file.txt
 \label{sec:c}
 Just some tricks.
 \begin{itemize}
-  \item Operator \verb|?|: it is a shortcut for a simple \texttt{if} statement. 
+  \item Operator \verb|?|: it is a shortcut for a simple \texttt{if} statement.
 \begin{verbatim}
-  /* binary condition */ ? /* if true, do this */ : /* otherwise, do this */ 
+  /* binary condition */ ? /* if true, do this */ : /* otherwise, do this */
 \end{verbatim}
     For instance it could be useful when one wants to define a \texttt{const} variable which however depends on a certain condition.
 \begin{verbatim}
@@ -466,9 +502,9 @@ Just some tricks.
     \begin{itemize}
       \item Fastest (?, possibly if one runs sequentially) to reset an array:
 \begin{verbatim}
-memset(dest, 0, dest_len*sizeof(<dest_type>)) 
+memset(dest, 0, dest_len*sizeof(<dest_type>))
 \end{verbatim}
-        (destination, value to copy, number of bits to consider). Notice that since it works on the single bits, this works only with zero, namely that would not work to fill an array with ones (or any value, indeed). Mnemonic: \verb|dest = 0|. 
+        (destination, value to copy, number of bits to consider). Notice that since it works on the single bits, this works only with zero, namely that would not work to fill an array with ones (or any value, indeed). Mnemonic: \verb|dest = 0|.
       \item Fastest (?, possibly if one runs sequentially) to copy an array into another: structure similar to the one above. Mnemonic: \verb|receive = send|
 \begin{verbatim}
 memcpy(receive, send, <n_element_to_copy>*sizeof(<send_type>))
@@ -499,7 +535,7 @@ memcpy(receive, send, <n_element_to_copy>*sizeof(<send_type>))
 \end{verbatim}
         \end{itemize}
     \end{itemize}
-    
+
 \end{itemize}
 
 \section{\texttt{python}}
@@ -511,7 +547,7 @@ memcpy(receive, send, <n_element_to_copy>*sizeof(<send_type>))
     \begin{itemize}
       \item Typical call: \verb|pip install <package>|. Add options \verb!--upgrade|-U! to upgrade.
       \item You'll need access to some directories, thus it is advised to have a local install: pass option \verb|--user|.
-      \item Proxy: pass the option \verb|--proxy=user@server.dom:port|. 
+      \item Proxy: pass the option \verb|--proxy=user@server.dom:port|.
       \item Get list of outdated packages: \verb|pip list --outdated|.
       \item When installing/upgrading problems may occur with older versions of the \texttt{C} compiler, \texttt{GCC}: try and force \texttt{C99} standard by setting \texttt{CFLAGS} before installing: \verb|export CFLAGS='-std=c99'|
     \end{itemize}
