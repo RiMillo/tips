@@ -364,9 +364,10 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
   find <mydir> -name <filename>
 \end{verbatim}
   \begin{itemize}
-    \item \verb|--regex|: similar to \texttt{name} but one can use regex syntax to write the pattern. The type can be chosen with \verb|--regextype| (ex. \texttt{sed}). Notice that \texttt{find} always prepends \verb|./| to the path so you may want to start your pattern with something like \verb|.*/|
+    \item \verb|-regex|: similar to \texttt{name} but one can use regex syntax to write the pattern. The type can be chosen with \verb|-regextype| (ex. \texttt{sed}). Notice that \texttt{find} always prepends \verb|./| to the path so you may want to start your pattern with something like \verb|.*/|
+    \item Case-insensitive search: use \verb|-iname| or \verb|-iregex| as you would use their parent options
   \end{itemize}
-  \item Filter on the file type: option \verb|--type <t>| where \texttt{<t>} can be, for example, \texttt{d} (directory), \texttt{f} (regular file), \texttt{l} (symbolic link)\dots
+  \item Filter on the file type: option \verb|-type <t>| where \texttt{<t>} can be, for example, \texttt{d} (directory), \texttt{f} (regular file), \texttt{l} (symbolic link)\dots
   \item \texttt{!}, \texttt{-not}: negation of the expression that follows. E.g.: \texttt{find . -not -name foo} print all the files in the current directory with a name different than \texttt{too}.
   \item Exclude a path: e.g. avoid matching the current directory
 \begin{verbatim}
@@ -385,8 +386,8 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
     \item Mind that \texttt{find} does not know the content of \texttt{.bashrc} and alike, hence one could not use alises (its \texttt{ls} command might be stripped-down with respect to what one is used to, you may want to consider adding some user-friendly options).
   \end{itemize}
   \begin{itemize}
-    \item \verb|--ok|: like \texttt{exec} but ask the permission first
-    \item \verb|--execdir|: like \texttt{exec} but run the command from the subdirectory that contains the matched file.
+    \item \verb|-ok|: like \texttt{exec} but ask the permission first
+    \item \verb|-execdir|: like \texttt{exec} but run the command from the subdirectory that contains the matched file.
   \end{itemize}
 \end{itemize}
 
@@ -498,6 +499,20 @@ Just some tricks.
   const int max = (n > m) ? n : m;
 \end{verbatim}
     Notice that in this case, if \verb|m| or \verb|n| are calls to functions, they are evaluated twice, one for the comparison, and one for the assignment. Hence, if the calls are time-consuming, you might want to use temporary variables.
+  \item \href{https://www.improgrammer.net/type-casting-c-language/}{Casting}: it is a way to change the type of a variable.
+    \begin{itemize}
+      \item Sometimes it is hidden: \verb|float a = 1;|. Because of its format, \verb|1| is actually interpreted as an integer and then cast into a floating-point number.
+      \item Casting could be done explicitly:
+\begin{verbatim}
+old_type a = [...];
+new_type b = (new_type)a;
+\end{verbatim}
+      \item The compiler will always try to cast, but if there is no correlation between the two data types unexpected behaviour and loss of precision may happen. Consider for instance
+\begin{verbatim}
+float a  = 1.1;
+int   ab = (int) a;
+\end{verbatim}
+    \end{itemize}
   \item Memory / arrays tricks
     \begin{itemize}
       \item Fastest (?, possibly if one runs sequentially) to reset an array:
@@ -523,20 +538,44 @@ memcpy(receive, send, <n_element_to_copy>*sizeof(<send_type>))
     \end{itemize}
   \item Preprocessor
     \begin{itemize}
+      \item Compile with \verb|-E| to get the source file preprocessed.
       \item \href{https://gcc.gnu.org/onlinedocs/gcc-7.5.0/cpp/Stringizing.html}{\emph{Stringizing}}
         \begin{itemize}
           \item Macro to make something a string, use \verb|#|: \verb|#define str(s) #s|
           \item Double it if you want to make the content of another macro a string
-\begin{verbatim}
+\begin{Verbatim}[samepage=true]
 #define foo 4.0
 #define str(s)  #s
 #define xstr(s) str(s)
 // Now use xstr(foo) -> "4.0"
-\end{verbatim}
+\end{Verbatim}
         \end{itemize}
+      \item Append / Concatenate: use operator \verb|##|. Consider this\footnote{Did you actually believe that \href{https://hitchhikers.fandom.com/wiki/42}{42} was not going to appear here?! You fool!}
+\begin{Verbatim}[samepage=true]
+float pow2(float x){return x*x;}
+float pow3(float x){return x*x*x;}
+#define _p(a,b) pow##b(a)
+[...]
+float var = 42.;
+float var_square = _p(var,2); // Expands to pow2(var)
+float var_cube   = _p(var,3); // Expands to pow3(var)
+\end{Verbatim}
     \end{itemize}
 
 \end{itemize}
+
+\subsection{\texttt{OpenMP}}
+\texttt{OpenMP} or \texttt{OMP} is a shared-memory interface for \texttt{C}/\texttt{C++} (and \texttt{Fortran} as well) for parallel computing. \emph{Shared-memory}, simply put, means that the memory may be accessed, read, and modified by any thread at any given moment. Most of the times, parallelize a piece of code with \texttt{OMP} comes down to prepend dedicated pragmas (\verb|#pragma omp [...]|) to \texttt{for} loops (The last two sentences were \emph{very} wrong, but it might get you on the right direction if this is the first time you have heard of parallelism and \texttt{OMP}). Now that you have the bigger picture and you are thinking "well, that was easy, I can do it!", welcome to the hardest part, where not so rarely you have to change your piece of code in order not to have threads modifying the work each other work.
+  \begin{itemize}
+    \item A nice training is available on the IDRIS \href{http://www.idris.fr/formations/openmp/}{website}.
+    \item A \href{https://www.openmp.org/wp-content/uploads/OpenMP-4.0-C.pdf}{cheat-sheet} (for version 4.0).
+    \item Unless dedicated instruction are provided (see a couple of items below), every line of code inside a parallel zone is executed by \emph{all} the threads.
+    \item A deal-breaker feature is the \texttt{reduction}s: compute sums, find max/min, or any operation you'd like (as long as you define it).
+    \item This is something that is true generally for any parallel framework not only \texttt{OMP}, parallel code and I/O operations (reading/writing) data can become tricky pretty easily, be advised (Remember: several threads working on the same and only thing?).
+    \item It is important to have in mind which commands are \emph{blocking}, meaning that have a hidden barrier at the end (a point at which all the threads have to meet before they are allowed to continuing the execution of the program). For instance, \verb|#pragma omp [parallel] for| is (however, keep in mind the \verb|nowait| clause).
+    \item Sometimes one need that one thread only may work on something at the same time. This is where \verb|#pragma omp critical| and \verb|#pragma omp atomic| come into play, where the last one provide better performances but allows only very few operations like reading, writing, and updating (e.g. \verb|sum += a[n];|).
+    \item In parallel mode but this particular piece of code should be executed once and once only? Put it in dedicated pragmas like \verb|#pragma omp master| (only the master thread, usually the one with ID 0, is allowed to execute the code) or with \verb|#pragma omp single| (only the first threads arrived at that point executes it, this is your best choice most of the times). They have no barriers.
+  \end{itemize}
 
 \section{\texttt{python}}
 \label{sec:python}
@@ -632,6 +671,7 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
       \item \verb|kill [options] <job_ID>|: kill (send \texttt{SIGTERM} to) the job denoted by \verb|<job_ID>|.
       \item \verb|pkill [options] <pattern>|: as \verb|kill| but looks for matches in job names before (as \verb|pgrep|).
     \end{itemize}
+  \item \verb|[h]top|: \verb|top| (and its user-friendly version \verb|htop|) give an overview of a running system. One can find, for instance and just to name the most useful features, which jobs are running and how much memory or processors are used.
   \item \texttt{du}: shows the space used by the directories (and files) (mnemonic: \emph{d}isc \emph{u}sage)
     \begin{itemize}
       \item \verb!-a|--all!: show the space of every files, not only the directories
