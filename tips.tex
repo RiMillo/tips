@@ -25,7 +25,12 @@
 
 \usepackage[top=2cm, bottom=2cm, left=1cm, right=1cm]{geometry}
 
+%\renewcommand{\ttdefault}{pcr}
 \usepackage{listings}
+\lstset{%
+  basicstyle=\ttfamily,
+  keywordstyle=\color{blue},
+}
 
 \usepackage{hyperref}
 
@@ -50,13 +55,46 @@ or sometimes
 <cmd> --help
 \end{verbatim}
 
+\emph{Notations and conventions.} You will find stuff inside angle brackets (like this \verb|<.>|): this is something that you can choose. You will also find other stuff within square brackets (like this \verb|[.]|, and they can be nested): this indicates something that is optional.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Shell}
 \label{sec:shell}
 There are different version of shell scripting, such as \texttt{bash}, \texttt{sh}, \texttt{zsh}; they have some differences in commands and syntax (but I do not know them \verb|\o/|).
 \begin{itemize}
   \item Of course I'm not the first to write tips, and certainly not the one which knows the most, so here a couples of tips lists, especially about shortcuts: \href{https://www.techrepublic.com/article/20-terminal-shortcuts-developers-need-to-know/}{here} and \href{https://www.howtogeek.com/howto/ubuntu/keyboard-shortcuts-for-bash-command-shell-for-ubuntu-debian-suse-redhat-linux-etc/}{here}.
+  \item Default applications: often we don't know the name of the programs that we use, for instance, for opening a pdf. Here some of them
+    \begin{itemize}
+      \item \texttt{evince} for pdf.
+      \item \texttt{eog} for images.
+      \item \texttt{nautilus} for file explorer.
+    \end{itemize}
+  \item Run in background:
+    \begin{itemize}
+      \item Add a \verb|&| after a command to run it back ground, meaning that it won't block the terminal while running, so that you can still use the terminal window for other stuff. This is quite useful when opening GUI programs (e.g. \texttt{evince}).
+      \item Precede your commands with \texttt{nohup} in order to have them running ever after the terminal window / session is closed. More \href{https://linux.101hacks.com/unix/nohup-command/}{here} or \href{https://hexadix.com/use-nohup-execute-commands-background-keep-running-exit-shell-promt/}{here}.
+    \end{itemize}
+  \item Some built-in variables:
+    \begin{itemize}
+      \item \verb|$#|: number of arguments passed to the script
+      \item \verb|$<n>|: argument \texttt{n}. It is 1-based, in fact \verb|$0| expands to shell / script's name
+      \item \verb|$@|: all arguments. You can use it in a list: \verb|for arg in "${@}"|
+      \item \verb|$!|: expands to the last run process's ID
+      \item \verb|$?|: return value of last command. You can store it \verb|ret_val=$?| or use it directly
+\begin{verbatim}
+some_command
+if [ $? -eq 0 ]; then
+echo OK
+else
+echo FAIL
+fi
+\end{verbatim}
+    \end{itemize}
   \item Operator \texttt{*} expands to all the files whose name does not start with "\texttt{.}". Hence, hidden files (as well as current directory "\texttt{.}", and parent directory "\texttt{..}" are not included).
-  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[[| (cf. \autoref{sec:misc}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{sec:awk}) or \texttt{python} (\autoref{sec:python}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
+  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[| (cf. \autoref{sec:misc}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{sec:awk}) or \texttt{python} (\autoref{sec:python}) or \texttt{bc} (\autoref{sec:misc}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
+  \item Conditional statements: \href{https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs}{here}
   \item Pipes: \verb!|! connects standard output of one command to standard input of another.
   \item File descriptors:
     \begin{enumerate}[start=0]
@@ -94,8 +132,23 @@ cmd 2>&1 >/dev/null | pipe_receiver
   \item For option management \verb|getopts| is recommended, see \autoref{sec:misc}.
   \item Arrays: have a look \href{https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays}{here}.
   \item For loops: have a look \href{https://www.cyberciti.biz/faq/bash-for-loop/}{here}.
+  \item Notifications and dialogue windows: we really like the old-school terminal, but sometimes nice GUI stuffs and visual aides make life easier. Consider this: you launch a script which takes a really long time, so from the terminal you switch to do other stuff. It would be nice to be alerted when the said script finishes. I am still working on an audio signal, but consider these two options:
+    \begin{itemize}
+      \item \verb|notify-send "Title" "Body"|: a little notification pop-up
+      \item More advanced: \verb|zenity|, Achieve notification, pop-up, interactive windows,\ldots Some stuff \href{https://renenyffenegger.ch/notes/Linux/shell/commands/zenity}{here}. Try \verb|zenity --<type> --text "Body"| where \texttt{type} can assume \texttt{notification}, \texttt{info}, \texttt{warning}, \texttt{error}, \texttt{text-info}, \texttt{progress}, \texttt{file-selection}, \texttt{list}, \texttt{entry}, \texttt{scale} and others. All but \texttt{notification} stop the flow of the script.
+        \begin{itemize}
+          \item Control the size with \verb|--width=<n>| and \verb|--height=<n>|
+          \item \verb|--window-icon=/pat/to/icon|: choose an icon for your widget
+          \item \verb|--timeout=<n>|: how long the widget should stay
+        \end{itemize}
+    \end{itemize}
+  \item Pimp your \texttt{bash} by modifying the file \texttt{.bashrc} in your home (load modules that you want by default, set global variables,\ldots) and define personal shortcuts in \texttt{.bash\_aliases}, again in your home (verify that it is loaded in \texttt{.bashrc}).
+  \item In \texttt{bash}, the keyboard combo \texttt{Ctrl+Alt+E} expands aliases and variables that you writing.
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{valgrind}}
 Some useful options:
 \begin{itemize}
@@ -104,6 +157,9 @@ Some useful options:
   \item Reachable / possibly-lost: \verb!--show-reachable=yes|no --show-possibly-lost=yes|no!
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{gdb}}
 \label{sec:gdb}
 \begin{itemize}
@@ -124,13 +180,19 @@ Some useful options:
     \end{itemize}
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{git}}
 \label{sec:git}
-A nice, user-friendly introduction to \texttt{git} is available \href{https://www.atlassian.com/git/tutorials/learn-git-with-bitbucket-cloud}{here}.
+A nice, user-friendly introduction to \texttt{git} is available \href{https://www.atlassian.com/git/tutorials/learn-git-with-bitbucket-cloud}{here}. And the official documentation is \href{https://git-scm.com/doc}{here}.
 
 Intro: for those who do not know, \texttt{SHA1} is either the ID (long or short, it does not matter) of the commit, which one can get via a \texttt{git log}, or a tree-path relative to the \texttt{HEAD} (e.g.: latest commit=\texttt{HEAD}, second to last=\verb|HEAD^| or \verb|HEAD~1|, ($n+1$)-th to last=\verb|HEAD~n|). More info \href{https://git-scm.com/docs/git-cherry-pick}{here}.
 
-For inexperienced users who want to perform simple tasks, such as looking at the changelogs and commit history, or creating commits, the user-friendly, GUI programs of \texttt{git-cola} (manage the current status of your git repository) and \texttt{gitk} (looking at the commit tree and moving around it) are advisable.
+For inexperienced users who want to perform simple tasks, such as looking at the changelogs and commit history, or creating commits, the user-friendly, GUI programs such as \texttt{git-cola} (manage the current status of your git repository) and \texttt{gitk} (looking at the commit tree and moving around it) are advisable.
+
+\emph{Bonus.} This could seem totally unrelated, but, here is one the most visited question on \texttt{StackOverflow} (more than 2 million times!) which deals with \href{https://stackoverflow.com/questions/11828270/how-do-i-exit-the-vim-editor}{How to exit the \texttt{Vim} editor}. You may want to have a look at this question which has more than 8 million views and it is indeed \texttt{git}-related: \href{https://stackoverflow.com/questions/927358/how-do-i-undo-the-most-recent-local-commits-in-git}{How do I undo the most recent local commits in \texttt{git}?}
+
 \begin{itemize}
   \item Run \verb|git| commands from another directory: \verb|git -C <path> <cmd>| (mnemonic: as in \verb|make|). Originally it was: \verb|--git-dir=<path> --work-dir=<path>|.
   \item \verb|git add <file_name>|: move the modifications in \verb|file_name| to commit stage (that is, they will be include in the next commit)
@@ -168,6 +230,12 @@ For inexperienced users who want to perform simple tasks, such as looking at the
   git branch [<branch_name>] --set-upstream-to new_remote/branch_on_remote
 \end{verbatim}
     If \verb|branch_name| is not provided, the current branch will be used as default;
+  \item Working with remote repositories
+    \begin{itemize}
+      \item Getting the latest commits: \verb|git pull|. One may want to add the \verb|--rebase| option so that your non yet published commits stay on top of the tree.
+      \item Publish the latest local commits: \verb|git push|. It is always better to do a \verb|git pull --rebase| before pushing in order to avoid conflicts.
+      \item Damn! You have just pushed a commit and you realize just now that it needs an amend. Modify it in you local repository then force-push it, have a look \href{https://stackoverflow.com/questions/179123/how-to-modify-existing-unpushed-commit-messages}{here}.
+    \end{itemize}
   \item Rename a branch:
     \begin{itemize}
       \item If on the branch to rename: \verb|git branch -m <new_name>|
@@ -229,14 +297,27 @@ $ git config [--global] alias.pr 'pull ---rebase'
       \item Add them to \texttt{.git/info/exclude}. This is local and impacts only the local directory and clone of the repository.
     \end{itemize}
   \item Push a new project to \href{https://github.com/}{GitHub} for the first time: follow \href{https://help.github.com/en/github/importing-your-projects-to-github/adding-an-existing-project-to-github-using-the-command-line}{this}.
+  \item \texttt{git bisect}: help to find the commit causing the bug by a bisection procedure
+    \begin{itemize}
+      \item \verb|start|: initialize the procedure.
+      \item \verb|bad [commit]|: tag commit as bad (default is current).
+      \item \verb|good [commit]|: tag commit as good (default is current).
+      \item \verb|reset|: once you have find the buggy commit, quit the procedure and go back to were you were at the beginning.
+    \end{itemize}
   \item \verb|git grep| (\href{https://git-scm.com/docs/git-grep}{Manual}): as \verb|grep| (\autoref{sec:grep}) but on tracked files: \verb|git grep 'time_t' -- '*.[ch]'|. Some bonus options:
     \begin{itemize}
       \item Notice that \verb|--| marks the end of the options.
       \item \verb|--and|, \verb|--or|, \verb|--not|. Option \verb|-e| should be used.
     \end{itemize}
+  \item Submodules: \href{https://git-scm.com/book/en/v2/Git-Tools-Submodules}{here}.
+  \item Sometimes the \texttt{.git} directory (where all the \texttt{git} magic happens) is larger than the projects itself: imaging having to store all the commits, changes,\ldots{} \href{https://stackoverflow.com/questions/5277467/how-can-i-clean-my-git-folder-cleaned-up-my-project-directory-but-git-is-sti}{Here} you find how to do a little house-keeping. \verb|git gc| might be an option, as well.
+  \item \href{https://git-scm.com/docs/git-filter-branch}{\texttt{git filter-branch}}: modify the tree according to filters.
 
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{sed}}
 Bases:
 \begin{itemize}
@@ -304,7 +385,7 @@ no bar embarassment
 \begin{verbatim}
 sed "s/${pattern}/${replaced}/" file
 \end{verbatim}
-  \item \verb|$| means last line.
+  \item \verb|$| means last line when dealing with ranges, or end of the line when dealing with patterns.
   \item Mind that command \verb|d| erases the entire line, if you want to delete only the pattern, you can replace it with an empty string.
   \item Write at the beginning of the line: match the beginning (special character \verb|^|) and replace. For instance, in \texttt{C} comments all the lines containing \texttt{Comment} (mind that we have to escape character \verb|/|)
 \begin{verbatim}
@@ -317,6 +398,9 @@ sed '0,/pattern/ s/pattern/new pattern/' file
   \item Replace only the last occurrence of pattern: I'm still working on that. A long and dirty workaround may be to use \verb|tac|, then replace \emph{first} occurrence and finally \verb|tac| again.
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{grep}}
 \label{sec:grep}
 \verb|grep [options] <pattern> [files]|
@@ -362,6 +446,11 @@ Types:
   \item \texttt{-F}, \verb|--fixed-strings|, exclude regexp
 \end{itemize}
 
+The version \texttt{zgrep} (with the same options) allows to search into compressed/\emph{z}ipped files.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{find}}
 It allows to find files in a tree and apply a command to them:
 \begin{verbatim}
@@ -378,29 +467,38 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
     \item Case-insensitive search: use \verb|-iname| or \verb|-iregex| as you would use their parent options
   \end{itemize}
   \item Filter on the file type: option \verb|-type <t>| where \texttt{<t>} can be, for example, \texttt{d} (directory), \texttt{f} (regular file), \texttt{l} (symbolic link)\dots
-  \item \texttt{!}, \texttt{-not}: negation of the expression that follows. E.g.: \texttt{find . -not -name foo} print all the files in the current directory with a name different than \texttt{too}.
-  \item Exclude a path: e.g. avoid matching the current directory
+  \item \texttt{!}, \texttt{-not}: negation of the expression that follows. E.g.: \texttt{find . -not -name foo} print all the files in the current directory with a name different than \texttt{foo}.
+    \begin{itemize}
+      \item Exclude a path:
 \begin{verbatim}
-  find . -not -name notmyfile -not -path .
+find . -name notmyfile -not -path <dir_excl>
 \end{verbatim}
-  \item Delete all the matching files: e.g. delete all the \texttt{.log} files \texttt{find . -name *.log -delete}
+        This is somehow too simple and \texttt{find} will still search into the sub-directories of \verb|dir_excl|. You may find other solutions \href{https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command}{here} (the accepted answer with \verb|-prune|may not always work).
+    \end{itemize}
   \item \verb|-maxdepth <n>|: limit the tree descent level of the search
   \item Apply a command to all the matching files: e.g. run a bash script, grep only certain files
 \begin{verbatim}
-  find . -name *.log -exec script.sh {} \;
-  find . -name *.log -exec script.sh {} +
-  find . -name *.log -exec grep -Hn --color "pattern" {} +
+find . -name *.log -exec script.sh {} \;
+find . -name *.log -exec script.sh {} +
+find . -name *.log -exec grep -Hn --color "pattern" {} +
 \end{verbatim}
 \verb|{}| stands for the matching files; the first version will execute as many calls as the numbers of matching files, the second (tries to) appends all the files in an single list of arguments (hence saving the calls to the script)
   \begin{itemize}
-    \item Mind that \texttt{find} does not know the content of \texttt{.bashrc} and alike, hence one could not use alises (its \texttt{ls} command might be stripped-down with respect to what one is used to, you may want to consider adding some user-friendly options).
+    \item Mind that \texttt{find} does not know the content of \texttt{.bashrc} and alike, hence one could not use aliases (its \texttt{ls} command might be stripped-down with respect to what one is used to, you may want to consider adding some user-friendly options).
   \end{itemize}
   \begin{itemize}
     \item \verb|-ok|: like \texttt{exec} but ask the permission first
     \item \verb|-execdir|: like \texttt{exec} but run the command from the subdirectory that contains the matched file.
   \end{itemize}
+  \item Delete all the matching files: e.g. delete all the \texttt{.log} files \texttt{find . -name *.log -delete}
+    \begin{itemize}
+      \item \texttt{-delete} calls \texttt{rm} under the hood, in fact it is practically equivalent to \texttt{-exec rm}. Hence it will fail if one tries to delete directory. In this case, use the long way: \texttt{-exec rm -r}
+    \end{itemize}
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Compressing: \texttt{tar} \& \texttt{zip}}
 \texttt{tar} is a utility which creates archives
 \begin{itemize}
@@ -408,11 +506,11 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
     \begin{itemize}
       \item \verb|c|, \verb|-c|, \verb|--create|: create. Remember to put all the files that you want in your archive in one go.
 \begin{verbatim}
-  tar -cf archived.tar file/to/archive
+tar -cf archived.tar file/to/archive
 \end{verbatim}
       \item \verb|x|, \verb|-x|, \verb|--extract|, \verb|--get|: extract
 \begin{verbatim}
-  tar -xf archived.tar
+tar -xf archived.tar
 \end{verbatim}
       \item As you have already understood, \verb|-f| stands for file(name).
     \end{itemize}
@@ -436,9 +534,12 @@ By default it adds links as hard-files (and not as links). Option \verb|-r| (mne
 
 To deflate, run \verb|unzip <compressed_file>.zip|
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{awk}}
 \label{sec:awk}
-\texttt{awk} is a text-processing utility that allows to perform easily operations line-by-line with column manipulations. A tutorial is given \href{https://www.tutorialspoint.com/awk/index.htm}{here}.
+\texttt{awk} is a text-processing utility that allows to perform easily operations line-by-line with column (here called \emph{fields}) manipulations. A tutorial is given \href{https://www.tutorialspoint.com/awk/index.htm}{here}.
 \begin{itemize}
   \item Basis: \verb|awk [opt] 'BEGIN{[...]} {[...]} END{[...]}' <file>|
     \begin{itemize}
@@ -451,13 +552,18 @@ To deflate, run \verb|unzip <compressed_file>.zip|
     \begin{itemize}
       \item print the third row: \verb|awk 'NR==3{print;exit}' file.txt|
       \item print lines containing \texttt{apple}: \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
+      \item More than one pattern might be used. No particular syntax is needed: nothing, a space or a newline will do the trick
+\begin{verbatim}
+awk '/apple/{print "Found an apple"}/banana/{print "Found a banana"}' infile
+\end{verbatim}
     \end{itemize}
+  \item Select the \texttt{n}-th field \verb|$<n>|. Remark: it is 1-based (first field is indexed by 1), and \verb|$0| expands to the whole line.
   \item Printing: it is usually achieved by command \texttt{print}. Some notes
     \begin{itemize}
       \item Columns are accessed with a dollar \verb|$|, for variables just use their name
 \begin{verbatim}
 awk '{print $NF}' file # Print last column only
-awk -v T=8 'END{print "T = " T}' file # Print T = 8
+awk -v T=8 'END{print "2 times T = " 2*T}' file
 \end{verbatim}
       \item One can use redirection such as \verb|>|, \verb|>>| as explained in \autoref{sec:shell} to write to file. E.g.
 \begin{verbatim}
@@ -472,12 +578,11 @@ awk '{printf "I want %5.2f bananas\n" 1.652}' file
   \item Useful options:
     \begin{itemize}
       \item The file name is given as argument of the command or with \verb|-f <file>|, or \verb|--file=<file>|.
-      \item \verb|-F <char>|, \verb|--field-separator="<char>"|: \verb|char| is the column separator;
-      \item Select the \texttt{n}-th column: \verb|$<n>|. Remark: it is 1-based (first column is indexed by 1), and \verb|$0| expands to the whole line.
+      \item \verb|-F <char>|, \verb|--field-separator="<char>"|: \verb|char| is the column separator (space is default);
       \item Pass an argument: \verb|-v var_name=<value>|
       \item When using \texttt{gawk} (the GNU implementation of \texttt{awk}) one can asks for in-place replacement: \verb|-i inplace|.
     \end{itemize}
-  \item Built-in variable:
+  \item Built-in variables:
     \begin{itemize}
       \item \verb|NF|: number of fields / columns in the current row (hence \verb|$NF| is the last column of the row)
       \item \verb|NR|: row number, mind that it is incremented if several files are read (1 based).
@@ -496,10 +601,22 @@ awk '$2~/<pattern>/{print $0}' file.txt
     \end{itemize}
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{C}}
 \label{sec:c}
 Just some tricks.
 \begin{itemize}
+  \item ATTENTION - Memory management. To some pointers and functions related to them such as \texttt{malloc}, \texttt{realloc} and \texttt{free}, are some of the most confusing things about \texttt{C}. Here, I do not pretend to explain everything, but let me tell you this, which should be a golden rule for developing in \texttt{C}: for every \texttt{malloc} that you call, remember to call also its related \texttt{free}. The impact of non-freed memory may be insignificant on certain problems, but it could quickly snowballing into something really dangerous and crash the run.
+  \item It is advised by someone to use preprocessor false statements as a comment zone in which one can put anything (s)he wants to
+\begin{verbatim}
+#if 0
+  This part won't be seen by the preprocessor
+  Anything you want, no special caratchers needed
+  Although some warning may be issued, for instance for unbalanced parantheses
+#endif
+\end{verbatim}
   \item Operator \verb|?|: it is a shortcut for a simple \texttt{if} statement.
 \begin{verbatim}
   /* binary condition */ ? /* if true, do this */ : /* otherwise, do this */
@@ -546,6 +663,7 @@ memcpy(receive, send, <n_element_to_copy>*sizeof(<send_type>))
       \item \texttt{break} exits the innermost loop only (\texttt{for} or \texttt{while}). If one wants to exit all of them, a flag (a \verb|_Bool|/\verb|bool|) should be used.
       \item \texttt{continue} skips the rest of the current iteration, increases the counter and goes to the next iteration (stays in the loop!)
     \end{itemize}
+  \item File reading/writing: \href{https://www.programiz.com/c-programming/c-file-input-output}{here}.
   \item Preprocessor
     \begin{itemize}
       \item Compile with \verb|-E| to get the source file preprocessed.
@@ -571,24 +689,77 @@ float var_square = _p(var,2); // Expands to pow2(var)
 float var_cube   = _p(var,3); // Expands to pow3(var)
 \end{Verbatim}
     \end{itemize}
+  \item Poorman optimizations: here are some simple optimizations that you can consider, you can think of them as good practices. They won't certainly have much of an impact on the total runtime (in fact, especially with the loops, the compiler will try do anticipate what you want to do and optimize it), but it is useful to have them in mind and of course, it is definitely better to use them. A great deal of them deals with cache optimizations and avoiding cache-misses, it could be interesting to have a look at how a cache is and works and how to get the most out of it. Anywho, here are some optimizations:
+    \begin{itemize}
+      \item Constant variables. You need to define a variable and you know for sure from the beginning that its values will not change in the current scope. It is then advisable to define them as constant: the compiler will take into consideration this piece of information and use it to optimize the program. In order to make a variable constant, just prepend \texttt{const} to the usual definition \texttt{const int n = 10;}. You try to modify a value of a constant value, you'll get an error or at least a warning. You can also make the arguments of a function constant, this may be beneficial in three ways: optimization, allow the user to identify input and output parameter, and avoid error like modifying a value that you are not supposed to. However, it is usually not advised to make an argument of a function constant if it's one value (\texttt{int}, \texttt{float},\ldots) since in this case the performance gains will be null. Still it could be beneficial for the lecture.
+      \item Data locality: try to define variables as close as possible to where you are going to use them. Basically, it is sometimes better to redefine a variable in a loop at each iteration rather than define it outside and change it at each iteration.
+      \item Array accessibility. Somehow related to the previous point, you are looping through a huge array with hundreds or thousands of elements. If you are going to use the value several times, redefine a pointer that points just the current item. For instance,
+\begin{verbatim}
+for (int i=0; i < 10000; i++){
+  double *a_i = a + i;
+  // use now a_i[0]
+}
+\end{verbatim}
+        This can be pretty useful if you are dealing with coordinates, for instance
+\begin{verbatim}
+for (int i=0; i < 10000; i++){
+  double *a_i = a + 3*i;
+  // a_i[0] will be the x-coordinate of the i-th point
+  // a_i[1] the y one and a_i[2] the z one
+}
+\end{verbatim}
+        Why that? Well, it actually takes some time to move in the memory to recover a value so accessing \texttt{v[1]} is (slightly) faster than \texttt{v[1000]}, having to doing it several thousands of times may impact the performances.
+      \item Prefer arrays to matrices: using \verb|a[i][j]| is convenient but if the dimensions are large is pretty slow, the reason is somehow related to the previous item. Anyway, the bottom line is: A unique array is much faster: \verb|a[n_cols*i+j]| (if you have to choose only one optimization to remember, choose this one, big times)
+      \item Prefer looping by columns rather than by rows. Another tips about memory and matrices, the reason of it is the cache: when the computer access a location in the memory, it also loads some chunks of memory that are just next to the one it actually needs, In this way, if it will need this additional piece of memory in the next iterations (as it is often the case), it already has it and avoid loading it thus saving some time. When looping by rows, the data that we request are (often) too far away from each other and a load at each iteration is almost certain. Bottom line: (notice the switch of the indexes and, most importantly, which loop is the innermost) this
+\begin{verbatim}
+for (int i=0; i < n_rows; i++)
+  for (int j=0; j < n_cols; j++)
+    a[i*n_cols+j] *= 2;
+\end{verbatim}
+        is better than
+\begin{verbatim}
+for (int j=0; j < n_cols; j++)
+  for (int i=0; i < n_rows; i++)
+    a[i*n_cols+j] *= 2;
+\end{verbatim}
+      \item Loop unrolling. Well, that is almost useless since the compiler will sometimes try do it even without being asked. However, a \texttt{for} loop has an overhead. So if it is not much of a fuss, you can try to write yourself by hand the iterations. Again, nowadays loop unrolling is practically useless but it is interesting to know how things work.
+      \item Keep loops as straight as possible. The compiler will try to guess what the next operation will be, try to (almost) perform consecutive iterations at the same time, load some memory which is adjacent to the one you are requesting,\ldots{} you get the idea. If it does not manage, the program has to do unload what it thought and load what you really asked, and that takes time. Hence, avoid \texttt{if} statement in loops as much as possible, avoid jumping around an array, basically keep a straight path.
+      \item Short types. Sometimes you know that a certain variables will not exceed a threshold, you can then using short types, which takes less memory than standard types. For instance, looping through the components of a vector, use \texttt{short int}
+\begin{verbatim}
+for (short int i=0; i < 3; i++){
+  // Do something
+}
+\end{verbatim}
+        (You may wonder, so why not use it all the times? Well, the maximum number that a short integer can represent is not that much and you may never reach the bound of the loop)
+      \item Inline function. If a function is less than a dozen line long, consider inlining it. If this concept is new to you, know that: he code of an inline functions is copied as is where it is requested, so that by using inlined functions we don't get the overhead for the call to a function. Calling a long inlined function many times makes the executable larger (many lines of code) and that is something to avoid, hence, a dozen lines is a good thumb-rule.
+      \item If dealing with synchronization in parallel mode, try to call those functions as less as possible. Instead of doing \texttt{n} times a synchronization of a vector of 3 values, prefer only one synchronization of a vector of \texttt{3*n} values.
+    \end{itemize}
 
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\texttt{OpenMP}}
-\texttt{OpenMP} or \texttt{OMP} is a shared-memory interface for \texttt{C}/\texttt{C++} (and \texttt{Fortran} as well) for parallel computing. \emph{Shared-memory}, simply put, means that the memory may be accessed, read, and modified by any thread at any given moment. Most of the times, parallelize a piece of code with \texttt{OMP} comes down to prepend dedicated pragmas (\verb|#pragma omp [...]|) to \texttt{for} loops (The last two sentences were \emph{very} wrong, but it might get you on the right direction if this is the first time you have heard of parallelism and \texttt{OMP}). Now that you have the bigger picture and you are thinking "well, that was easy, I can do it!", welcome to the hardest part, where not so rarely you have to change your piece of code in order not to have threads modifying the work each other work.
+\texttt{OpenMP} or \texttt{OMP} is a shared-memory interface for \texttt{C}/\texttt{C++} (and \texttt{Fortran} as well) for parallel computing. \emph{Shared-memory}, simply put, means that the memory may be accessed, read, and modified by any thread at any given moment. Most of the times, parallelize a piece of code with \texttt{OMP} comes down to prepend dedicated pragmas (\verb|#pragma omp [...]|) to \texttt{for} loops (the last two sentences were \emph{very} wrong, but it might get you on the right direction if this is the first time you have heard of parallelism and \texttt{OMP}). Now that you have the bigger picture and you are thinking "Well, that was easy, I can do it!", welcome to the hardest part, where not so rarely you have to change your piece of code in order not to have threads modifying each other's work.
   \begin{itemize}
     \item A nice training is available on the IDRIS \href{http://www.idris.fr/formations/openmp/}{website}.
     \item A \href{https://www.openmp.org/wp-content/uploads/OpenMP-4.0-C.pdf}{cheat-sheet} (for version 4.0).
     \item Unless dedicated instruction are provided (see a couple of items below), every line of code inside a parallel zone is executed by \emph{all} the threads.
-    \item A deal-breaker feature is the \texttt{reduction}s: compute sums, find max/min, or any operation you'd like (as long as you define it).
-    \item This is something that is true generally for any parallel framework not only \texttt{OMP}, parallel code and I/O operations (reading/writing) data can become tricky pretty easily, be advised (Remember: several threads working on the same and only thing?).
-    \item It is important to have in mind which commands are \emph{blocking}, meaning that have a hidden barrier at the end (a point at which all the threads have to meet before they are allowed to continuing the execution of the program). For instance, \verb|#pragma omp [parallel] for| is (however, keep in mind the \verb|nowait| clause).
+    \item A killer feature is the \texttt{reduction}s: compute sums, find max/min, or any operation you'd like (as long as you define it).
+    \item This is something that is true generally for any parallel framework not only \texttt{OMP}: parallel code and I/O operations (reading/writing) can become tricky pretty easily, be advised (Remember: several threads working on the same thing? Too many cooks spoil the broth).
+    \item It is important to have in mind which commands are \emph{blocking}, meaning that have a hidden barrier at the end (a point at which all the threads have to meet before they are allowed to continuing the execution of the program). For instance, \verb|#pragma omp [parallel] for| is blocking (however, keep in mind the \verb|nowait| clause).
     \item Sometimes one need that one thread only may work on something at the same time. This is where \verb|#pragma omp critical| and \verb|#pragma omp atomic| come into play, where the last one provide better performances but allows only very few operations like reading, writing, and updating (e.g. \verb|sum += a[n];|).
     \item In parallel mode but this particular piece of code should be executed once and once only? Put it in dedicated pragmas like \verb|#pragma omp master| (only the master thread, usually the one with ID 0, is allowed to execute the code) or with \verb|#pragma omp single| (only the first threads arrived at that point executes it, this is your best choice most of the times). They have no barriers.
+    \item Just to get it right, let us recap the difference between the last two points. With \texttt{critical} or \texttt{atomic} all the threads execute the command, but one at the time. With \texttt{single} or \texttt{master} the code is executed only once.
   \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{python}}
 \label{sec:python}
+(I used to be better with \texttt{python} but I don't use it so much now, so these tips here are not many nor much useful. I'm sorry. If you agree, please contribute!)
 \begin{itemize}
   \item Debugging, info \href{https://docs.python.org/2/library/pdb.html}{here}: \texttt{python -m pdb script.py}.
     Commands are similar to \texttt{gdb} (\ref{sec:gdb}).
@@ -600,8 +771,16 @@ float var_cube   = _p(var,3); // Expands to pow3(var)
       \item Get list of outdated packages: \verb|pip list --outdated|.
       \item When installing/upgrading problems may occur with older versions of the \texttt{C} compiler, \texttt{GCC}: try and force \texttt{C99} standard by setting \texttt{CFLAGS} before installing: \verb|export CFLAGS='-std=c99'|
     \end{itemize}
+  \item \texttt{matplotlib}
+    \begin{itemize}
+      \item \texttt{matplotlib.ion()} switch the interaction with the plot on, so that \texttt{plt.plot()} is not blocking and the plot can be kept and redrawn multiple times. This of course works in a plot environment, if you use it on a script the plot will disappear as soon as the script reaches its end.
+      \item 3D plots. A nice introduction can be found \href{https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html}{here}. To activate 3D-plotting (scatter, surface, mesh plot or any other) the axis should be called with \lstinline[language=python]{projection='3d'} which should be imported as follows: \lstinline[language=python]{from mpl_toolkits import mplot3d}
+    \end{itemize}
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{markdown}}
 \begin{itemize}
   \item \texttt{markdown} files are usually used for \texttt{README} and such.
@@ -610,9 +789,13 @@ float var_cube   = _p(var,3); // Expands to pow3(var)
 \begin{verbatim}
 pandoc --from=markdown --to=html -o out.html in.md
 \end{verbatim}
-  \item Guides, cheat-sheet and tutorial: on \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{Git-Hub}}, quick \href{https://commonmark.org/help/}{cheat-sheet} and a \href{https://agea.github.io/tutorial.md/}{tutorial}.
+  \item Guides, cheat-sheet and tutorial:
+    \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{Git-Hub}-flavoured}, \href{https://daringfireball.net/projects/markdown/syntax#list}{official}, quick \href{https://commonmark.org/help/}{cheat-sheet} and a \href{https://agea.github.io/tutorial.md/}{tutorial}.
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{gnuplot}}
 \begin{itemize}
   \item Keep the plot-windows open after closing the platform / having run the script: \verb|gnuplot --persist|
@@ -629,6 +812,9 @@ Useful options:
   \item \verb!linewidth|w!
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Miscellaneous}
 \label{sec:misc}
 \begin{itemize}
@@ -671,17 +857,32 @@ wc [options] <file>
     \begin{itemize}
       \item Changing the modification date of a file will force a smart compiler such as \verb|make| to re-run the compilation.
     \end{itemize}
-  \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: extract and/or merge pdf by command line
+  \item \href{http://www.imagemagick.org/script/convert.php}{\texttt{convert}}: very powerful tool for manipulating images (part of the \href{https://imagemagick.org/index.php}{\texttt{image magick}} suite, some \href{http://www.imagemagick.org/script/command-line-processing.php}{tips})
+    \begin{itemize}
+      \item Convert: \verb|convert test.<ext1> test.<ext2>| the extension can be \texttt{pdf}, \texttt{jpg}, \texttt{png},\ldots
+      \item Rotate: \verb|-rotate <deg>|
+      \item Choose density|quality (and hence the final size): option \verb|-density <n>| (its unit is \texttt{dpi})
+    \end{itemize}
+  \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: nice and easy utility to modify \texttt{pdf} files
+    \begin{itemize}
+      \item Extract and/or merge
+    \end{itemize}
 \begin{verbatim}
 pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...]
 \end{verbatim}
+    \begin{itemize}
+      \item Rotate: Commands specified for certain angles are available: \verb!pdf90|180|270 <in.pdf>!
+    \end{itemize}
   \item Job management:
     \begin{itemize}
       \item \verb|pgrep [options] <pattern>|: print info, especially the job-IDs, of all the jobs matching \verb|<pattern>|. Option \verb|-l| lists the names as well (and not only the IDs).
       \item \verb|kill [options] <job_ID>|: kill (send \texttt{SIGTERM} to) the job denoted by \verb|<job_ID>|.
       \item \verb|pkill [options] <pattern>|: as \verb|kill| but looks for matches in job names before (as \verb|pgrep|).
     \end{itemize}
-  \item \verb|[h]top|: \verb|top| (and its user-friendly version \verb|htop|) give an overview of a running system. One can find, for instance and just to name the most useful features, which jobs are running and how much memory or processors are used.
+  \item \verb|[h]top|: \verb|top| (and its user-friendly version \verb|htop|) gives an overview of a running system. One can find, for instance and just to name the most useful features, which jobs are running and how much memory or processors are used.
+    \begin{itemize}
+      \item Filter: use option \verb|-p <ID>|. Using the job name instead of the ID is more convenient: have a look at \href{https://unix.stackexchange.com/a/347544}{this}: \verb|top -p `pgrep -d "," <name>`|.
+    \end{itemize}
   \item \texttt{du}: shows the space used by the directories (and files) (mnemonic: \emph{d}isc \emph{u}sage)
     \begin{itemize}
       \item \verb!-a|--all!: show the space of every files, not only the directories
@@ -704,12 +905,25 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
       \item \verb|-u|: copy only if there is no file with the same name in \texttt{dest} or if \texttt{source} is newer
       \item \verb|-p|: preserve mode, ownership, and time-stamps
     \end{itemize}
+  \item \verb|crontab|: job scheduling. It allows one to regularly run some commands or scripts. Tutorial \href{https://www.adminschoice.com/crontab-quick-reference}{here} or \href{https://www.computerhope.com/unix/ucrontab.htm}{here}.
   \item \texttt{tee}: read from standard input and write to standard output \textbf{\&} files. Useful when you want to save the output of a command to file but you still want to read it on screen. E.g.
 \begin{verbatim}
   echo "This'll be printed to screen and inside file.txt" | tee file.txt
 \end{verbatim}
     \begin{itemize}
+      \item \verb|-a|: append to file.
       \item Print to screen \& pipe: \verb!./script | tee /dev/tty | ./script_with_pipe!
+    \end{itemize}
+  \item \texttt{bc}: shell calculator (mnemonic: \texttt{b}asic \texttt{c}alculator)
+    \begin{itemize}
+      \item Some examples \href{https://www.geeksforgeeks.org/bc-command-linux-examples/}{here}.
+      \item How to
+        \begin{itemize}
+          \item Simply run \texttt{bc} and an interactive interface will open (similar to what you get when you run \texttt{python}). Type \texttt{quit} for\ldots yeah, quitting.
+          \item If you do not need extensive calculation but have just a one-liner expression, just pass it to \texttt{bc}: \verb!echo "20+5" | bc! or \verb|bc <<< "20+5"|
+        \end{itemize}
+      \item Operators like \verb|++|, \verb|*=|, etc. are accepted
+      \item Give option \verb|-l| to load the standard math library and, for instance, deal with floating point calculation and use standard functions (e.g. sine \verb|s(x)|).
     \end{itemize}
   \item \texttt{tr}: \emph{tr}anslate, squeeze and/or delete characters from standard input. Basically performs string operations on standard input. Some options and examples
     \begin{itemize}
