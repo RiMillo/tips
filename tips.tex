@@ -73,7 +73,7 @@ There are different version of shell scripting, such as \texttt{bash}, \texttt{s
     \end{itemize}
   \item Run in background:
     \begin{itemize}
-      \item Add a \verb|&| after a command to run it back ground, meaning that it won't block the terminal while running, so that you can still use the terminal window for other stuff. This is quite useful when opening GUI programs (e.g. \texttt{evince}).
+      \item Add a \verb|&| after a command to run it back ground, meaning that it won't block the terminal while running, so that you can still use the terminal window for other stuff. This is quite useful when opening GUI programs (e.g.~\texttt{evince}).
       \item Precede your commands with \texttt{nohup} in order to have them running ever after the terminal window / session is closed. More \href{https://linux.101hacks.com/unix/nohup-command/}{here} or \href{https://hexadix.com/use-nohup-execute-commands-background-keep-running-exit-shell-promt/}{here}.
     \end{itemize}
   \item Some built-in variables:
@@ -211,7 +211,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item \verb|git <command> --continue|: the problems have been solved, tells \texttt{git} to continue what it was doing,
       \item \verb|git <command> --abort|: cancel the operation and return to the pre-sequence state, the situation before \texttt{git <command>} was called,
       \item \verb|git <command> --quit|: similar to \texttt{abort}, but do not reset the \texttt{HEAD} back to the original branch. The index and working tree are also left unchanged,
-      \item \verb|git <command> --skip|: in some commands, e.g. the \texttt{rebase}-related ones, skip (do not apply) the current commit, and continue.
+      \item \verb|git <command> --skip|: in some commands, e.g.~the \texttt{rebase}-related ones, skip (do not apply) the current commit, and continue.
     \end{itemize}
   \item \verb|git reset [options] SHA1|, \href{https://git-scm.com/docs/git-reset}{here}:
     \begin{itemize}
@@ -259,7 +259,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item \verb|--until=<date>|, \verb|--before=<date>|: show commits older than \texttt{date}
       \item \verb|-L <start>,<end>:<file>|: show commits which modified the zone of \texttt{file} delimited by the line numbers \texttt{start} and \texttt{end}
       \item \verb|-L:<function>:<file>|: show commits which modified function \texttt{function} of \texttt{file}
-      \item \verb!--<path>|<path/to/filename>!: show commits which modified the files in \texttt{path} (resp. the file \verb|path/to/filename|). To be put after all other options;
+      \item \verb!--<path>|<path/to/filename>!: show commits which modified the files in \texttt{path} (resp.~the file \verb|path/to/filename|). To be put after all other options;
       \item \verb|--pretty[=<format>]|, \verb|--format=<format>|: customize the format of your output. You may want to choose predefined styles, then \texttt{format} can be chosen in \texttt{oneline}, \texttt{short}, \texttt{medium}, \texttt{full}, \texttt{fuller}, ...
     \end{itemize}
   \item Commit cherry-picking (\href{https://git-scm.com/docs/git-cherry-pick}{manual}): apply a specific commit from another branch
@@ -476,7 +476,7 @@ find . -name notmyfile -not -path <dir_excl>
         This is somehow too simple and \texttt{find} will still search into the sub-directories of \verb|dir_excl|. You may find other solutions \href{https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command}{here} (the accepted answer with \verb|-prune|may not always work).
     \end{itemize}
   \item \verb|-maxdepth <n>|: limit the tree descent level of the search
-  \item Apply a command to all the matching files: e.g. run a bash script, grep only certain files
+  \item Apply a command to all the matching files: e.g.~run a bash script, grep only certain files
 \begin{verbatim}
 find . -name *.log -exec script.sh {} \;
 find . -name *.log -exec script.sh {} +
@@ -490,9 +490,9 @@ find . -name *.log -exec grep -Hn --color "pattern" {} +
     \item \verb|-ok|: like \texttt{exec} but ask the permission first
     \item \verb|-execdir|: like \texttt{exec} but run the command from the subdirectory that contains the matched file.
   \end{itemize}
-  \item Delete all the matching files: e.g. delete all the \texttt{.log} files \texttt{find . -name *.log -delete}
+  \item Delete all the matching files: e.g.~delete all the \texttt{.log} files \texttt{find . -name *.log -delete}
     \begin{itemize}
-      \item \texttt{-delete} calls \texttt{rm} under the hood, in fact it is practically equivalent to \texttt{-exec rm}. Hence it will fail if one tries to delete directory. In this case, use the long way: \texttt{-exec rm -r}
+      \item \texttt{-delete} calls \texttt{rm} under the hood, in fact it is practically equivalent to \texttt{-exec rm}. Hence it will fail if one tries to delete directory. In this case, use the long way: \verb|-exec rm -r {} \;|. You may add \verb|-prune| to avoid some warnings/errors. Moreover, one may add quote around braces to avoid errors with names that contains whitespaces.
     \end{itemize}
 \end{itemize}
 
@@ -589,7 +589,7 @@ awk '{printf "I want %5.2f bananas\n" 1.652}' file
       \item \verb|FNR|: row number relative to current file. It resets to 1 every time a new file is read.
       \item \verb|FS|: field separator
       \item \verb|FILENAME|: should I explain?
-      \item \verb|ENVIRON|: array with environment variables (e.g. try \verb|ENVIRON["USER"]|).
+      \item \verb|ENVIRON|: array with environment variables (e.g.~try \verb|ENVIRON["USER"]|).
     \end{itemize}
   \item Tricks:
     \begin{itemize}
@@ -799,7 +799,7 @@ pandoc --from=markdown --to=html -o out.html in.md
 \section{\texttt{gnuplot}}
 \begin{itemize}
   \item Keep the plot-windows open after closing the platform / having run the script: \verb|gnuplot --persist|
-  \item Basic plotting from file: e.g. use column 1 as x and 3 as y (mind \texttt{u} is equivalent to \texttt{using})
+  \item Basic plotting from file: e.g.~use column 1 as x and 3 as y (mind \texttt{u} is equivalent to \texttt{using})
 \begin{verbatim}
   plot "file.dat" using 1:2 [options], "file2.dat" u 1:3
 \end{verbatim}
@@ -828,6 +828,11 @@ echo "I want a ${what}"
       \item \verb|-n|: do not to insert a new line at the end.
       \item \verb|-e|: interpret a backslashed character, e.g. \verb|\n| will be considered as newline
       \item Overwrite: use \verb|\b| (needs option \verb|-e|) to go back a character. For entire lines, have a look \href{https://stackoverflow.com/questions/11283625/overwrite-last-line-on-terminal}{here}.
+    \end{itemize}
+  \item Download with command line: \texttt{wget} and \texttt{curl}
+    \begin{itemize}
+      \item Basic stuff \href{https://linuxconfig.org/download-file-from-url-on-linux-using-command-line}{here}
+      \item With proxy \href{https://www.cyberciti.biz/faq/linux-unix-curl-command-with-proxy-username-password-http-options/}{here}
     \end{itemize}
   \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
 \begin{verbatim}
@@ -922,8 +927,8 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
           \item Simply run \texttt{bc} and an interactive interface will open (similar to what you get when you run \texttt{python}). Type \texttt{quit} for\ldots yeah, quitting.
           \item If you do not need extensive calculation but have just a one-liner expression, just pass it to \texttt{bc}: \verb!echo "20+5" | bc! or \verb|bc <<< "20+5"|
         \end{itemize}
-      \item Operators like \verb|++|, \verb|*=|, etc. are accepted
-      \item Give option \verb|-l| to load the standard math library and, for instance, deal with floating point calculation and use standard functions (e.g. sine \verb|s(x)|).
+      \item Operators like \verb|++|, \verb|*=|, etc.~are accepted
+      \item Give option \verb|-l| to load the standard math library and, for instance, deal with floating point calculation and use standard functions (e.g.~sine \verb|s(x)|).
     \end{itemize}
   \item \texttt{tr}: \emph{tr}anslate, squeeze and/or delete characters from standard input. Basically performs string operations on standard input. Some options and examples
     \begin{itemize}
