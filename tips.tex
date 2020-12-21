@@ -142,8 +142,12 @@ cmd 2>&1 >/dev/null | pipe_receiver
           \item \verb|--timeout=<n>|: how long the widget should stay
         \end{itemize}
     \end{itemize}
-  \item Pimp your \texttt{bash} by modifying the file \texttt{.bashrc} in your home (load modules that you want by default, set global variables,\ldots) and define personal shortcuts in \texttt{.bash\_aliases}, again in your home (verify that it is loaded in \texttt{.bashrc}).
-  \item In \texttt{bash}, the keyboard combo \texttt{Ctrl+Alt+E} expands aliases and variables that you writing.
+  \item Aliases
+    \begin{itemize}
+      \item \item Pimp your \texttt{bash} by modifying the file \texttt{.bashrc} in your home (load modules that you want by default, set global variables,\ldots) and define personal shortcuts in \texttt{.bash\_aliases}, again in your home (verify that it is loaded in \texttt{.bashrc}).
+      \item Preceding a terminal command with a backslash will tell the shell to run the command itself and not the alias with the same name if it exists.
+      \item In \texttt{bash}, the keyboard combo \texttt{Ctrl+Alt+E} expands aliases and variables that you writing.
+    \end{itemize}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -689,7 +693,9 @@ float var_square = _p(var,2); // Expands to pow2(var)
 float var_cube   = _p(var,3); // Expands to pow3(var)
 \end{Verbatim}
     \end{itemize}
-  \item Poorman optimizations: here are some simple optimizations that you can consider, you can think of them as good practices. They won't certainly have much of an impact on the total runtime (in fact, especially with the loops, the compiler will try do anticipate what you want to do and optimize it), but it is useful to have them in mind and of course, it is definitely better to use them. A great deal of them deals with cache optimizations and avoiding cache-misses, it could be interesting to have a look at how a cache is and works and how to get the most out of it. Anywho, here are some optimizations:
+  \end{itemize}
+\subsection{Poorman optimizations}
+  Here are some simple optimizations that you can consider, you can think of them as good practices. They won't certainly have much of an impact on the total runtime (in fact, especially with the loops, the compiler will try do anticipate what you want to do and optimize it), but it is useful to have them in mind and of course, it is definitely better to use them. A great deal of them deals with cache optimizations and avoiding cache-misses, it could be interesting to have a look at how a cache is and works and how to get the most out of it. Anywho, here are some optimizations:
     \begin{itemize}
       \item Constant variables. You need to define a variable and you know for sure from the beginning that its values will not change in the current scope. It is then advisable to define them as constant: the compiler will take into consideration this piece of information and use it to optimize the program. In order to make a variable constant, just prepend \texttt{const} to the usual definition \texttt{const int n = 10;}. You try to modify a value of a constant value, you'll get an error or at least a warning. You can also make the arguments of a function constant, this may be beneficial in three ways: optimization, allow the user to identify input and output parameter, and avoid error like modifying a value that you are not supposed to. However, it is usually not advised to make an argument of a function constant if it's one value (\texttt{int}, \texttt{float},\ldots) since in this case the performance gains will be null. Still it could be beneficial for the lecture.
       \item Data locality: try to define variables as close as possible to where you are going to use them. Basically, it is sometimes better to redefine a variable in a loop at each iteration rather than define it outside and change it at each iteration.
@@ -734,8 +740,6 @@ for (short int i=0; i < 3; i++){
       \item Inline function. If a function is less than a dozen line long, consider inlining it. If this concept is new to you, know that: he code of an inline functions is copied as is where it is requested, so that by using inlined functions we don't get the overhead for the call to a function. Calling a long inlined function many times makes the executable larger (many lines of code) and that is something to avoid, hence, a dozen lines is a good thumb-rule.
       \item If dealing with synchronization in parallel mode, try to call those functions as less as possible. Instead of doing \texttt{n} times a synchronization of a vector of 3 values, prefer only one synchronization of a vector of \texttt{3*n} values.
     \end{itemize}
-
-\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -855,6 +859,7 @@ wc [options] <file>
       \item \verb|-l|: print number of lines;
       \item \verb|-m|: print number of characters;
       \item \verb|-L|: print max line length;
+      \item It usually (at least with \verb|-l|) re-prints the file name. To avoid use: \verb|wc -l < file.txt| (notice \verb|<|);
     \end{itemize}
   \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one.
   \item \verb|touch <file>|: modify the file access and/or modification date. If the file doesn't exist, an empty one will be created (unless specific options are given). For more details and all the options, have a look at its \texttt{man} page.\\
