@@ -64,9 +64,9 @@ or sometimes
 \label{sec:shell}
 There are different version of shells scripting, such as \texttt{bash}, \texttt{sh}, \texttt{zsh}; they have some differences in commands and syntax (but I do not know them \verb|\o/|).
 
-Notice that some terminal commands have their own section in these tips (e.g.~\texttt{grep} in \autoref{sec:grep}), for others some insights are given in \autoref{sec:misc}.
+In this first part, we cover basic stuff about the shell. For useful terminal commands and tools, see the next sub-sections.
 \begin{itemize}
-  \item Of course I'm not the first to write tips, and certainly not the one which knows the most, so here a couples of tips lists, especially about shortcuts: \href{https://www.techrepublic.com/article/20-terminal-shortcuts-developers-need-to-know/}{here} and \href{https://www.howtogeek.com/howto/ubuntu/keyboard-shortcuts-for-bash-command-shell-for-ubuntu-debian-suse-redhat-linux-etc/}{here} and \href{https://devhints.io/bash}{here}.
+  \item Of course I'm not the first to write tips, and certainly not the one who knows the most, so here a couples of tips lists, especially about shortcuts: \href{https://www.techrepublic.com/article/20-terminal-shortcuts-developers-need-to-know/}{here} and \href{https://www.howtogeek.com/howto/ubuntu/keyboard-shortcuts-for-bash-command-shell-for-ubuntu-debian-suse-redhat-linux-etc/}{here} and \href{https://devhints.io/bash}{here}.
   \item Default applications: often we don't know the name of the programs that we use, for instance, for opening a pdf. Here some of them
     \begin{itemize}
       \item \texttt{evince} for pdf.
@@ -95,7 +95,7 @@ fi
 \end{verbatim}
     \end{itemize}
   \item Operator \texttt{*} expands to all the files whose name does not start with "\texttt{.}". Hence, hidden files (as well as current directory "\texttt{.}", and parent directory "\texttt{..}" are not included).
-  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[| (cf. \autoref{sec:misc}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{sec:awk}) or \texttt{python} (\autoref{sec:python}) or \texttt{bc} (\autoref{sec:misc}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
+  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[| (cf. \autoref{sec:misc}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{ssec:awk}) or \texttt{python} (\autoref{sec:python}) or \texttt{bc} (\autoref{sec:misc}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
   \item Conditional statements: \href{https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs}{here}
   \item Pipes: \verb!|! connects standard output of one command to standard input of another.
   \item File descriptors:
@@ -170,7 +170,315 @@ for i in ${!list[@]}; do [...] done # Indeces only
     \end{itemize}
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\texttt{sed}}
+Bases:
+\begin{itemize}
+  \item Some info could be found in the \href{https://www.gnu.org/software/sed/manual/sed.html}{manual} or in \href{http://www.grymoire.com/Unix/Sed.html}{this tutorial}; \href{https://www.tutorialspoint.com/unix/unix-regular-expressions.htm}{this} could be useful as well.
+  \item A general knowledge of the regex could be very useful. Take a look at this \href{https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285}{chetsheet}
+    \begin{itemize}
+      \item \verb|^pattern|: matches any string that starts with \texttt{pattern}. \verb|pattern$|: matches any string that ends with \texttt{pattern}
+    \end{itemize}
+  \item General usage: \verb|sed [options] "[range] <command>" old_file new_file|. Double quotes \texttt{"..."} may be replaced by single quotes \texttt{'...'}.
+    \begin{itemize}
+      \item If no \verb|new_file| is given, the result is printed to \texttt{stdout}.
+    \end{itemize}
+\end{itemize}
+
+Commands:
+\begin{itemize}
+  \item Common commands may be found \href{https://www.gnu.org/software/sed/manual/sed.html#Common-Commands}{here}, less common ones \href{https://www.gnu.org/software/sed/manual/sed.html#Other-Commands}{here}, the \href{https://www.gnu.org/software/sed/manual/html_node/sed-commands-list.html}{list} from the manual
+  \item Search and replace, \verb|s|:
+\begin{verbatim}
+  sed -i "s/<pattern>/<replaced>/" file
+\end{verbatim}
+  \item Replace all the lines matching \verb|pattern| with \verb|Pattern was here| - this works on the entire line, \verb|c <text>| or \verb|c\<newline><text>|:
+\begin{verbatim}
+sed -i "/pattern/c Pattern was here/" file,
+\end{verbatim}
+  \item Delete all lines containing \verb|pattern| - this works on the entire line:
+\begin{verbatim}
+sed -i "/pattern/d" file;
+\end{verbatim}
+  \item Insert before line, \verb|i <text>| or \verb|i\<newline><text>|
+\begin{verbatim}
+sed -i "/pattern/i Next line is pattern/" file,
+\end{verbatim}
+  \item Append after line, \verb|a <text>| or \verb|a\<newline><text>|
+\begin{verbatim}
+sed -i "/pattern/a Previous line was pattern/" file,
+\end{verbatim}
+  \item Apply multiple commands at the same time:
+    \begin{itemize}
+      \item Separate them with semicolons: \verb|sed 'cmd1 ; cmd2' file|
+      \item Separate them with \verb|-e|: \verb|sed -e 'cmd1' -e 'cmd2' file|
+      \item Group sever commands together with braces: \verb|{cmd1 ; cmd2}|
+    \end{itemize}
+\end{itemize}
+
+Ranges: ranges are optional and it is the way to tell \verb|sed| to apply the provided commands only to those lines specified by the range. Some examples
+\begin{itemize}
+  \item \verb|4,10|: lines 4 to 10
+  \item \verb|4,+6|: line 4 and the following 6 lines
+  \item \verb|4,10!|: everything except lines 4 to 10
+  \item \verb|4~3|: starting from line 4, every 3 lines
+  \item \verb|/pattern/|: all the lines matching \verb|pattern|
+\end{itemize}
+
+Options and tricks:
+\begin{itemize}
+  \item The option \verb|-i[<suffix>]|, \verb|--in-place=[<suffix>]| allows to overwrite the file once it is modified. If \verb|suffix| is provided a backup is created with the chosen extension;
+    \begin{itemize}
+      \item \verb|-i.bak| creates a backup file,
+      \item The option \verb|--follow-symlinks|, available only with \verb|-i| activated, enables to modify the original file;
+    \end{itemize}
+  \item If in one line there are more occurrences, only the first one is matched. Appending \texttt{g} will make \texttt{sed} match all the occurrences.
+\begin{verbatim}
+  sed -i "s/<pattern>/<replaced>/g" file
+\end{verbatim}
+  \item Character \verb|&| expands to matched string.
+  \item Match exactly the word: from regex, \verb|\b| delimits boundaries of the word. Hence, (although \verb|\<word\>| seems to work, as well (\texttt{vim}, anyone?)):
+\begin{verbatim}
+$ echo "bar embarassment" | sed "s/\bbar\b/no bar/g"
+no bar embarassment
+\end{verbatim}
+  \item Parentheses used in regex syntax (for groups \verb|(.)|, repetitions \verb|{.}|) should be escaped by a backslash: e.g. \verb|\(agroup\)|. Access groups content with \verb|\<n>| where \verb|n| is the number of the group. Or, add option \verb|-E|.
+  \item Use \texttt{bash} variables: prefer the double-quotes \verb|"| instead of the single ones \verb|'|:
+\begin{verbatim}
+sed "s/${pattern}/${replaced}/" file
+\end{verbatim}
+  \item \verb|$| means last line when dealing with ranges, or end of the line when dealing with patterns.
+  \item Mind that command \verb|d| erases the entire line, if you want to delete only the pattern, you can replace it with an empty string.
+  \item Write at the beginning of the line: match the beginning (special character \verb|^|) and replace. For instance, in \texttt{C} comments all the lines containing \texttt{Comment} (mind that we have to escape character \verb|/|)
+\begin{verbatim}
+sed '/Comment/ s/^/\/\//' test.c
+\end{verbatim}
+  \item Replace only the first occurrence of \verb|pattern|: a bit tricky, find the right range (from line zero to first occurrence) then replace
+\begin{verbatim}
+sed '0,/pattern/ s/pattern/new pattern/' file
+\end{verbatim}
+  \item Replace only the last occurrence of pattern: I'm still working on that. A long and dirty workaround may be to use \verb|tac|, then replace \emph{first} occurrence and finally \verb|tac| again.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\texttt{grep}}
+\label{ssec:grep}
+\verb|grep [options] <pattern> [files]|
+
+Some useful options:
+\begin{itemize}
+  \item \texttt{-r}: recursive, then \texttt{files} can be a directory;
+  \item \texttt{-R}: as above, but follow links;
+  \item \texttt{-w}: match only complete \emph{w}ords;
+  \item \texttt{-c}: just print the \emph{c}ount of the lines with a match;
+  \item \texttt{-v}, \verb|--invert-match|: get lines with that do \emph{not} match the \texttt{pattern};
+  \item \texttt{-e}, \verb|--regexp=<pattern>|: look for \texttt{pattern}. This can be used, for example if \texttt{pattern} starts with a dash (\texttt{-}); similar options are \verb!-E|F|G|P!
+  \item \texttt{-i}, \verb|--ignore-case|: search is case-\emph{i}nsensitive;
+  \item \texttt{-h}: without filename (mnemonic: \emph{h}ead)
+  \item \texttt{-H}: with filename (mnemonic: \emph{H}ead)
+  \item \texttt{-n}: show line number;
+  \item \texttt{-m <n>}: print only the first \texttt{n} occurrences of the \texttt{pattern};
+  \item \texttt{-B <n>}: print \texttt{<n>} lines \emph{B}efore the match (included);
+  \item \texttt{-A <n>}: print \texttt{<n>} lines \emph{A}fter the match (included);
+  \item \texttt{-C <n>}: print \texttt{<n>} lines of the \emph{C}ontext of the match;
+  \item \texttt{-l}, \verb|--files-with-matches|: \emph{l}ist only the file names in which at least one match is found;
+  \item \texttt{-L}, \verb|--files-without-matches|: \emph{L}ist only the file names in which no match is found;
+  \item \texttt{-q}: \emph{q}uiet, return just the exit status code (0 or 1 corresponding to, respectively, true or false) according to whether it have found a match or not;
+  \item \verb|--include=<pattern>|: consider only files matching \texttt{pattern}. For example for only \TeX{} sources
+\begin{verbatim}
+grep --include=\*.tex -r "O Bella Ciao" .
+\end{verbatim}
+  \item \verb|--exclude=<pattern>|: do not consider files matching \texttt{pattern};
+  \item \verb|--exclude-dir=<dir>|: exclude files in directory \texttt{dir};
+\end{itemize}
+
+Tricks:
+\begin{itemize}
+  \item Start from the end: \verb!tac <files> | grep [options] <pattern>! (Add a pipe to \texttt{tac} to recover the original order).
+  \item Print even if the match is not found \verb!grep -E '^|<pattern>' <file>!. Special character \verb|^| means "beginning of the line", hence it is always found. Why should one use it? with the option \verb|--color| (usually enabled by default) \verb|grep| highlights the matches. Here, the command find the beginning of the line, which cannot be highlighted, hence it prints the line, if it finds the pattern as well it will highlight it.
+\end{itemize}
+
+Types:
+\begin{itemize}
+  \item \texttt{-G}, \verb|--basic-regexp|, simple regexp, default
+  \item \texttt{-E}, \verb|--extended-regexp|
+  \item \texttt{-P}, \verb|--perl-regexp|
+  \item \texttt{-F}, \verb|--fixed-strings|, exclude regexp
+\end{itemize}
+
+The version \texttt{zgrep} (with the same options) allows to search into compressed/\emph{z}ipped files.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\texttt{find}}
+It allows to find files in a tree and apply a command to them:
+\begin{verbatim}
+  find [options] <path> <command>
+\end{verbatim}
+If no command is given, \texttt{-print} is executed. Some examples and options:
+\begin{itemize}
+  \item Check if file \texttt{filename} is in \texttt{mydir} or one of its subdirectories (\texttt{-print} is considered, thus it works similarly to \texttt{ls})
+\begin{verbatim}
+  find <mydir> -name <filename>
+\end{verbatim}
+  \begin{itemize}
+    \item \verb|-regex|: similar to \texttt{name} but one can use regex syntax to write the pattern. The type can be chosen with \verb|-regextype| (ex. \texttt{sed}). Notice that \texttt{find} always prepends \verb|./| to the path so you may want to start your pattern with something like \verb|.*/|
+    \item Case-insensitive search: use \verb|-iname| or \verb|-iregex| as you would use their parent options
+  \end{itemize}
+  \item Filter on the file type: option \verb|-type <t>| where \texttt{<t>} can be, for example, \texttt{d} (directory), \texttt{f} (regular file), \texttt{l} (symbolic link)\dots
+  \item \texttt{!}, \texttt{-not}: negation of the expression that follows. E.g.: \texttt{find . -not -name foo} print all the files in the current directory with a name different than \texttt{foo}.
+    \begin{itemize}
+      \item Exclude a path:
+\begin{verbatim}
+find . -name notmyfile -not -path <dir_excl>
+\end{verbatim}
+        This is somehow too simple and \texttt{find} will still search into the sub-directories of \verb|dir_excl|. You may find other solutions \href{https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command}{here} (the accepted answer with \verb|-prune|may not always work).
+    \end{itemize}
+  \item \verb|-maxdepth <n>|: limit the tree descent level of the search
+  \item Apply a command to all the matching files: e.g.~run a bash script, grep only certain files
+\begin{verbatim}
+find . -name "*.log" -exec script.sh {} \;
+find . -name "*.log" -exec script.sh {} +
+find . -name "*.log" -exec grep -Hn --color "pattern" {} +
+\end{verbatim}
+    \verb|{}| stands for the matching files; the first version will execute as many calls as the numbers of matching files, the second (tries to) appends all the files in an single list of arguments (hence saving the calls to the script). If you would like to use a pipe in your \texttt{exec} command, use \texttt{sh} like below, or have a look \href{https://stackoverflow.com/questions/307015/how-do-i-include-a-pipe-in-my-linux-find-exec-command}{here}.
+\begin{verbatim}
+find . -name "*.log" -exec sh -c "tac {} | grep -m1 pattern" \;
+\end{verbatim}
+  \begin{itemize}
+    \item Mind that \texttt{find} does not know the content of \texttt{.bashrc} and alike, hence one could not use aliases (its \texttt{ls} command might be stripped-down with respect to what one is used to, you may want to consider adding some user-friendly options).
+  \end{itemize}
+  \begin{itemize}
+    \item \verb|-ok|: like \texttt{exec} but ask the permission first
+    \item \verb|-execdir|: like \texttt{exec} but run the command from the subdirectory that contains the matched file.
+  \end{itemize}
+  \item Delete all the matching files: e.g.~delete all the \texttt{.log} files \texttt{find . -name *.log -delete}
+    \begin{itemize}
+      \item \texttt{-delete} calls \texttt{rm} under the hood, in fact it is practically equivalent to \texttt{-exec rm}. Hence it will fail if one tries to delete directory. In this case, use the long way: \verb|-exec rm -r {} \;|. You may add \verb|-prune| to avoid some warnings/errors. Moreover, one may add quote around braces to avoid errors with names that contains whitespaces.
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Compressing: \texttt{tar} \& \texttt{zip}}
+\texttt{tar} is a utility which creates archives
+\begin{itemize}
+  \item Basic usage:
+    \begin{itemize}
+      \item \verb|c|, \verb|-c|, \verb|--create|: create. Remember to put all the files that you want in your archive in one go.
+\begin{verbatim}
+tar -cf archived.tar file/to/archive
+\end{verbatim}
+      \item \verb|x|, \verb|-x|, \verb|--extract|, \verb|--get|: extract
+\begin{verbatim}
+tar -xf archived.tar
+\end{verbatim}
+      \item As you have already understood, \verb|-f| stands for file(name).
+    \end{itemize}
+  \item Additional options:
+    \begin{itemize}
+      \item \verb|t|, \verb|-t|, \verb|--list|: list the files.
+      \item \verb|r|, \verb|-r|, \verb|--append|: add files to an existing archive.
+      \item \verb|u|, \verb|-u|, \verb|--update|: add to the archive only the files which are already present and which have been modified.
+      \item \verb|A|, \verb|-A|, \verb|--catenate|, \verb|--concatenate|: concatenate archives.
+      \item Symbolic links: by default, \texttt{tar} keeps the links. If in the archive one wants a \emph{copy} of the \emph{original} file to which the link points to, option \verb!-h|--deeference! should be used.
+      \item \verb|-C|, \verb|--directory <path>|: execute from \verb|path| (e.g.~decompress inside a given directory)
+    \end{itemize}
+  \item Compression algorithms:
+    \begin{itemize}
+      \item Zip (compress), \verb|-z|, \verb|--gzip|, \verb|--gunzip|, \verb|--ungzip|: use compression algorithms. The option has to be used also when extracting compressed archived. Usually, compressed archived have \verb|.tar.gz| or \verb|.tgz| as extension.
+      \item \verb|-j|, \verb|--bzip2|
+      \item \verb|-J|, \verb|xz|
+    \end{itemize}
+\end{itemize}
+
+\medskip
+A cross-platform extension for compressed files is \texttt{zip}. To compress simply run
+\begin{verbatim}
+zip [options] <compressed_file>.zip <files_to_compress>
+\end{verbatim}
+By default it adds links as hard-files (and not as links). Option \verb|-r| (mneno: \emph{r}ecursive) include also {sub}directories and their files.
+
+To deflate, run \verb|unzip <compressed_file>.zip|
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\texttt{awk}}
+\label{ssec:awk}
+\texttt{awk} is a text-processing utility that allows to perform easily operations line-by-line with column (here called \emph{fields}) manipulations. A tutorial is given \href{https://www.tutorialspoint.com/awk/index.htm}{here}.
+\begin{itemize}
+  \item Basis: \verb|awk [opt] 'BEGIN{[...]} {[...]} END{[...]}' <file>|
+    \begin{itemize}
+      \item The commands in the curly brackets after \texttt{BEGIN} are executed before starting the reading of the file,
+      \item The commands in the unnamed curly brackets are executed at each line,
+      \item The commands in the curly brackets after \texttt{END} are executed once the file has been read,
+      \item Each of these three sections is optional;
+    \end{itemize}
+  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g.
+    \begin{itemize}
+      \item print the third row: \verb|awk 'NR==3{print;exit}' file.txt|
+      \item print lines containing \texttt{apple}: \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
+      \item More than one pattern might be used. No particular syntax is needed: nothing, a space or a newline will do the trick
+\begin{verbatim}
+awk '/apple/{print "Found an apple"}/banana/{print "Found a banana"}' infile
+\end{verbatim}
+    \end{itemize}
+  \item Select the \texttt{n}-th field \verb|$<n>|. Remark: it is 1-based (first field is indexed by 1), and \verb|$0| expands to the whole line.
+  \item Printing: it is usually achieved by command \texttt{print}. Some notes
+    \begin{itemize}
+      \item Columns are accessed with a dollar \verb|$|, for variables just use their name
+\begin{verbatim}
+awk '{print $NF}' file # Print last column only
+awk -v T=8 'END{print "2 times T = " 2*T}' file
+\end{verbatim}
+      \item One can use redirection such as \verb|>|, \verb|>>| as explained in \autoref{sec:shell} to write to file. E.g.
+\begin{verbatim}
+awk 'BEGIN{print Ciao > "ciao.txt"}' file
+\end{verbatim}
+      \item \texttt{print} it also prints a new line stamp at the end
+      \item \texttt{printf}, very similar to the \texttt{C} function, it can be used to choose the format. Differently from \texttt{print}, it does not insert a new line. E.g. (mind the \verb|\n|)
+\begin{verbatim}
+awk '{printf "I want %5.2f bananas\n" 1.652}' file
+\end{verbatim}
+    \end{itemize}
+  \item Useful options:
+    \begin{itemize}
+      \item The file name is given as argument of the command or with \verb|-f <file>|, or \verb|--file=<file>|.
+      \item \verb|-F <char>|, \verb|--field-separator="<char>"|: \verb|char| is the column separator (space is default);
+      \item Pass an argument: \verb|-v var_name=<value>|
+      \item When using \texttt{gawk} (the GNU implementation of \texttt{awk}) one can asks for in-place replacement: \verb|-i inplace|.
+    \end{itemize}
+  \item Built-in variables:
+    \begin{itemize}
+      \item \verb|NF|: number of fields / columns in the current row (hence \verb|$NF| is the last column of the row)
+      \item \verb|NR|: row number, mind that it is incremented if several files are read (1 based).
+      \item \verb|FNR|: row number relative to current file. It resets to 1 every time a new file is read.
+      \item \verb|FS|: field separator
+      \item \verb|FILENAME|: should I explain?
+      \item \verb|ENVIRON|: array with environment variables (e.g.~try \verb|ENVIRON["USER"]|).
+    \end{itemize}
+  \item Tricks:
+    \begin{itemize}
+      \item \href{https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html}{String-Manipulation functions}
+      \item Operator "match", \verb|~| (tilde): \verb|<string>~<pattern>| true if \verb|string| matches \verb|pattern|. The negation is \verb|!~|. Hence, the following emulates \texttt{grep }(well, not exactly since we search in the second column only, but you get the idea)
+\begin{verbatim}
+awk '$2~/<pattern>/{print $0}' file.txt
+\end{verbatim}
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Shell commands and tools}
+\label{ssec:shell_tools}
 \begin{itemize}
   \item \texttt{echo}: print a line to standard output. E.g. \verb|echo "Ciao World"|. It includes a newline at the end. It could be used via piping to provide an input parameter to a command.
     \begin{itemize}
@@ -182,6 +490,18 @@ echo "I want a ${what}"
       \item \verb|-n|: do not to insert a new line at the end.
       \item \verb|-e|: interpret a backslashed character, e.g. \verb|\n| will be considered as newline
       \item Overwrite: use \verb|\b| (needs option \verb|-e|) to go back a character. For entire lines, have a look \href{https://stackoverflow.com/questions/11283625/overwrite-last-line-on-terminal}{here}.
+    \end{itemize}
+  \item \href{https://man7.org/linux/man-pages/man1/script.1.html}{\texttt{script}}: save a shell session (commands and outputs) to a file
+\begin{verbatim}
+script session.log
+[commands here]
+exit
+\end{verbatim}
+    \begin{itemize}
+      \item End the recording with \texttt{exit}
+      \item \verb|-q|: quiet mode (do not print \texttt{script}-related ``greetings'')
+      \item \verb|-a|: \emph{a}ppend to file
+      \item \verb|-c <cmd>|: record command \verb|cmd| only (without starting an interactive session)
     \end{itemize}
   \item \verb|eval [args]|: \verb|args| are concatenated to build and run a command. Variables can be used:
 \begin{verbatim}
@@ -377,7 +697,8 @@ printf "%d %d %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texttt{valgrind}}
+\section{Debugging tools}
+\subsection{\texttt{valgrind}}
 Some useful options:
 \begin{itemize}
   \item Check and track memory leaks: \verb|--leak-check=full| \verb|--track-origins=yes|
@@ -388,7 +709,7 @@ Some useful options:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texttt{gdb}}
+\subsection{\texttt{gdb}}
 \label{sec:gdb}
 \begin{itemize}
   \item Calling functions such as \texttt{fabs}, \texttt{sin},...: \texttt{((double(*)(double))<foo>)(x)}
@@ -538,7 +859,7 @@ $ git config [--global] alias.pr 'pull ---rebase'
       \item \verb|good [commit]|: tag commit as good (default is current).
       \item \verb|reset|: once you have find the buggy commit, quit the procedure and go back to were you were at the beginning.
     \end{itemize}
-  \item \verb|git grep| (\href{https://git-scm.com/docs/git-grep}{Manual}): as \verb|grep| (\autoref{sec:grep}) but on tracked files: \verb|git grep 'time_t' -- '*.[ch]'|. Some bonus options:
+  \item \verb|git grep| (\href{https://git-scm.com/docs/git-grep}{Manual}): it basically works as \verb|grep| (see \autoref{ssec:grep}) but on tracked files only: \verb|git grep 'time_t' -- '*.[ch]'|. Some bonus options:
     \begin{itemize}
       \item Notice that \verb|--| marks the end of the options.
       \item \verb|--and|, \verb|--or|, \verb|--not|. Option \verb|-e| should be used.
@@ -549,309 +870,6 @@ $ git config [--global] alias.pr 'pull ---rebase'
 
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texttt{sed}}
-Bases:
-\begin{itemize}
-  \item Some info could be found in the \href{https://www.gnu.org/software/sed/manual/sed.html}{manual} or in \href{http://www.grymoire.com/Unix/Sed.html}{this tutorial}; \href{https://www.tutorialspoint.com/unix/unix-regular-expressions.htm}{this} could be useful as well.
-  \item A general knowledge of the regex could be very useful. Take a look at this \href{https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285}{chetsheet}
-    \begin{itemize}
-      \item \verb|^pattern|: matches any string that starts with \texttt{pattern}. \verb|pattern$|: matches any string that ends with \texttt{pattern}
-    \end{itemize}
-  \item General usage: \verb|sed [options] "[range] <command>" old_file new_file|. Double quotes \texttt{"..."} may be replaced by single quotes \texttt{'...'}.
-    \begin{itemize}
-      \item If no \verb|new_file| is given, the result is printed to \texttt{stdout}.
-    \end{itemize}
-\end{itemize}
-
-Commands:
-\begin{itemize}
-  \item Common commands may be found \href{https://www.gnu.org/software/sed/manual/sed.html#Common-Commands}{here}, less common ones \href{https://www.gnu.org/software/sed/manual/sed.html#Other-Commands}{here}, the \href{https://www.gnu.org/software/sed/manual/html_node/sed-commands-list.html}{list} from the manual
-  \item Search and replace, \verb|s|:
-\begin{verbatim}
-  sed -i "s/<pattern>/<replaced>/" file
-\end{verbatim}
-  \item Replace all the lines matching \verb|pattern| with \verb|Pattern was here| - this works on the entire line, \verb|c <text>| or \verb|c\<newline><text>|:
-\begin{verbatim}
-sed -i "/pattern/c Pattern was here/" file,
-\end{verbatim}
-  \item Delete all lines containing \verb|pattern| - this works on the entire line:
-\begin{verbatim}
-sed -i "/pattern/d" file;
-\end{verbatim}
-  \item Insert before line, \verb|i <text>| or \verb|i\<newline><text>|
-\begin{verbatim}
-sed -i "/pattern/i Next line is pattern/" file,
-\end{verbatim}
-  \item Append after line, \verb|a <text>| or \verb|a\<newline><text>|
-\begin{verbatim}
-sed -i "/pattern/a Previous line was pattern/" file,
-\end{verbatim}
-  \item Apply multiple commands at the same time:
-    \begin{itemize}
-      \item Separate them with semicolons: \verb|sed 'cmd1 ; cmd2' file|
-      \item Separate them with \verb|-e|: \verb|sed -e 'cmd1' -e 'cmd2' file|
-      \item Group sever commands together with braces: \verb|{cmd1 ; cmd2}|
-    \end{itemize}
-\end{itemize}
-
-Ranges: ranges are optional and it is the way to tell \verb|sed| to apply the provided commands only to those lines specified by the range. Some examples
-\begin{itemize}
-  \item \verb|4,10|: lines 4 to 10
-  \item \verb|4,+6|: line 4 and the following 6 lines
-  \item \verb|4,10!|: everything except lines 4 to 10
-  \item \verb|4~3|: starting from line 4, every 3 lines
-  \item \verb|/pattern/|: all the lines matching \verb|pattern|
-\end{itemize}
-
-Options and tricks:
-\begin{itemize}
-  \item The option \verb|-i[<suffix>]|, \verb|--in-place=[<suffix>]| allows to overwrite the file once it is modified. If \verb|suffix| is provided a backup is created with the chosen extension;
-    \begin{itemize}
-      \item \verb|-i.bak| creates a backup file,
-      \item The option \verb|--follow-symlinks|, available only with \verb|-i| activated, enables to modify the original file;
-    \end{itemize}
-  \item If in one line there are more occurrences, only the first one is matched. Appending \texttt{g} will make \texttt{sed} match all the occurrences.
-\begin{verbatim}
-  sed -i "s/<pattern>/<replaced>/g" file
-\end{verbatim}
-  \item Character \verb|&| expands to matched string.
-  \item Match exactly the word: from regex, \verb|\b| delimits boundaries of the word. Hence, (although \verb|\<word\>| seems to work, as well (\texttt{vim}, anyone?)):
-\begin{verbatim}
-$ echo "bar embarassment" | sed "s/\bbar\b/no bar/g"
-no bar embarassment
-\end{verbatim}
-  \item Parentheses used in regex syntax (for groups \verb|(.)|, repetitions \verb|{.}|) should be escaped by a backslash: e.g. \verb|\(agroup\)|. Access groups content with \verb|\<n>| where \verb|n| is the number of the group. Or, add option \verb|-E|.
-  \item Use \texttt{bash} variables: prefer the double-quotes \verb|"| instead of the single ones \verb|'|:
-\begin{verbatim}
-sed "s/${pattern}/${replaced}/" file
-\end{verbatim}
-  \item \verb|$| means last line when dealing with ranges, or end of the line when dealing with patterns.
-  \item Mind that command \verb|d| erases the entire line, if you want to delete only the pattern, you can replace it with an empty string.
-  \item Write at the beginning of the line: match the beginning (special character \verb|^|) and replace. For instance, in \texttt{C} comments all the lines containing \texttt{Comment} (mind that we have to escape character \verb|/|)
-\begin{verbatim}
-sed '/Comment/ s/^/\/\//' test.c
-\end{verbatim}
-  \item Replace only the first occurrence of \verb|pattern|: a bit tricky, find the right range (from line zero to first occurrence) then replace
-\begin{verbatim}
-sed '0,/pattern/ s/pattern/new pattern/' file
-\end{verbatim}
-  \item Replace only the last occurrence of pattern: I'm still working on that. A long and dirty workaround may be to use \verb|tac|, then replace \emph{first} occurrence and finally \verb|tac| again.
-\end{itemize}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texttt{grep}}
-\label{sec:grep}
-\verb|grep [options] <pattern> [files]|
-
-Some useful options:
-\begin{itemize}
-  \item \texttt{-r}: recursive, then \texttt{files} can be a directory;
-  \item \texttt{-R}: as above, but follow links;
-  \item \texttt{-w}: match only complete \emph{w}ords;
-  \item \texttt{-c}: just print the \emph{c}ount of the lines with a match;
-  \item \texttt{-v}, \verb|--invert-match|: get lines with that do \emph{not} match the \texttt{pattern};
-  \item \texttt{-e}, \verb|--regexp=<pattern>|: look for \texttt{pattern}. This can be used, for example if \texttt{pattern} starts with a dash (\texttt{-}); similar options are \verb!-E|F|G|P!
-  \item \texttt{-i}, \verb|--ignore-case|: search is case-\emph{i}nsensitive;
-  \item \texttt{-h}: without filename (mnemonic: \emph{h}ead)
-  \item \texttt{-H}: with filename (mnemonic: \emph{H}ead)
-  \item \texttt{-n}: show line number;
-  \item \texttt{-m <n>}: print only the first \texttt{n} occurrences of the \texttt{pattern};
-  \item \texttt{-B <n>}: print \texttt{<n>} lines \emph{B}efore the match (included);
-  \item \texttt{-A <n>}: print \texttt{<n>} lines \emph{A}fter the match (included);
-  \item \texttt{-C <n>}: print \texttt{<n>} lines of the \emph{C}ontext of the match;
-  \item \texttt{-l}, \verb|--files-with-matches|: \emph{l}ist only the file names in which at least one match is found;
-  \item \texttt{-L}, \verb|--files-without-matches|: \emph{L}ist only the file names in which no match is found;
-  \item \texttt{-q}: \emph{q}uiet, return just the exit status code (0 or 1 corresponding to, respectively, true or false) according to whether it have found a match or not;
-  \item \verb|--include=<pattern>|: consider only files matching \texttt{pattern}. For example for only \TeX{} sources
-\begin{verbatim}
-grep --include=\*.tex -r "O Bella Ciao" .
-\end{verbatim}
-  \item \verb|--exclude=<pattern>|: do not consider files matching \texttt{pattern};
-  \item \verb|--exclude-dir=<dir>|: exclude files in directory \texttt{dir};
-\end{itemize}
-
-Tricks:
-\begin{itemize}
-  \item Start from the end: \verb!tac <files> | grep [options] <pattern>! (Add a pipe to \texttt{tac} to recover the original order).
-  \item Print even if the match is not found \verb!grep -E '^|<pattern>' <file>!. Special character \verb|^| means "beginning of the line", hence it is always found. Why should one use it? with the option \verb|--color| (usually enabled by default) \verb|grep| highlights the matches. Here, the command find the beginning of the line, which cannot be highlighted, hence it prints the line, if it finds the pattern as well it will highlight it.
-\end{itemize}
-
-Types:
-\begin{itemize}
-  \item \texttt{-G}, \verb|--basic-regexp|, simple regexp, default
-  \item \texttt{-E}, \verb|--extended-regexp|
-  \item \texttt{-P}, \verb|--perl-regexp|
-  \item \texttt{-F}, \verb|--fixed-strings|, exclude regexp
-\end{itemize}
-
-The version \texttt{zgrep} (with the same options) allows to search into compressed/\emph{z}ipped files.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texttt{find}}
-It allows to find files in a tree and apply a command to them:
-\begin{verbatim}
-  find [options] <path> <command>
-\end{verbatim}
-If no command is given, \texttt{-print} is executed. Some examples and options:
-\begin{itemize}
-  \item Check if file \texttt{filename} is in \texttt{mydir} or one of its subdirectories (\texttt{-print} is considered, thus it works similarly to \texttt{ls})
-\begin{verbatim}
-  find <mydir> -name <filename>
-\end{verbatim}
-  \begin{itemize}
-    \item \verb|-regex|: similar to \texttt{name} but one can use regex syntax to write the pattern. The type can be chosen with \verb|-regextype| (ex. \texttt{sed}). Notice that \texttt{find} always prepends \verb|./| to the path so you may want to start your pattern with something like \verb|.*/|
-    \item Case-insensitive search: use \verb|-iname| or \verb|-iregex| as you would use their parent options
-  \end{itemize}
-  \item Filter on the file type: option \verb|-type <t>| where \texttt{<t>} can be, for example, \texttt{d} (directory), \texttt{f} (regular file), \texttt{l} (symbolic link)\dots
-  \item \texttt{!}, \texttt{-not}: negation of the expression that follows. E.g.: \texttt{find . -not -name foo} print all the files in the current directory with a name different than \texttt{foo}.
-    \begin{itemize}
-      \item Exclude a path:
-\begin{verbatim}
-find . -name notmyfile -not -path <dir_excl>
-\end{verbatim}
-        This is somehow too simple and \texttt{find} will still search into the sub-directories of \verb|dir_excl|. You may find other solutions \href{https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command}{here} (the accepted answer with \verb|-prune|may not always work).
-    \end{itemize}
-  \item \verb|-maxdepth <n>|: limit the tree descent level of the search
-  \item Apply a command to all the matching files: e.g.~run a bash script, grep only certain files
-\begin{verbatim}
-find . -name "*.log" -exec script.sh {} \;
-find . -name "*.log" -exec script.sh {} +
-find . -name "*.log" -exec grep -Hn --color "pattern" {} +
-\end{verbatim}
-    \verb|{}| stands for the matching files; the first version will execute as many calls as the numbers of matching files, the second (tries to) appends all the files in an single list of arguments (hence saving the calls to the script). If you would like to use a pipe in your \texttt{exec} command, use \texttt{sh} like below, or have a look \href{https://stackoverflow.com/questions/307015/how-do-i-include-a-pipe-in-my-linux-find-exec-command}{here}.
-\begin{verbatim}
-find . -name "*.log" -exec sh -c "tac {} | grep -m1 pattern" \;
-\end{verbatim}
-  \begin{itemize}
-    \item Mind that \texttt{find} does not know the content of \texttt{.bashrc} and alike, hence one could not use aliases (its \texttt{ls} command might be stripped-down with respect to what one is used to, you may want to consider adding some user-friendly options).
-  \end{itemize}
-  \begin{itemize}
-    \item \verb|-ok|: like \texttt{exec} but ask the permission first
-    \item \verb|-execdir|: like \texttt{exec} but run the command from the subdirectory that contains the matched file.
-  \end{itemize}
-  \item Delete all the matching files: e.g.~delete all the \texttt{.log} files \texttt{find . -name *.log -delete}
-    \begin{itemize}
-      \item \texttt{-delete} calls \texttt{rm} under the hood, in fact it is practically equivalent to \texttt{-exec rm}. Hence it will fail if one tries to delete directory. In this case, use the long way: \verb|-exec rm -r {} \;|. You may add \verb|-prune| to avoid some warnings/errors. Moreover, one may add quote around braces to avoid errors with names that contains whitespaces.
-    \end{itemize}
-\end{itemize}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Compressing: \texttt{tar} \& \texttt{zip}}
-\texttt{tar} is a utility which creates archives
-\begin{itemize}
-  \item Basic usage:
-    \begin{itemize}
-      \item \verb|c|, \verb|-c|, \verb|--create|: create. Remember to put all the files that you want in your archive in one go.
-\begin{verbatim}
-tar -cf archived.tar file/to/archive
-\end{verbatim}
-      \item \verb|x|, \verb|-x|, \verb|--extract|, \verb|--get|: extract
-\begin{verbatim}
-tar -xf archived.tar
-\end{verbatim}
-      \item As you have already understood, \verb|-f| stands for file(name).
-    \end{itemize}
-  \item Additional options:
-    \begin{itemize}
-      \item \verb|t|, \verb|-t|, \verb|--list|: list the files.
-      \item \verb|r|, \verb|-r|, \verb|--append|: add files to an existing archive.
-      \item \verb|u|, \verb|-u|, \verb|--update|: add to the archive only the files which are already present and which have been modified.
-      \item \verb|A|, \verb|-A|, \verb|--catenate|, \verb|--concatenate|: concatenate archives.
-      \item Symbolic links: by default, \texttt{tar} keeps the links. If in the archive one wants a \emph{copy} of the \emph{original} file to which the link points to, option \verb!-h|--deeference! should be used.
-      \item \verb|-C|, \verb|--directory <path>|: execute from \verb|path| (e.g.~decompress inside a given directory)
-    \end{itemize}
-  \item Compression algorithms:
-    \begin{itemize}
-      \item Zip (compress), \verb|-z|, \verb|--gzip|, \verb|--gunzip|, \verb|--ungzip|: use compression algorithms. The option has to be used also when extracting compressed archived. Usually, compressed archived have \verb|.tar.gz| or \verb|.tgz| as extension.
-      \item \verb|-j|, \verb|--bzip2|
-      \item \verb|-J|, \verb|xz|
-    \end{itemize}
-\end{itemize}
-
-\medskip
-A cross-platform extension for compressed files is \texttt{zip}. To compress simply run
-\begin{verbatim}
-zip [options] <compressed_file>.zip <files_to_compress>
-\end{verbatim}
-By default it adds links as hard-files (and not as links). Option \verb|-r| (mneno: \emph{r}ecursive) include also {sub}directories and their files.
-
-To deflate, run \verb|unzip <compressed_file>.zip|
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texttt{awk}}
-\label{sec:awk}
-\texttt{awk} is a text-processing utility that allows to perform easily operations line-by-line with column (here called \emph{fields}) manipulations. A tutorial is given \href{https://www.tutorialspoint.com/awk/index.htm}{here}.
-\begin{itemize}
-  \item Basis: \verb|awk [opt] 'BEGIN{[...]} {[...]} END{[...]}' <file>|
-    \begin{itemize}
-      \item The commands in the curly brackets after \texttt{BEGIN} are executed before starting the reading of the file,
-      \item The commands in the unnamed curly brackets are executed at each line,
-      \item The commands in the curly brackets after \texttt{END} are executed once the file has been read,
-      \item Each of these three sections is optional;
-    \end{itemize}
-  \item A conditional statement (called \emph{pattern}) may be put just before the unnamed braces. Binary operations or comparisons can be used. If present, the commands inside are applied only to the rows verifying the pattern; if not, to all the rows. E.g.
-    \begin{itemize}
-      \item print the third row: \verb|awk 'NR==3{print;exit}' file.txt|
-      \item print lines containing \texttt{apple}: \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
-      \item More than one pattern might be used. No particular syntax is needed: nothing, a space or a newline will do the trick
-\begin{verbatim}
-awk '/apple/{print "Found an apple"}/banana/{print "Found a banana"}' infile
-\end{verbatim}
-    \end{itemize}
-  \item Select the \texttt{n}-th field \verb|$<n>|. Remark: it is 1-based (first field is indexed by 1), and \verb|$0| expands to the whole line.
-  \item Printing: it is usually achieved by command \texttt{print}. Some notes
-    \begin{itemize}
-      \item Columns are accessed with a dollar \verb|$|, for variables just use their name
-\begin{verbatim}
-awk '{print $NF}' file # Print last column only
-awk -v T=8 'END{print "2 times T = " 2*T}' file
-\end{verbatim}
-      \item One can use redirection such as \verb|>|, \verb|>>| as explained in \autoref{sec:shell} to write to file. E.g.
-\begin{verbatim}
-awk 'BEGIN{print Ciao > "ciao.txt"}' file
-\end{verbatim}
-      \item \texttt{print} it also prints a new line stamp at the end
-      \item \texttt{printf}, very similar to the \texttt{C} function, it can be used to choose the format. Differently from \texttt{print}, it does not insert a new line. E.g. (mind the \verb|\n|)
-\begin{verbatim}
-awk '{printf "I want %5.2f bananas\n" 1.652}' file
-\end{verbatim}
-    \end{itemize}
-  \item Useful options:
-    \begin{itemize}
-      \item The file name is given as argument of the command or with \verb|-f <file>|, or \verb|--file=<file>|.
-      \item \verb|-F <char>|, \verb|--field-separator="<char>"|: \verb|char| is the column separator (space is default);
-      \item Pass an argument: \verb|-v var_name=<value>|
-      \item When using \texttt{gawk} (the GNU implementation of \texttt{awk}) one can asks for in-place replacement: \verb|-i inplace|.
-    \end{itemize}
-  \item Built-in variables:
-    \begin{itemize}
-      \item \verb|NF|: number of fields / columns in the current row (hence \verb|$NF| is the last column of the row)
-      \item \verb|NR|: row number, mind that it is incremented if several files are read (1 based).
-      \item \verb|FNR|: row number relative to current file. It resets to 1 every time a new file is read.
-      \item \verb|FS|: field separator
-      \item \verb|FILENAME|: should I explain?
-      \item \verb|ENVIRON|: array with environment variables (e.g.~try \verb|ENVIRON["USER"]|).
-    \end{itemize}
-  \item Tricks:
-    \begin{itemize}
-      \item \href{https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html}{String-Manipulation functions}
-      \item Operator "match", \verb|~| (tilde): \verb|<string>~<pattern>| true if \verb|string| matches \verb|pattern|. The negation is \verb|!~|. Hence, the following emulates \texttt{grep }(well, not exactly since we search in the second column only, but you get the idea)
-\begin{verbatim}
-awk '$2~/<pattern>/{print $0}' file.txt
-\end{verbatim}
-    \end{itemize}
-\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
