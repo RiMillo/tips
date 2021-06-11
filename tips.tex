@@ -170,6 +170,210 @@ for i in ${!list[@]}; do [...] done # Indeces only
     \end{itemize}
 \end{itemize}
 
+\subsection{Shell commands and tools}
+\begin{itemize}
+  \item \texttt{echo}: print a line to standard output. E.g. \verb|echo "Ciao World"|. It includes a newline at the end. It could be used via piping to provide an input parameter to a command.
+    \begin{itemize}
+      \item Variables can be used. Suppose you have \verb|what="cute puppy"|, then one can use
+\begin{verbatim}
+echo "I want a ${what}"
+\end{verbatim}
+      \item For redirection to files have a look at \autoref{sec:shell}.
+      \item \verb|-n|: do not to insert a new line at the end.
+      \item \verb|-e|: interpret a backslashed character, e.g. \verb|\n| will be considered as newline
+      \item Overwrite: use \verb|\b| (needs option \verb|-e|) to go back a character. For entire lines, have a look \href{https://stackoverflow.com/questions/11283625/overwrite-last-line-on-terminal}{here}.
+    \end{itemize}
+  \item \verb|eval [args]|: \verb|args| are concatenated to build and run a command. Variables can be used:
+\begin{verbatim}
+cmd="ls"
+echo "I will now $cmd in dir"
+eval $cmd dir
+\end{verbatim}
+  \item Download with command line: \texttt{wget} and \texttt{curl}
+    \begin{itemize}
+      \item Basic stuff \href{https://linuxconfig.org/download-file-from-url-on-linux-using-command-line}{here}
+      \item With proxy \href{https://www.cyberciti.biz/faq/linux-unix-curl-command-with-proxy-username-password-http-options/}{here}; \verb|-x| option with \texttt{curl}; with \texttt{wget} you may want to export environmental variable \verb|http[s]_proxy|.
+    \end{itemize}
+  \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
+\begin{verbatim}
+  echo "Message Body Here" | \
+      mailx -s "Subject Here" -a attachment.txt user@example.com
+  echo "Message Body Here" | \
+      mail -s "Subject Here" -A attachment.txt user@example.com
+\end{verbatim}
+  \item \texttt{wc}: \texttt{shell} command to perform some basic counting operations on a file (mnemonic: \emph{w}ord \emph{c}ount):
+\begin{verbatim}
+wc [options] <file>
+\end{verbatim}
+    \begin{itemize}
+      \item \verb|-c|: print number of bytes;
+      \item \verb|-w|: print number of words;
+      \item \verb|-l|: print number of lines;
+      \item \verb|-m|: print number of characters;
+      \item \verb|-L|: print max line length;
+      \item It usually (at least with \verb|-l|) re-prints the file name. To avoid use: \verb|wc -l < file.txt| (notice \verb|<|);
+    \end{itemize}
+  \item \texttt{sort [OPTIONS] [FILE]}
+    \begin{itemize}
+      \item if \texttt{FILE} is \texttt{-} or not given, it uses \texttt{stdin}
+      \item \verb|-r|: \texttt{r}everse
+      \item \verb|-u|: \texttt{u}nique
+      \item \verb|-t <SEP>|: use \texttt{SEP} instead of blank space as field separator
+      \item \verb|-f|: case insensitive
+      \item \ldots and many others, check the man.
+    \end{itemize}
+  \item \texttt{uniq}: filter for repeated adjacent lines. Let me stress: only adjacent lines are checked
+    \begin{itemize}
+      \item \verb|-c|: prefix line with number of occurrences
+      \item \verb|-d|: print repeated lines only occ
+      \item \verb|-u|: print unique lines only
+    \end{itemize}
+  \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one. A little syntax:
+    \begin{itemize}
+      \item Conditional \verb|!| negate, \verb!-a|-o! and/or
+      \item Strings: \verb!-z|-n! true if zero | nonzero, compare with \verb|=| and \verb|!=|
+      \item Integers: \verb|-eq| equal, \verb|-ne| not-equal, \verb!-gt|-ge! (resp.~\verb!-lt|-le!) greater than | greater or equal (resp.~less)
+      \item Files: \verb!-ot|-nt! older|newer than, \verb|-e| exists, \verb|-f| regular file, \verb|-d| directory
+    \end{itemize}
+  \item \verb|touch <file>|: modify the file access and/or modification date. If the file doesn't exist, an empty one will be created (unless specific options are given). For more details and all the options, have a look at its \texttt{man} page.\\
+  Why should one use it?
+    \begin{itemize}
+      \item Changing the modification date of a file will force a smart compiler such as \verb|make| to re-run the compilation.
+    \end{itemize}
+  \item \href{http://www.imagemagick.org/script/convert.php}{\texttt{convert}}: very powerful tool for manipulating images (part of the \href{https://imagemagick.org/index.php}{\texttt{image magick}} suite, some \href{http://www.imagemagick.org/script/command-line-processing.php}{tips})
+    \begin{itemize}
+      \item Convert: \verb|convert test.<ext1> test.<ext2>| the extension can be \texttt{pdf}, \texttt{jpg}, \texttt{png},\ldots
+      \item Rotate: \verb|-rotate <deg>|
+      \item Choose density|quality (and hence the final size): option \verb|-density <n>| (its unit is \texttt{dpi})
+      \item Reduce size: \verb|-size <n>%| the output will have be the \verb|n|\% of the initial size
+      \item Mirror image: \verb|-flip| vertical (meaning top becomes bottom) axis, \verb|-flop| horizontal axis (meaning right becomes left)
+    \end{itemize}
+  \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: nice and easy utility to modify \texttt{pdf} files
+    \begin{itemize}
+      \item Extract and/or merge: Examples of accepted ranges: \texttt{'1,6-9'}, \texttt{'-2,4,6'}
+\begin{verbatim}
+pdfjam [options] -- file_1.pdf ['<page_range>'] \
+                   [file_2.pdf ['<page_range>'] ...]
+\end{verbatim}
+      \item Rotate: Commands specified for certain angles are available: \verb!pdf90|180|270 <in.pdf>!
+      \item A similar utility with a wider range of capabilities is \href{https://www.ghostscript.com/doc/current/Use.htm}{\texttt{ghostscript}}
+      \item In fact, under the hood \texttt{pdfjam} calls \LaTeX{} and loads the pdf into a page. This is enough most of the time, however, if the pdf has non-standard dimensions, let say smaller than A4, this will result in a blank A4 page with the pdf at the center. To fit to the size, use \texttt{ghostscript} (for the pages, the option \texttt{-sPageList} is also available and accepts ranges)
+    \end{itemize}
+\begin{verbatim}
+gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -dPSFitPage \
+   -dFirstPage=2 -dLastPage=5 -o out.pdf in.pdf
+\end{verbatim}
+  \item Job management:
+    \begin{itemize}
+      \item \verb|kill [options] <job_ID>|: kill (send \texttt{SIGTERM} to) the job denoted by \verb|<job_ID>|.
+      \item \verb|pgrep [options] <pattern>|: print info, especially the job-IDs, of all the jobs matching \verb|<pattern>|. Option \verb|-l| lists the names as well (and not only the IDs).
+      \item \verb|pkill [options] <pattern>|: as \verb|kill| but looks for matches in job names before (as \verb|pgrep|).
+      \item Options for \verb!pgrep|pkill!
+        \begin{itemize}
+          \item \verb|-c|: count
+          \item \verb|-l|: lists names, \verb|-a|: lists fully
+          \item \verb!-n|-o!: newest/oldest only
+          \item \verb|-x|: select if name is exact
+          \item \verb|-u UID|: only for user \verb|UID|
+          \item \verb|-s SIG|: send signal \verb|SIG|
+        \end{itemize}
+    \end{itemize}
+  \item \verb|[h]top|: \verb|top| (and its user-friendly version \verb|htop|) gives an overview of a running system. One can find, for instance and just to name the most useful features, which jobs are running and how much memory or processors are used.
+    \begin{itemize}
+      \item Filter: use option \verb|-p <ID>|. Using the job name instead of the ID is more convenient: have a look at \href{https://unix.stackexchange.com/a/347544}{this}: \verb|top -p `pgrep -d "," <name>`|.
+    \end{itemize}
+  \item \texttt{du}: shows the space used by the directories (and files) (mnemonic: \emph{d}isc \emph{u}sage)
+    \begin{itemize}
+      \item \verb!-a|--all!: show the space of every files, not only the directories
+      \item \verb!-h|--human-readable!: use convenient units (MB,GB,\ldots)
+      \item \verb!-d|--max-depth=<n>!: how many levels down the directory-tree \texttt{du} should search
+      \item \verb|--exlude=<pattern>|: well, I think you get it
+    \end{itemize}
+  \item \texttt{df}: check disk space info about the system (mnemonic: \emph{d}isk \emph{f}ree / \emph{f}ilesystem)
+  \item \texttt{time}: run programs and summarize system resource usage (from \texttt{man}). \verb|time my_script.sh|; get the execution time of the script. More insight \href{https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1/556411#556411}{here}.
+  \item \texttt{uname}: print system info
+  \item ``Safely remove'' disks from command line: use \texttt{udisksctl} as explained \href{https://askubuntu.com/questions/532586/what-is-the-command-line-equivalent-of-safely-remove-drive}{here}:
+\begin{verbatim}
+udisksctl unmount -b /dev/sdX
+udisksctl power-off -b /dev/sdX
+\end{verbatim}
+  \item Con\emph{cat}enate files and print to standard output (basically print the content to screen)
+    \begin{itemize}
+      \item \verb|cat [<opt>] file [file2 [...]]|
+      \item \verb|tac [<opt>] file [file2 [...]]| as above but reverse order of the lines
+    \end{itemize}
+  \item \verb|cp [options] <source> [dest]|: copy \texttt{source} into \texttt{dest} (if omitted, "\texttt{.}")
+    \begin{itemize}
+      \item \verb|-t|: target. \verb|cp -t dest -- <source>| is equivalent to \verb|cp <source> [dest]|
+      \item \verb|-r|: recursive, useful for directories
+      \item \verb|-u|: copy only if there is no file with the same name in \texttt{dest} or if \texttt{source} is newer (mnemonic: \emph{u}nique)
+      \item \verb|-p|: preserve mode, ownership, and time-stamps
+      \item \verb|-l|: (hard) link source instead of copy
+      \item \verb|-L|: if \texttt{source} is a (symbolic) link, copy the file it points to instead of copying the link
+    \end{itemize}
+  \item \verb|crontab|: job scheduling. It allows one to regularly run some commands or scripts. Tutorial \href{https://www.adminschoice.com/crontab-quick-reference}{here} or \href{https://www.computerhope.com/unix/ucrontab.htm}{here}.
+  \item \texttt{tee}: read from standard input and write to standard output \textbf{\&} files. Useful when you want to save the output of a command to file but you still want to read it on screen. E.g.
+\begin{verbatim}
+  echo "This'll be printed to screen and inside file.txt" | tee file.txt
+\end{verbatim}
+    \begin{itemize}
+      \item \verb|-a|: append to file.
+      \item Print to screen \& pipe: \verb!./script | tee /dev/tty | ./script_with_pipe!
+    \end{itemize}
+  \item \texttt{bc}: shell calculator (mnemonic: \texttt{b}asic \texttt{c}alculator)
+    \begin{itemize}
+      \item Some examples \href{https://www.geeksforgeeks.org/bc-command-linux-examples/}{here}.
+      \item How to
+        \begin{itemize}
+          \item Simply run \texttt{bc} and an interactive interface will open (similar to what you get when you run \texttt{python}). Type \texttt{quit} for\ldots yeah, quitting.
+          \item If you do not need extensive calculation but have just a one-liner expression, just pass it to \texttt{bc}: \verb!echo "20+5" | bc! or \verb|bc <<< "20+5"|
+        \end{itemize}
+      \item Operators like \verb|++|, \verb|*=|, etc.~are accepted
+      \item Give option \verb|-l| to load the standard math library and, for instance, deal with floating point calculation and use standard functions (e.g.~sine \verb|s(x)|).
+    \end{itemize}
+  \item \texttt{tr}: \emph{tr}anslate, squeeze and/or delete characters from standard input. Basically performs string operations on standard input. Some options and examples
+    \begin{itemize}
+      \item \verb!echo Maaan | tr a e!: change \texttt{a}'s into \texttt{e}'s, hence the result is \texttt{Meeen}.
+      \item \verb|-d|: \emph{d}elete. \verb!echo Maaan | tr -d a! gives \texttt{Mn}
+      \item \verb|-s|: \emph{s}queeze. \verb!echo Maaan | tr -s a e! replaces each sequence of repeated \texttt{a}'s with a single occurrence of \texttt{e}, hence it gives \texttt{Men}.
+    \end{itemize}
+  \item \texttt{xargs}: use standard output to build commands (you can think of it as a more powerful way of piping). Have a look at some tutorials \href{https://shapeshed.com/unix-xargs/}{here} and \href{https://www.thegeekstuff.com/2013/12/xargs-examples/}{here}. Typical call is (the 0-related flags deal with files with spaces in their names)
+\begin{verbatim}
+find . -name foo -print0 | xargs -0 rm
+\end{verbatim}
+    \begin{itemize}
+      \item \texttt{-t}: print the command
+      \item \texttt{-p}: prompt a user-confirmation before executing the command
+      \item \texttt{-n <n>}: group the inputs by \texttt{n}. That is, instead of (braces added for the sake of explanation) \verb|{1} {2} {3} {4}|, with \texttt{-n 2} one gets \verb|{1 2} {3 4}|.
+      \item \texttt{-I}: enables \texttt{xargs} to execute multiple commands. In this case, \verb|%| is the placeholder for the input (sort of \verb|{}| in \verb|find -exec|)
+      \item \texttt{-a <file>}: read from \texttt{file} instead of standard output
+    \end{itemize}
+  \item \texttt{cut}: cut out part of the content of the input. Typical call is:
+\begin{verbatim}
+cut -f 2-5 text.txt
+\end{verbatim}
+    print only columns (\texttt{f}ields) 2 to 5 of the content of file \verb|text.txt|.
+    \begin{itemize}
+      \item \verb|-f <list>| (or \verb|--fields|): print only fields in the list
+      \item \verb|-b <list>| (or \verb|--bytes|): same as above but with bytes
+      \item \verb|-c <list>| (or \verb|--characters|): same as above but with characters
+      \item \verb|-d <,>|: use \verb|<,>| as delimiter for fields
+      \item List examples: \texttt{n} or \texttt{n-m} or \texttt{-n} or \texttt{n-}
+    \end{itemize}
+  \item \texttt{getopts}: built-in command of \texttt{bash} which allows to parse options and arguments passed to a script. Two quick and well-done tutorials can be found \href{https://www.computerhope.com/unix/bash/getopts.htm}{here} and \href{https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/}{here}. We provide a hand-made example in the appendix, \autoref{lst:getopt_ex}.
+    \begin{itemize}
+      \item Typically, one calls \verb|while getopts ":<option_list>" opt; do [...] done|. One may want to use a \verb|case| environment to deal with the options.
+      \item Here above, \verb|option_list| contains the list of accepted options. If the option is followed by a \verb|:| (colon) it means that it requires arguments. The argument is stored in the macro \verb|$OPTARG|.
+      \item \verb|\?| stands for an invalid/unknown option, \verb|:| (colon) for an option for which an argument is required but not provided.
+    \end{itemize}
+  \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}. E.g.: consider the following \texttt{path/to/file.txt}. Then \texttt{dirname} returns \texttt{path/to}, whereas \texttt{basename} \texttt{file.txt}.
+  \item Convert from HEX to RGB colors from command line
+\begin{verbatim}
+hex="11001A"
+printf "%d %d %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2}
+\end{verbatim}
+\end{itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1109,213 +1313,14 @@ Useful options of \texttt{plot}-like commands:
 \section{Miscellaneous}
 \label{sec:misc}
 \begin{itemize}
-  \item \texttt{echo}: print a line to standard output. E.g. \verb|echo "Ciao World"|. It includes a newline at the end. It could be used via piping to provide an input parameter to a command.
-    \begin{itemize}
-      \item Variables can be used. Suppose you have \verb|what="cute puppy"|, then one can use
-\begin{verbatim}
-echo "I want a ${what}"
-\end{verbatim}
-      \item For redirection to files have a look at \autoref{sec:shell}.
-      \item \verb|-n|: do not to insert a new line at the end.
-      \item \verb|-e|: interpret a backslashed character, e.g. \verb|\n| will be considered as newline
-      \item Overwrite: use \verb|\b| (needs option \verb|-e|) to go back a character. For entire lines, have a look \href{https://stackoverflow.com/questions/11283625/overwrite-last-line-on-terminal}{here}.
-    \end{itemize}
-  \item \verb|eval [args]|: \verb|args| are concatenated to build and run a command. Variables can be used:
-\begin{verbatim}
-cmd="ls"
-echo "I will now $cmd in dir"
-eval $cmd dir
-\end{verbatim}
-  \item Download with command line: \texttt{wget} and \texttt{curl}
-    \begin{itemize}
-      \item Basic stuff \href{https://linuxconfig.org/download-file-from-url-on-linux-using-command-line}{here}
-      \item With proxy \href{https://www.cyberciti.biz/faq/linux-unix-curl-command-with-proxy-username-password-http-options/}{here}; \verb|-x| option with \texttt{curl}; with \texttt{wget} you may want to export environmental variable \verb|http[s]_proxy|.
-    \end{itemize}
-  \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
-\begin{verbatim}
-  echo "Message Body Here" | \
-      mailx -s "Subject Here" -a attachment.txt user@example.com
-  echo "Message Body Here" | \
-      mail -s "Subject Here" -A attachment.txt user@example.com
-\end{verbatim}
   \item \texttt{PETSc} \href{https://www.mcs.anl.gov/petsc/petsc-current/docs/manual.pdf}{manual}
     \begin{itemize}
       \item Use \verb|MatView(Mat a, PETSC_VIEWER_DRAW_WORLD)| or with any another \texttt{PetscViewer} to draw the nonzero structure of a matrix.
     \end{itemize}
-  \item \texttt{wc}: \texttt{shell} command to perform some basic counting operations on a file (mnemonic: \emph{w}ord \emph{c}ount):
-\begin{verbatim}
-wc [options] <file>
-\end{verbatim}
-    \begin{itemize}
-      \item \verb|-c|: print number of bytes;
-      \item \verb|-w|: print number of words;
-      \item \verb|-l|: print number of lines;
-      \item \verb|-m|: print number of characters;
-      \item \verb|-L|: print max line length;
-      \item It usually (at least with \verb|-l|) re-prints the file name. To avoid use: \verb|wc -l < file.txt| (notice \verb|<|);
-    \end{itemize}
-  \item \texttt{sort [OPTIONS] [FILE]}
-    \begin{itemize}
-      \item if \texttt{FILE} is \texttt{-} or not given, it uses \texttt{stdin}
-      \item \verb|-r|: \texttt{r}everse
-      \item \verb|-u|: \texttt{u}nique
-      \item \verb|-t <SEP>|: use \texttt{SEP} instead of blank space as field separator
-      \item \verb|-f|: case insensitive
-      \item \ldots and many others, check the man.
-    \end{itemize}
-  \item \texttt{uniq}: filter for repeated adjacent lines. Let me stress: only adjacent lines are checked
-    \begin{itemize}
-      \item \verb|-c|: prefix line with number of occurrences
-      \item \verb|-d|: print repeated lines only occ
-      \item \verb|-u|: print unique lines only
-    \end{itemize}
-  \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one. A little syntax:
-    \begin{itemize}
-      \item Conditional \verb|!| negate, \verb!-a|-o! and/or
-      \item Strings: \verb!-z|-n! true if zero | nonzero, compare with \verb|=| and \verb|!=|
-      \item Integers: \verb|-eq| equal, \verb|-ne| not-equal, \verb!-gt|-ge! (resp.~\verb!-lt|-le!) greater than | greater or equal (resp.~less)
-      \item Files: \verb!-ot|-nt! older|newer than, \verb|-e| exists, \verb|-f| regular file, \verb|-d| directory
-    \end{itemize}
-  \item \verb|touch <file>|: modify the file access and/or modification date. If the file doesn't exist, an empty one will be created (unless specific options are given). For more details and all the options, have a look at its \texttt{man} page.\\
-  Why should one use it?
-    \begin{itemize}
-      \item Changing the modification date of a file will force a smart compiler such as \verb|make| to re-run the compilation.
-    \end{itemize}
-  \item \href{http://www.imagemagick.org/script/convert.php}{\texttt{convert}}: very powerful tool for manipulating images (part of the \href{https://imagemagick.org/index.php}{\texttt{image magick}} suite, some \href{http://www.imagemagick.org/script/command-line-processing.php}{tips})
-    \begin{itemize}
-      \item Convert: \verb|convert test.<ext1> test.<ext2>| the extension can be \texttt{pdf}, \texttt{jpg}, \texttt{png},\ldots
-      \item Rotate: \verb|-rotate <deg>|
-      \item Choose density|quality (and hence the final size): option \verb|-density <n>| (its unit is \texttt{dpi})
-      \item Reduce size: \verb|-size <n>%| the output will have be the \verb|n|\% of the initial size
-      \item Mirror image: \verb|-flip| vertical (meaning top becomes bottom) axis, \verb|-flop| horizontal axis (meaning right becomes left)
-    \end{itemize}
-  \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: nice and easy utility to modify \texttt{pdf} files
-    \begin{itemize}
-      \item Extract and/or merge: Examples of accepted ranges: \texttt{'1,6-9'}, \texttt{'-2,4,6'}
-\begin{verbatim}
-pdfjam [options] -- file_1.pdf ['<page_range>'] \
-                   [file_2.pdf ['<page_range>'] ...]
-\end{verbatim}
-      \item Rotate: Commands specified for certain angles are available: \verb!pdf90|180|270 <in.pdf>!
-      \item A similar utility with a wider range of capabilities is \href{https://www.ghostscript.com/doc/current/Use.htm}{\texttt{ghostscript}}
-      \item In fact, under the hood \texttt{pdfjam} calls \LaTeX{} and loads the pdf into a page. This is enough most of the time, however, if the pdf has non-standard dimensions, let say smaller than A4, this will result in a blank A4 page with the pdf at the center. To fit to the size, use \texttt{ghostscript} (for the pages, the option \texttt{-sPageList} is also available and accepts ranges)
-    \end{itemize}
-\begin{verbatim}
-gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -dPSFitPage \
-   -dFirstPage=2 -dLastPage=5 -o out.pdf in.pdf
-\end{verbatim}
-  \item Job management:
-    \begin{itemize}
-      \item \verb|kill [options] <job_ID>|: kill (send \texttt{SIGTERM} to) the job denoted by \verb|<job_ID>|.
-      \item \verb|pgrep [options] <pattern>|: print info, especially the job-IDs, of all the jobs matching \verb|<pattern>|. Option \verb|-l| lists the names as well (and not only the IDs).
-      \item \verb|pkill [options] <pattern>|: as \verb|kill| but looks for matches in job names before (as \verb|pgrep|).
-      \item Options for \verb!pgrep|pkill!
-        \begin{itemize}
-          \item \verb|-c|: count
-          \item \verb|-l|: lists names, \verb|-a|: lists fully
-          \item \verb!-n|-o!: newest/oldest only
-          \item \verb|-x|: select if name is exact
-          \item \verb|-u UID|: only for user \verb|UID|
-          \item \verb|-s SIG|: send signal \verb|SIG|
-        \end{itemize}
-    \end{itemize}
-  \item \verb|[h]top|: \verb|top| (and its user-friendly version \verb|htop|) gives an overview of a running system. One can find, for instance and just to name the most useful features, which jobs are running and how much memory or processors are used.
-    \begin{itemize}
-      \item Filter: use option \verb|-p <ID>|. Using the job name instead of the ID is more convenient: have a look at \href{https://unix.stackexchange.com/a/347544}{this}: \verb|top -p `pgrep -d "," <name>`|.
-    \end{itemize}
-  \item \texttt{du}: shows the space used by the directories (and files) (mnemonic: \emph{d}isc \emph{u}sage)
-    \begin{itemize}
-      \item \verb!-a|--all!: show the space of every files, not only the directories
-      \item \verb!-h|--human-readable!: use convenient units (MB,GB,\ldots)
-      \item \verb!-d|--max-depth=<n>!: how many levels down the directory-tree \texttt{du} should search
-      \item \verb|--exlude=<pattern>|: well, I think you get it
-    \end{itemize}
-  \item \texttt{df}: check disk space info about the system (mnemonic: \emph{d}isk \emph{f}ree / \emph{f}ilesystem)
-  \item \texttt{time}: run programs and summarize system resource usage (from \texttt{man}). \verb|time my_script.sh|; get the execution time of the script. More insight \href{https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1/556411#556411}{here}.
-  \item \texttt{uname}: print system info
-  \item ``Safely remove'' disks from command line: use \texttt{udisksctl} as explained \href{https://askubuntu.com/questions/532586/what-is-the-command-line-equivalent-of-safely-remove-drive}{here}:
-\begin{verbatim}
-udisksctl unmount -b /dev/sdX
-udisksctl power-off -b /dev/sdX
-\end{verbatim}
-  \item Con\emph{cat}enate files and print to standard output (basically print the content to screen)
-    \begin{itemize}
-      \item \verb|cat [<opt>] file [file2 [...]]|
-      \item \verb|tac [<opt>] file [file2 [...]]| as above but reverse order of the lines
-    \end{itemize}
-  \item \verb|cp [options] <source> [dest]|: copy \texttt{source} into \texttt{dest} (if omitted, "\texttt{.}")
-    \begin{itemize}
-      \item \verb|-t|: target. \verb|cp -t dest -- <source>| is equivalent to \verb|cp <source> [dest]|
-      \item \verb|-r|: recursive, useful for directories
-      \item \verb|-u|: copy only if there is no file with the same name in \texttt{dest} or if \texttt{source} is newer (mnemonic: \emph{u}nique)
-      \item \verb|-p|: preserve mode, ownership, and time-stamps
-      \item \verb|-l|: (hard) link source instead of copy
-      \item \verb|-L|: if \texttt{source} is a (symbolic) link, copy the file it points to instead of copying the link
-    \end{itemize}
-  \item \verb|crontab|: job scheduling. It allows one to regularly run some commands or scripts. Tutorial \href{https://www.adminschoice.com/crontab-quick-reference}{here} or \href{https://www.computerhope.com/unix/ucrontab.htm}{here}.
-  \item \texttt{tee}: read from standard input and write to standard output \textbf{\&} files. Useful when you want to save the output of a command to file but you still want to read it on screen. E.g.
-\begin{verbatim}
-  echo "This'll be printed to screen and inside file.txt" | tee file.txt
-\end{verbatim}
-    \begin{itemize}
-      \item \verb|-a|: append to file.
-      \item Print to screen \& pipe: \verb!./script | tee /dev/tty | ./script_with_pipe!
-    \end{itemize}
-  \item \texttt{bc}: shell calculator (mnemonic: \texttt{b}asic \texttt{c}alculator)
-    \begin{itemize}
-      \item Some examples \href{https://www.geeksforgeeks.org/bc-command-linux-examples/}{here}.
-      \item How to
-        \begin{itemize}
-          \item Simply run \texttt{bc} and an interactive interface will open (similar to what you get when you run \texttt{python}). Type \texttt{quit} for\ldots yeah, quitting.
-          \item If you do not need extensive calculation but have just a one-liner expression, just pass it to \texttt{bc}: \verb!echo "20+5" | bc! or \verb|bc <<< "20+5"|
-        \end{itemize}
-      \item Operators like \verb|++|, \verb|*=|, etc.~are accepted
-      \item Give option \verb|-l| to load the standard math library and, for instance, deal with floating point calculation and use standard functions (e.g.~sine \verb|s(x)|).
-    \end{itemize}
-  \item \texttt{tr}: \emph{tr}anslate, squeeze and/or delete characters from standard input. Basically performs string operations on standard input. Some options and examples
-    \begin{itemize}
-      \item \verb!echo Maaan | tr a e!: change \texttt{a}'s into \texttt{e}'s, hence the result is \texttt{Meeen}.
-      \item \verb|-d|: \emph{d}elete. \verb!echo Maaan | tr -d a! gives \texttt{Mn}
-      \item \verb|-s|: \emph{s}queeze. \verb!echo Maaan | tr -s a e! replaces each sequence of repeated \texttt{a}'s with a single occurrence of \texttt{e}, hence it gives \texttt{Men}.
-    \end{itemize}
-  \item \texttt{xargs}: use standard output to build commands (you can think of it as a more powerful way of piping). Have a look at some tutorials \href{https://shapeshed.com/unix-xargs/}{here} and \href{https://www.thegeekstuff.com/2013/12/xargs-examples/}{here}. Typical call is (the 0-related flags deal with files with spaces in their names)
-\begin{verbatim}
-find . -name foo -print0 | xargs -0 rm
-\end{verbatim}
-    \begin{itemize}
-      \item \texttt{-t}: print the command
-      \item \texttt{-p}: prompt a user-confirmation before executing the command
-      \item \texttt{-n <n>}: group the inputs by \texttt{n}. That is, instead of (braces added for the sake of explanation) \verb|{1} {2} {3} {4}|, with \texttt{-n 2} one gets \verb|{1 2} {3 4}|.
-      \item \texttt{-I}: enables \texttt{xargs} to execute multiple commands. In this case, \verb|%| is the placeholder for the input (sort of \verb|{}| in \verb|find -exec|)
-      \item \texttt{-a <file>}: read from \texttt{file} instead of standard output
-    \end{itemize}
-  \item \texttt{cut}: cut out part of the content of the input. Typical call is:
-\begin{verbatim}
-cut -f 2-5 text.txt
-\end{verbatim}
-    print only columns (\texttt{f}ields) 2 to 5 of the content of file \verb|text.txt|.
-    \begin{itemize}
-      \item \verb|-f <list>| (or \verb|--fields|): print only fields in the list
-      \item \verb|-b <list>| (or \verb|--bytes|): same as above but with bytes
-      \item \verb|-c <list>| (or \verb|--characters|): same as above but with characters
-      \item \verb|-d <,>|: use \verb|<,>| as delimiter for fields
-      \item List examples: \texttt{n} or \texttt{n-m} or \texttt{-n} or \texttt{n-}
-    \end{itemize}
-  \item \texttt{getopts}: built-in command of \texttt{bash} which allows to parse options and arguments passed to a script. Two quick and well-done tutorials can be found \href{https://www.computerhope.com/unix/bash/getopts.htm}{here} and \href{https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/}{here}. We provide a hand-made example: \autoref{lst:getopt_ex}.
-    \begin{itemize}
-      \item Typically, one calls \verb|while getopts ":<option_list>" opt; do [...] done|. One may want to use a \verb|case| environment to deal with the options.
-      \item Here above, \verb|option_list| contains the list of accepted options. If the option is followed by a \verb|:| (colon) it means that it requires arguments. The argument is stored in the macro \verb|$OPTARG|.
-      \item \verb|\?| stands for an invalid/unknown option, \verb|:| (colon) for an option for which an argument is required but not provided.
-    \end{itemize}
-  \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}. E.g.: consider the following \texttt{path/to/file.txt}. Then \texttt{dirname} returns \texttt{path/to}, whereas \texttt{basename} \texttt{file.txt}.
-  \item Convert from HEX to RGB colors from command line
-\begin{verbatim}
-hex="11001A"
-printf "%d %d %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2}
-\end{verbatim}
   \item Create QR-codes: \href{https://www.qrcode-monkey.com/}{here} is a pretty simple, 100\% free and highly customizable QR-code generator.
 \end{itemize}
 
+\appendix
 \begin{lstlisting}[language=bash,numbers=left,float,frame=single,caption={script.sh, an example for \texttt{getopts}},label={lst:getopt_ex},numberfirstline=true,stepnumber=5,firstnumber=1]
 #!/bin/bash
 
