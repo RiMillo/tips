@@ -63,6 +63,8 @@ or sometimes
 \section{Shell}
 \label{sec:shell}
 There are different version of shells scripting, such as \texttt{bash}, \texttt{sh}, \texttt{zsh}; they have some differences in commands and syntax (but I do not know them \verb|\o/|).
+
+Notice that some terminal commands have their own section in these tips (e.g.~\texttt{grep} in \autoref{sec:grep}), for others some insights are given in \autoref{sec:misc}.
 \begin{itemize}
   \item Of course I'm not the first to write tips, and certainly not the one which knows the most, so here a couples of tips lists, especially about shortcuts: \href{https://www.techrepublic.com/article/20-terminal-shortcuts-developers-need-to-know/}{here} and \href{https://www.howtogeek.com/howto/ubuntu/keyboard-shortcuts-for-bash-command-shell-for-ubuntu-debian-suse-redhat-linux-etc/}{here} and \href{https://devhints.io/bash}{here}.
   \item Default applications: often we don't know the name of the programs that we use, for instance, for opening a pdf. Here some of them
@@ -97,11 +99,14 @@ fi
   \item Conditional statements: \href{https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs}{here}
   \item Pipes: \verb!|! connects standard output of one command to standard input of another.
   \item File descriptors:
-    \begin{enumerate}[start=0]
+    \begin{enumerate}[start=0,label={\texttt{\arabic*} :}]
       \item Standard input
       \item Standard output
       \item Standard error
     \end{enumerate}
+  \item Use output of commands (for instance, to define a variable or a command)
+  \item Brackets: \verb|$(cmd)|
+  \item Backticks: \verb|`cmd`|
   \item \href{https://www.gnu.org/software/bash/manual/bash.html#Redirections}{Redirection}: use \verb|>| to redirect, \verb|>&| to duplicate and redirect
     \begin{itemize}
       \item Redirect \texttt{stdout} to \texttt{stderr}: \verb|<cmd> 1>&2|
@@ -130,8 +135,18 @@ cmd 2>&1 >/dev/null | pipe_receiver
     \end{itemize}
   \item In a script, adding at the beginning \verb|set -e| will make the script exit immediately as soon as one of its commands finishes with a non-zero status (when it fails).
   \item For option management \verb|getopts| is recommended, see \autoref{sec:misc}.
-  \item Arrays: have a look \href{https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays}{here}.
-  \item For loops: have a look \href{https://www.cyberciti.biz/faq/bash-for-loop/}{here}.
+  \item Arrays: have a look \href{https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays}{here}. Access with \verb|${list[$i]}|
+  \item Loops: have a look \href{https://www.cyberciti.biz/faq/bash-for-loop/}{here}.
+  \item Combine loops and arrays: some examples
+\begin{verbatim}
+for n in one two three; do [...] done
+# or
+for n in (one two three); do [...] done
+#
+list=(one two three)
+for n in ${list[@]}; do [...] done # Items only
+for i in ${!list[@]}; do [...] done # Indeces only
+\end{verbatim}
   \item Notifications and dialogue windows: we really like the old-school terminal, but sometimes nice GUI stuffs and visual aides make life easier. Consider this: you launch a script which takes a really long time, so from the terminal you switch to do other stuff. It would be nice to be alerted when the said script finishes. I am still working on an audio signal, but consider these two options:
     \begin{itemize}
       \item \verb|notify-send "Title" "Body"|: a little notification pop-up
@@ -144,9 +159,14 @@ cmd 2>&1 >/dev/null | pipe_receiver
     \end{itemize}
   \item Aliases
     \begin{itemize}
-      \item \item Pimp your \texttt{bash} by modifying the file \texttt{.bashrc} in your home (load modules that you want by default, set global variables,\ldots) and define personal shortcuts in \texttt{.bash\_aliases}, again in your home (verify that it is loaded in \texttt{.bashrc}).
+      \item Pimp your \texttt{bash} by modifying the file \texttt{.bashrc} in your home (load modules that you want by default, set global variables,\ldots) and define personal shortcuts in \texttt{.bash\_aliases}, again in your home (verify that it is loaded in \texttt{.bashrc}).
       \item Preceding a terminal command with a backslash will tell the shell to run the command itself and not the alias with the same name if it exists.
       \item In \texttt{bash}, the keyboard combo \texttt{Ctrl+Alt+E} expands aliases and variables that you writing.
+    \end{itemize}
+  \item Quitting
+    \begin{itemize}
+      \item \verb|exit [error_number]|: quit the current section. That's exactly what you wish, if you are in a script or in a \texttt{ssh} connection. However, if you try it in a terminal or in a function, it will close the terminal.
+      \item In order to quit a function without closing the terminal / script, use \verb|kill -INT $$|
     \end{itemize}
 \end{itemize}
 
@@ -210,6 +230,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item Forgot a file in your last commit or want to modify it? \verb|git commit --amend| add the staged modifications to the last commit.
       \item Commit with the same message as the original (after a reset, or with the \verb|--amend| option): \verb|git commit -c ORIG_HEAD|.
     \end{itemize}
+  \item \href{https://www.conventionalcommits.org/en/v1.0.0/}{Conventional commits}: a style-guide for writing commits messages
   \item For all merging-related commands (\texttt{am}, \texttt{merge}, \texttt{cherry-pick}, \texttt{rebase}, \verb|pull --rebase|...), if errors occur, you can use
     \begin{itemize}
       \item \verb|git <command> --continue|: the problems have been solved, tells \texttt{git} to continue what it was doing,
@@ -250,6 +271,11 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item \texttt{-<n>}: create only \texttt{n} patches (always starting from \texttt{SHA1});
       \item \verb|--start-number <n>|: the patches are numbered starting from \texttt{n};
       \item \texttt{-N}: commits are unnumbered.
+    \end{itemize}
+  \item \href{https://git-scm.com/docs/git-merge}{Merge} a branch: \verb|git merge [options] <to_merge>| incorporate all the commits of \verb|o_merge| onto the current branch. Some info also on \href{https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-request-merges}{\texttt{GitHub}}.
+    \begin{itemize}
+      \item If the history of the current and to-be-merged branch split, then an additional, automatically-generated commit is added (it is usually called ``Merge branch [\ldots]''). To avoid that, you can try to rebase \verb|branch_to_merge| over the final brunch, and possibly use the option \verb|--ff-only|.
+      \item It \verb|branch_to_merge| has more than one commits, use \verb|--squash| to merge all its commits without, however, committing the changes into the current branch.
     \end{itemize}
   \item \href{https://git-scm.com/docs/git-am}{Apply a patch}: \verb|git am [options] path/to/patch|
     \begin{itemize}
@@ -338,23 +364,32 @@ Bases:
 
 Commands:
 \begin{itemize}
-  \item Common commands may be found \href{https://www.gnu.org/software/sed/manual/sed.html#Common-Commands}{here}, less common ones \href{https://www.gnu.org/software/sed/manual/sed.html#Other-Commands}{here}
-  \item Search and replace:
+  \item Common commands may be found \href{https://www.gnu.org/software/sed/manual/sed.html#Common-Commands}{here}, less common ones \href{https://www.gnu.org/software/sed/manual/sed.html#Other-Commands}{here}, the \href{https://www.gnu.org/software/sed/manual/html_node/sed-commands-list.html}{list} from the manual
+  \item Search and replace, \verb|s|:
 \begin{verbatim}
   sed -i "s/<pattern>/<replaced>/" file
 \end{verbatim}
-  \item Replace all the lines matching \verb|pattern| with \verb|new_line| - this works on the entire line:
+  \item Replace all the lines matching \verb|pattern| with \verb|Pattern was here| - this works on the entire line, \verb|c <text>| or \verb|c\<newline><text>|:
 \begin{verbatim}
-sed -i "/pattern/c\new_line/" file,
+sed -i "/pattern/c Pattern was here/" file,
 \end{verbatim}
   \item Delete all lines containing \verb|pattern| - this works on the entire line:
 \begin{verbatim}
 sed -i "/pattern/d" file;
 \end{verbatim}
+  \item Insert before line, \verb|i <text>| or \verb|i\<newline><text>|
+\begin{verbatim}
+sed -i "/pattern/i Next line is pattern/" file,
+\end{verbatim}
+  \item Append after line, \verb|a <text>| or \verb|a\<newline><text>|
+\begin{verbatim}
+sed -i "/pattern/a Previous line was pattern/" file,
+\end{verbatim}
   \item Apply multiple commands at the same time:
     \begin{itemize}
       \item Separate them with semicolons: \verb|sed 'cmd1 ; cmd2' file|
       \item Separate them with \verb|-e|: \verb|sed -e 'cmd1' -e 'cmd2' file|
+      \item Group sever commands together with braces: \verb|{cmd1 ; cmd2}|
     \end{itemize}
 \end{itemize}
 
@@ -482,11 +517,14 @@ find . -name notmyfile -not -path <dir_excl>
   \item \verb|-maxdepth <n>|: limit the tree descent level of the search
   \item Apply a command to all the matching files: e.g.~run a bash script, grep only certain files
 \begin{verbatim}
-find . -name *.log -exec script.sh {} \;
-find . -name *.log -exec script.sh {} +
-find . -name *.log -exec grep -Hn --color "pattern" {} +
+find . -name "*.log" -exec script.sh {} \;
+find . -name "*.log" -exec script.sh {} +
+find . -name "*.log" -exec grep -Hn --color "pattern" {} +
 \end{verbatim}
-\verb|{}| stands for the matching files; the first version will execute as many calls as the numbers of matching files, the second (tries to) appends all the files in an single list of arguments (hence saving the calls to the script)
+    \verb|{}| stands for the matching files; the first version will execute as many calls as the numbers of matching files, the second (tries to) appends all the files in an single list of arguments (hence saving the calls to the script). If you would like to use a pipe in your \texttt{exec} command, use \texttt{sh} like below, or have a look \href{https://stackoverflow.com/questions/307015/how-do-i-include-a-pipe-in-my-linux-find-exec-command}{here}.
+\begin{verbatim}
+find . -name "*.log" -exec sh -c "tac {} | grep -m1 pattern" \;
+\end{verbatim}
   \begin{itemize}
     \item Mind that \texttt{find} does not know the content of \texttt{.bashrc} and alike, hence one could not use aliases (its \texttt{ls} command might be stripped-down with respect to what one is used to, you may want to consider adding some user-friendly options).
   \end{itemize}
@@ -520,12 +558,18 @@ tar -xf archived.tar
     \end{itemize}
   \item Additional options:
     \begin{itemize}
-      \item Zip (compress), \verb|-z|: use compression algorithms. The option has to be used also when extracting compressed archived. Usually, compressed archived have \verb|.tar.gz| or \verb|.tgz| as extension.
       \item \verb|t|, \verb|-t|, \verb|--list|: list the files.
       \item \verb|r|, \verb|-r|, \verb|--append|: add files to an existing archive.
       \item \verb|u|, \verb|-u|, \verb|--update|: add to the archive only the files which are already present and which have been modified.
       \item \verb|A|, \verb|-A|, \verb|--catenate|, \verb|--concatenate|: concatenate archives.
       \item Symbolic links: by default, \texttt{tar} keeps the links. If in the archive one wants a \emph{copy} of the \emph{original} file to which the link points to, option \verb!-h|--deeference! should be used.
+      \item \verb|-C|, \verb|--directory <path>|: execute from \verb|path| (e.g.~decompress inside a given directory)
+    \end{itemize}
+  \item Compression algorithms:
+    \begin{itemize}
+      \item Zip (compress), \verb|-z|, \verb|--gzip|, \verb|--gunzip|, \verb|--ungzip|: use compression algorithms. The option has to be used also when extracting compressed archived. Usually, compressed archived have \verb|.tar.gz| or \verb|.tgz| as extension.
+      \item \verb|-j|, \verb|--bzip2|
+      \item \verb|-J|, \verb|xz|
     \end{itemize}
 \end{itemize}
 
@@ -621,7 +665,7 @@ Just some tricks.
   Although some warning may be issued, for instance for unbalanced parantheses
 #endif
 \end{verbatim}
-  \item Operator \verb|?|: it is a shortcut for a simple \texttt{if} statement.
+  \item Operator \verb|?| (ternary operator): it is a shortcut for a simple \texttt{if} statement.
 \begin{verbatim}
   /* binary condition */ ? /* if true, do this */ : /* otherwise, do this */
 \end{verbatim}
@@ -765,27 +809,194 @@ for (short int i=0; i < 3; i++){
 \label{sec:python}
 (I used to be better with \texttt{python} but I don't use it so much now, so these tips here are not many nor much useful. I'm sorry. If you agree, please contribute!)
 \begin{itemize}
-  \item Debugging, info \href{https://docs.python.org/2/library/pdb.html}{here}: \texttt{python -m pdb script.py}.
-    Commands are similar to \texttt{gdb} (\ref{sec:gdb}).
+  \item Debugging, info \href{https://docs.python.org/2/library/pdb.html}{here}: \texttt{python -m pdb script.py}. Commands are similar to \texttt{gdb} (\ref{sec:gdb}).
+  \item Virtual environments: have look \href{https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/}{here} or \href{https://docs.python.org/3/tutorial/venv.html}{here}.
+    \begin{enumerate}
+      \item Create: \verb|python3 -m venv <env_name>|. The argument \verb|env_name| is arbitrary: let's fix it to \verb|test|
+      \item Activate: \verb|source test/bin/activate|. From now on the python version of the virtual element is loaded, you may check this with \verb|which python|. Hence, for instance, \verb|pip| will install packages in the virtual environment only
+      \item Deactivate: \verb|deactivate|
+    \end{enumerate}
   \item \texttt{pip}: allows you to download and update python libraries
     \begin{itemize}
       \item Typical call: \verb|pip install <package>|. Add options \verb!--upgrade|-U! to upgrade.
       \item You'll need access to some directories, thus it is advised to have a local install: pass option \verb|--user|.
-      \item Proxy: pass the option \verb|--proxy=user@server.dom:port|.
+      \item Proxy: pass the option \verb|--proxy=user@server.dom:port|. However, it might not work if some dependencies have to be downloaded as well. In that case, try exporting the shell variables \verb|HTTP_PROXY=<proxy>| and \verb|HTTPS_PROXY=<proxy>|.
       \item Get list of outdated packages: \verb|pip list --outdated|.
       \item When installing/upgrading problems may occur with older versions of the \texttt{C} compiler, \texttt{GCC}: try and force \texttt{C99} standard by setting \texttt{CFLAGS} before installing: \verb|export CFLAGS='-std=c99'|
+    \end{itemize}
+  \item Format strings: several ways are available, have a look \href{https://realpython.com/python-string-formatting/}{here}
+  \item \verb|pass|: does nothing. But it is useful as place holder
+\begin{lstlisting}[language=python]
+class This:
+  pass # Remember to wrtite this
+\end{lstlisting}
+  \item \verb|try ... expect| and alike: An example
+\begin{lstlisting}[language=python]
+try:
+    # Code here
+except:
+    # If error happens in try zone, this code is run...
+else:
+    # ... otherwise, if no exception caught, run this
+finally:
+    # This code is always run, with or without exception
+\end{lstlisting}
+  \item ``\verb|_|'': placeholder for unused parameter
+  \item \href{https://wiki.python.org/moin/Generators}{Generators}: Generator functions allow you to declare a function that behaves like an iterator, i.e.~it can be used in a for loop. This is faster than creating lists on purpose. Brief \href{https://www.programiz.com/python-programming/generator}{intro}. Generators do not \emph{return}, they \emph{yield}. An example
+\begin{lstlisting}[language=python]
+def zero_or_square(n):
+  for i in range(-n, n):
+    if i <= 0:
+      yield 0
+    else:
+      yield i**2
+
+for i in zero_or_square(5):
+  print(i)
+\end{lstlisting}
+  \item Data structures (the \href{https://docs.python.org/3/library/stdtypes.html}{manual} of all the predefined types) and how to create them
+    \begin{itemize}
+      \item Dictionaries: \verb|d = {'key':item}|
+      \item Lists: \verb|l = [1, 2]|
+      \item Tuples: \verb|t = (1, 2)|. ATTENTION: tuples are similar to lists, however they are immutable, for instance, you won't be able to do: \verb|t[0] = 2|
+      \item Sets: \verb|s = {1, 2}|. Unordered, unique elements.
+        \begin{itemize}
+          \item Frozen sets: \verb|f = frozenset{[1, 2]}|. As sets, but immutable.
+        \end{itemize}
+    \end{itemize}
+  \item Access arrays, lists:
+    \begin{itemize}
+      \item Operator square brackets, 0-based, separate dimensions with commas ``\texttt{,}''
+      \item Negative indices means starting from the end, hence \texttt{a[-1]} is the last element
+      \item \verb|a[start:end:range]|: \verb|a[i:j:n]| gives every \texttt{n}-th elements starting from \texttt{i} to \texttt{j}. If \texttt{i} (resp.~\texttt{j}) is omitted, defaults to first, \texttt{0}, (resp.~last, \texttt{-1}) element. E.g.: \verb|a[::2]| yields every other element.
+      \item \verb|a[start:end]|: \verb|a[i:j]|: elements from \texttt{i} to \texttt{j}. If \texttt{i} (resp.~\texttt{j}) is omitted, defaults to first, \texttt{0}, (resp.~last, \texttt{-1}) element
+      \item E.g.: \verb|l[::-1| reverse the list
+      \item ``\verb|:|'': everything. \verb|a[:,n]|: the \texttt{n}-th column
+    \end{itemize}
+  \item Lists, let \verb|l| be a list of natural integers for the sake of simplicity (notation: \verb|i| stands for index, \verb|n| for natural integer)
+    \begin{itemize}
+      \item Insertion, elimination: \verb|l.append(n)| (in-place, it returns \verb|None|), \verb|l.insert(i,n)| \verb|l.remove(n)|, \verb|l.pop(i)| (remove \texttt{i}-th element, default 0)
+      \item It accepts \verb|l.max()|
+      \item Loop both on indices and values: \verb|for i, v in enumerate(l):|
+      \item Initialize (list comprehension): \verb|l = [0 for _ in range(3)]|
+      \item Search for: \verb|l.index(n)|
+      \item Reverse: \verb|l.reverse()| in-place, \verb|l[::-1]|
+      \item Sorting: \verb|l.sort()| in-place, \verb|sorted(l)| returns a new list
+      \item List comprehension: \href{https://www.programiz.com/python-programming/list-comprehension}{here}.
+    \end{itemize}
+  \item Dictionaries: have a look \href{https://realpython.com/python-dicts/}{here}
+    \begin{itemize}
+      \item In recent versions, they are ordered
+      \item Create: empty \verb|d = {}| or \verb|d = dict()|; not empty \verb|d={key:value}| or \verb|dict()| plus list of tuples. \verb|key| and \verb|value| can be of any (?) type.
+      \item Add new item or update existing: \verb|d[key]=value|, \verb|d.update| accepts either another dictionary object or an iterable of key/value pairs (as tuples or other iterables of length two)
+      \item Access: by key \verb|d[k]=val|; by index \verb|d[2]=val|; \verb|d.get(<key>[, <default>])| returns the value if \texttt{k} is a key (otherwise, \texttt{default})
+      \item \verb|d.items()|: returns a list of key-value pairs
+      \item \verb|d.keys()|: returns a list of keys
+      \item \verb|d.values()|: returns a list of values
+      \item \verb|d.pop(k,[default])|: If \texttt{k} is in the dictionary, removes it and return its value, else return \texttt{default}
+      \item \verb|d.clear()|: remove everything
+    \end{itemize}
+  \item Sets: Operation and stuff (see \href{https://realpython.com/python-sets/}{here})
+    \begin{itemize}
+      \item Union (any element): \verb!s1 | s2! or better \verb|s1.union(s2)|
+      \item Intersection (elements in both): \verb|s1 & s2| or \verb|s1.intersection(s2)|
+      \item Difference (elements in \verb|s1| only): \verb|s1 - s2| or \verb|s1.difference(s2)|
+      \item Symmetric difference (not in intersection): \verb|s1 ^ s2| or \verb|s1.symmetric_difference(s2)|
+      \item And many others: \verb|s1.isdisjoint(s2)|, \verb|s1.issubset(s2)| or \verb|s1 <= s2| or \verb|s1 < s2| for proper subset\ldots
+    \end{itemize}
+  \item Ternary operator:
+\begin{lstlisting}[language=python]
+msg = "True" if condition else "False"
+\end{lstlisting}
+    or suppose that you have an argument which can be passed or not (hence in this case equal to \verb|None|)
+\begin{lstlisting}[language=python]
+msg = arg_msg or "Your message here"
+\end{lstlisting}
+  \item Classes: random stuff about classes (hidden) methods
+    \begin{itemize}
+      \item \verb|__init__(self[,args])|: creator
+      \item \verb|__call__(self[,args])|: overload operator \verb|( )|
+      \item \verb|__getitem__(self, key)|: overload evaluation with operator \verb|[ ]|, e.g.~\verb|a = obj[n]|
+      \item \verb|__setitem__(self, key)|: overload assignment with operator \verb|[ ]|, e.g.~\verb|obj[n] = a|
+      \item \verb|__add__(self, other)|: overload operator \verb|+|, see \href{https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types}{here}.
+        \begin{itemize}
+          \item You may overload also \verb|-| with \verb|__sub__|, \texttt{*} with \verb|__mult__|, etc\ldots
+          \item \verb|a + b| is interpreted as \verb|a.__add__(b)|. However, lets say that \texttt{a} is not an instance of your class, but \verb|b| is. In this case, only be \verb|b + a| work. In order to take into account also the Reverse case, define also \verb|__radd__| (\verb|__rsub__|,\ldots). Most of the time, if the operation is symmetric, one can simply put \verb|__radd__ = __add__|.
+          \item The in-place versions of the above mentioned operators are: \verb|__iadd__| for \verb|+=|, \verb|__isub__| for \verb|-=|,\ldots
+        \end{itemize}
+      \item \verb|__int__(self)|: overload cast \verb|int(<n>)|. Same applies for \verb|str|, \verb|float|
+      \item \verb|__eq__(self,other)|: overload \verb|==|. Similarly, \verb!__ne|lt|le|gt|ge__!
+        \begin{itemize}
+          \item If \texttt{eq} not present, \texttt{==} is ensured by \texttt{is} (checks the ID)
+          \item As long as there is a \texttt{==}, you can use the \verb|[not] in| keyword
+        \end{itemize}
+    \end{itemize}
+  \item \texttt{numpy} and the \texttt{axis} keyword
+    \begin{itemize}
+      \item TL;DR: \verb|axis=0| acts by column, \verb|axis=1| by row. Hence,
+\begin{lstlisting}[language=python]
+x=numpy.ones([3,4])
+x.sum(axis=0) # Gives [3, 3, 3, 3]
+x.sum(axis=1) # Gives [4, 4, 4]
+\end{lstlisting}
+      \item The value of \texttt{axis} indicate on which dimension the operation is done (in a certain sens, which direction collapses after the operation).
+      \item The value correspond to the index of the direction in, for instance, the result of \verb|numpy.size()|. Think about it: above \verb|x| was a 3-rows-4-columns matrix. Then, \verb|x.size() # =(3,4)|
+    \end{itemize}
+  \item \href{https://docs.python.org/3/library/tkinter.html}{\texttt{tkinter}}: manage windows and dialogue
+  \item \texttt{args} and \texttt{kwargs}: have a look \href{https://realpython.com/python-kwargs-and-args/}{here}
+  \item Parallelization: Couple of resources:
+    \begin{itemize}
+      \item \href{https://docs.python.org/3/library/multiprocessing.html}{\texttt{multiprocessing}} module.
+      \item \href{https://docs.python.org/3/library/threading.html}{\texttt{threading}} module.
+      \item An \href{https://www.machinelearningplus.com/python/parallel-processing-python/}{intro} with simple examples.
     \end{itemize}
   \item \texttt{matplotlib}
     \begin{itemize}
       \item \texttt{matplotlib.ion()} switch the interaction with the plot on, so that \texttt{plt.plot()} is not blocking and the plot can be kept and redrawn multiple times. This of course works in a plot environment, if you use it on a script the plot will disappear as soon as the script reaches its end.
       \item 3D plots. A nice introduction can be found \href{https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html}{here}. To activate 3D-plotting (scatter, surface, mesh plot or any other) the axis should be called with \lstinline[language=python]{projection='3d'} which should be imported as follows: \lstinline[language=python]{from mpl_toolkits import mplot3d}
     \end{itemize}
+  \item Argument parsing: \href{https://docs.python.org/3/library/argparse.html#module-argparse}{\texttt{argparse}}
+  \item Progress bar: \href{https://github.com/tqdm/tqdm#manual}{\texttt{tqdm}}
+  \item \href{https://mypy.readthedocs.io/en/stable/index.html}{\texttt{mypy}}: write annotations indicating the types of your variables, parameters, and return values, then run \texttt{mypy} to check if your code is coherent (are you assigning a list to a variable that should a dictionary? and so on\ldots). The annotations do not interfere with the code when you are running directly the script.
+  \item Statistics and data analysis:
+    \begin{itemize}
+      \item \texttt{scipy.stats}: hypothesis testing and all the basics.
+      \item \texttt{statsmodels}: regressions.
+      \item \href{https://seaborn.pydata.org/introduction.html}{\texttt{seaborn}}: powerful data visualization tool.
+    \end{itemize}
 \end{itemize}
+
+\subsection{Writing documentation}
+We give here some tips about writing documentation for your \texttt{python} code using \href{https://www.sphinx-doc.org/en/master/index.html}{\texttt{sphinx}}, basic ideas are \href{https://docs.python-guide.org/writing/documentation/}{here}. The main features of \texttt{sphinx} are that it provides building procedures, it is highly customizable, it uses reStructured Text (a markup language similar to \texttt{markdown}, \autoref{sec:markdown}) and can automatically process the docstrings.
+
+First of all, here some info about docstrings, defined \href{https://www.python.org/dev/peps/pep-0257/}{here}. They are the comment-like lines just after function / class declarations, included in triple single- or double-quotes (\verb|'''| or \verb|"""|), that are read by python when invoking \texttt{help( )} or \texttt{doc( )}, \href{https://www.geeksforgeeks.org/python-docstrings/}{here} is basic stuff, also \href{https://www.programiz.com/python-programming/docstrings}{here}.
+
+There are docstrings conventions that can be read and processed by \texttt{sphinx} so that it can generate automatically the documentation. The two most well-known and used are \href{https://www.programiz.com/python-programming/docstrings}{Google style} (example \href{https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html}{here}), and the \href{https://numpydoc.readthedocs.io/en/latest/format.html}{NumPy style} (example \href{https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html#example-numpy}{here}, mind that this format needs an additional extension of \texttt{sphinx}, we'll come back on this later). In short, choose one of the styles, used it coherently, so that you may create your doc in no times. In order for the docstrings to be understood by \texttt{sphinx}, you may use \texttt{sphinx} directive, like \href{https://sphinx-rtd-tutorial.readthedocs.io/en/latest/docstrings.html#an-example-class-with-docstrings}{this}, but the docstrings are a little less readable.
+
+Now comes the real part about using \texttt{sphinx}. I am no wiz, I just figured out a couple of tricks by trial'n'error. Before getting into the detail myself, let me just give some web posts which (somehow) details the procedure: \href{https://betterprogramming.pub/auto-documenting-a-python-project-using-sphinx-8878f9ddc6e9}{here}, \href{https://samnicholls.net/2016/06/15/how-to-sphinx-readthedocs/}{here}, \href{https://eikonomega.medium.com/getting-started-with-sphinx-autodoc-part-1-2cebbbca5365}{here} (keep this for \texttt{automodule} / \texttt{autodoc}), \href{https://medium.com/@richdayandnight/a-simple-tutorial-on-how-to-document-your-python-project-using-sphinx-and-rinohtype-177c22a15b5b}{here}.
+\begin{enumerate}
+  \item Install \texttt{sphinx} if you don't have it with \texttt{pip install Sphinx}. It is advised to use virtual environments.
+  \item \texttt{sphinx} uses a configuration file \texttt{conf.py}. The default configuration may be set up by running \texttt{sphinx-quickstart} and answering its question. You may want to activate the \texttt{autodoc} (automatically generates from docstrings), \texttt{intersphinx} (generates links within documentations), \texttt{coverage} (checks if you forgot to document something), \texttt{viewcode} (provides links to the code), and possibly even \texttt{doctest} (runs some examples found in the docstrings) extensions. The \texttt{Makefile} is quite useful, too. Now, you have set your doc up.
+  \item You should say to \texttt{sphinx} where your scripts are. Open \texttt{conf.py} and uncomment the first imports (\texttt{os} and \texttt{sys}) and the path insertion: default is current directory, adjust with the path which is right for you.
+  \item In the \texttt{conf.py}, you may also change a number of settings and extensions:
+    \begin{itemize}
+      \item Theme: default is ``alabaster''. See \href{https://sphinx-themes.org/}{here} for a gallery. Among the most used ones, is the ReadTheDocs theme: \verb|sphinx_rtd_theme|
+      \item Extensions: the above mentioned \texttt{autodoc}, \texttt{intersphix},\ldots are already loaded if you asked for them in the quickstart. If using the NumPy style, you should activate also the Napoleon extension, hence add \texttt{sphinx.ext.napoleon} to the list.
+      \item And a lot of more stuff
+    \end{itemize}
+  \item If you want \texttt{sphinx} to automatically generate the doc from your docstrings, you should tell it in the \texttt{index.rst} file as explained in item 8 \href{https://medium.com/@richdayandnight/a-simple-tutorial-on-how-to-document-your-python-project-using-sphinx-and-rinohtype-177c22a15b5b}{here} or \href{https://eikonomega.medium.com/getting-started-with-sphinx-autodoc-part-1-2cebbbca5365}{here}.
+    \begin{itemize}
+      \item This enables \texttt{sphinx} to do it all by itself, otherwise, you can also do it yourself using the utility \texttt{sphinx-apidoc} as mentioned \href{https://samnicholls.net/2016/06/15/how-to-sphinx-readthedocs/}{here}.
+    \end{itemize}
+  \item Now, if you asked for the \texttt{Makefile}, you just need to run \verb|make html| (or \texttt{latexpdf}, or anything that pleases you) and your doc is generated in the \verb|[]_build| directory.
+  \item That's it.
+\end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{markdown}}
+\label{sec:markdown}
 \begin{itemize}
   \item \texttt{markdown} files are usually used for \texttt{README} and such.
   \item Common extension: \texttt{.md}, \texttt{.markdown}
@@ -794,7 +1005,14 @@ for (short int i=0; i < 3; i++){
 pandoc --from=markdown --to=html -o out.html in.md
 \end{verbatim}
   \item Guides, cheat-sheet and tutorial:
-    \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{Git-Hub}-flavoured}, \href{https://daringfireball.net/projects/markdown/syntax#list}{official}, quick \href{https://commonmark.org/help/}{cheat-sheet} and a \href{https://agea.github.io/tutorial.md/}{tutorial}.
+    \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{Git-Hub}-flavoured},
+    \href{https://daringfireball.net/projects/markdown/syntax}{official}, quick
+    \href{https://commonmark.org/help/}{cheat-sheet} and a
+    \href{https://agea.github.io/tutorial.md/}{tutorial} and
+    \href{https://enterprise.github.com/downloads/en/markdown-cheatsheet.pdf}{cheat sheet again}.
+  \item Official \texttt{GitHub} \href{https://docs.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax}{documentation}.
+  \item Citations, references, bibliography: \href{https://stackoverflow.com/questions/26587527/cite-a-paper-using-github-markdown-syntax}{here}.
+  \item \texttt{grip}: \texttt{python}-based script which allows you to have a \texttt{GitHub} rendering of your documents (needs internet to send request for translation to \texttt{GitHub}).
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -803,17 +1021,86 @@ pandoc --from=markdown --to=html -o out.html in.md
 \section{\texttt{gnuplot}}
 \begin{itemize}
   \item Keep the plot-windows open after closing the platform / having run the script: \verb|gnuplot --persist|
-  \item Basic plotting from file: e.g.~use column 1 as x and 3 as y (mind \texttt{u} is equivalent to \texttt{using})
+  \item Scripts: A script is just a sequence of \texttt{gnuplot} commands.
+    \begin{itemize}
+      \item There is no official extension, although the most common are: \texttt{gpi} (recognized by \texttt{vim}), \texttt{plt}, \texttt{gp}, \texttt{gnu}.
+      \item To launch: \verb|gnuplot script.gpi| from terminal, or \verb|load 'script.gpi'| inside a \verb|gnuplot| session
+    \end{itemize}
+  \item Variables: simply \verb|var = 8.5|, or \verb|var = 'smth'|
+  \item New figure: \verb|set term xterm <n>| where \verb|n| is the ID
+  \item Basic plotting from file: e.g.~use column 1 as x and 2 as y (mind \texttt{u} is equivalent to \texttt{using})
 \begin{verbatim}
-  plot "file.dat" using 1:2 [options], "file2.dat" u 1:3
+plot "file.dat" using 1:2 [options]
+\end{verbatim}
+  \item Multiple plots in the same picture. Usually, when executing \texttt{plot}, the old picture is cleared. To plot several curves separate them with a comma or use \verb|replot|. Indeed, the following
+\begin{verbatim}
+plot "file.dat" u 1:2 [options], "file2.dat" u 1:3 [options]
+\end{verbatim}
+    is equivalent to
+\begin{verbatim}
+plot "file.dat" u 1:2 [options]
+replot "file2.dat" u 1:3 [options]
+\end{verbatim}
+  \item Subplots: \verb|set multiplot <n_rows>,<n_cols>| dispose the following plots in \verb|n_rows|$\times$\verb|n_cols| structure. Each \verb|plot|-like command will automatically switch to the following slot in the structure.
+  \item Save:
+    \begin{enumerate}
+      \item Change terminal to the chosen output: \verb|set term postscript|, for \texttt{.ps} files. Use \texttt{png} for \texttt{.png} files instead. In this latter case, you can choose the size in pixels: \verb|set term png size 600,400|
+      \item Choose name (according to the output): \verb|set output "plot.ps"|
+      \item Plot into file: \verb|replot|
+      \item Go back to initial terminal: \verb|set term x11|
+    \end{enumerate}
+  \item Column separator: for instance, with a \texttt{.csv} file one would use \verb|set datafile separator ','|
+  \item Column names/headers: if columns has names/headers, you can use them instead of indices, using \verb|(column('name'))|. Yes, the brackets are necessary
+\begin{verbatim}
+plot file u (column('time')):(column('price'))
+\end{verbatim}
+  \item If a plot is already shown, and you run a \verb|set <cmd>| command, this will be active starting from the next \verb|plot|-like command only. Hence, you may want to run a \verb|replot| to update the figure with the new setting.
+  \item Log scale: \verb!set log x|y!
+  \item Plot title: \verb|set title 'Plot title'|
+  \item Axis labels: \verb!set x|ylabel 'Label'!
+  \item Legend:
+    \begin{itemize}
+      \item Deactivate: \verb|unset key| or \verb|set nokey|
+      \item Place: \verb|set key <pos>| where \verb|pos| may assume: \verb|left top|,\ldots, \verb|outside|
+      \item If columns have names and you want to use as legend labels: \texttt{set key autotitle columnhead}
+    \end{itemize}
+  \item Axis limits: \verb!set x|yrange [<min>:<max>]! or simply put \verb![<xmin>:<xmax>] [<ymin>:<ymax>]! after plot
+  \item Color cycles: \verb!set colorsequence default|classic|podo!
+  \item Loops: have a look \href{https://stackoverflow.com/a/18592561}{here} and \href{https://stackoverflow.com/a/14947085}{here}. From the first link (\verb|word| extract a word from a string)
+\begin{verbatim}
+colors = "red green #0000FF"
+files = "file1 file2 file3"
+plot for [i=1:words(files)] word(files, i).'.dat' lc rgb word(colors, i)
 \end{verbatim}
 \end{itemize}
-Useful options:
+Useful options of \texttt{plot}-like commands:
 \begin{itemize}
   \item \verb!linecolor|lc!: e.g. \verb|lc "black"|. For more advance setting: \verb|linetype rgb "<parameters>"|
-  \item \verb!with|w!: lines and marks \verb|linespoints|, lines/marks only \verb!lines|points!
-  \item \verb|title "<legend_entry>"|
+  \item \verb!with|w!: lines and marks \verb|linespoints|, lines/marks only \verb!lines|points!, \verb|impulses|
+  \item \verb|pointtype <n>| (or \verb|pt|): set style \texttt{n} for the point. There are also \verb|pointsize| (or \verb|ps|)
+  \item \verb|title "<legend_entry>"|. If columns have names, \verb|title columnhead|
   \item \verb!linewidth|w!
+  \item Solid/dashed lines: \verb|dashtype| or \verb|dt|
+    \begin{itemize}
+      \item \verb|dt N|: predefined type
+      \item \verb|dt "<pattern>"|: custom pattern where \verb|pattern| is a combination of dots, hyphens, underscores and spaces
+      \item ATTENTION: set dash type before giving line type: \verb|plot x:sin(x) dt 1 w linespoints|
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\texttt{ImageJ} - \texttt{Fiji}}
+\texttt{ImageJ} is a \texttt{Java}-based image processing program especially adapted to scientific researches. \texttt{Fiji} Is Just \texttt{ImageJ}, with many many plugins (you are advised to use this latter). Just a couple of tools that I have used (so that I don't forget them)
+\begin{itemize}
+  \item Rotate: \texttt{Image > Transform > Rotate}
+  \item Set origin: usually the origin (the point (0,0)) is the upper left corner of the image. You can however change it: \texttt{Image > Transform > Properties > Origin} (do you need the \texttt{Global} case?)
+  \item Since the origin point is by default at the top of the image, the y axis, that is the vertical one, has positive values towards the bottom. Sometimes is destabilizing. Change it with \texttt{Analyze > Set measurements > Invert y}
+  \item Set a dimension scale from a part of the image whose dimension is known: draw a line than \texttt{Analyze > Set scale}
+  \item Perspective: \texttt{Plugins > Transform > Interactive perspective}
+  \item Make points from two different images correspond. Consider this. You have some photo of the same thing but you are a bad photographer and all the pictures have their own perspective and angle. Well, choose a reference photo than make all the other correspond to it with \texttt{Plugins > Transform > Landscape correspondences}
+  \item Macros: in order to automate your process, you may write your own macros. See \texttt{Plugins > Macros > [...]}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -833,10 +1120,16 @@ echo "I want a ${what}"
       \item \verb|-e|: interpret a backslashed character, e.g. \verb|\n| will be considered as newline
       \item Overwrite: use \verb|\b| (needs option \verb|-e|) to go back a character. For entire lines, have a look \href{https://stackoverflow.com/questions/11283625/overwrite-last-line-on-terminal}{here}.
     \end{itemize}
+  \item \verb|eval [args]|: \verb|args| are concatenated to build and run a command. Variables can be used:
+\begin{verbatim}
+cmd="ls"
+echo "I will now $cmd in dir"
+eval $cmd dir
+\end{verbatim}
   \item Download with command line: \texttt{wget} and \texttt{curl}
     \begin{itemize}
       \item Basic stuff \href{https://linuxconfig.org/download-file-from-url-on-linux-using-command-line}{here}
-      \item With proxy \href{https://www.cyberciti.biz/faq/linux-unix-curl-command-with-proxy-username-password-http-options/}{here}
+      \item With proxy \href{https://www.cyberciti.biz/faq/linux-unix-curl-command-with-proxy-username-password-http-options/}{here}; \verb|-x| option with \texttt{curl}; with \texttt{wget} you may want to export environmental variable \verb|http[s]_proxy|.
     \end{itemize}
   \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
 \begin{verbatim}
@@ -861,7 +1154,28 @@ wc [options] <file>
       \item \verb|-L|: print max line length;
       \item It usually (at least with \verb|-l|) re-prints the file name. To avoid use: \verb|wc -l < file.txt| (notice \verb|<|);
     \end{itemize}
-  \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one.
+  \item \texttt{sort [OPTIONS] [FILE]}
+    \begin{itemize}
+      \item if \texttt{FILE} is \texttt{-} or not given, it uses \texttt{stdin}
+      \item \verb|-r|: \texttt{r}everse
+      \item \verb|-u|: \texttt{u}nique
+      \item \verb|-t <SEP>|: use \texttt{SEP} instead of blank space as field separator
+      \item \verb|-f|: case insensitive
+      \item \ldots and many others, check the man.
+    \end{itemize}
+  \item \texttt{uniq}: filter for repeated adjacent lines. Let me stress: only adjacent lines are checked
+    \begin{itemize}
+      \item \verb|-c|: prefix line with number of occurrences
+      \item \verb|-d|: print repeated lines only occ
+      \item \verb|-u|: print unique lines only
+    \end{itemize}
+  \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one. A little syntax:
+    \begin{itemize}
+      \item Conditional \verb|!| negate, \verb!-a|-o! and/or
+      \item Strings: \verb!-z|-n! true if zero | nonzero, compare with \verb|=| and \verb|!=|
+      \item Integers: \verb|-eq| equal, \verb|-ne| not-equal, \verb!-gt|-ge! (resp.~\verb!-lt|-le!) greater than | greater or equal (resp.~less)
+      \item Files: \verb!-ot|-nt! older|newer than, \verb|-e| exists, \verb|-f| regular file, \verb|-d| directory
+    \end{itemize}
   \item \verb|touch <file>|: modify the file access and/or modification date. If the file doesn't exist, an empty one will be created (unless specific options are given). For more details and all the options, have a look at its \texttt{man} page.\\
   Why should one use it?
     \begin{itemize}
@@ -872,22 +1186,38 @@ wc [options] <file>
       \item Convert: \verb|convert test.<ext1> test.<ext2>| the extension can be \texttt{pdf}, \texttt{jpg}, \texttt{png},\ldots
       \item Rotate: \verb|-rotate <deg>|
       \item Choose density|quality (and hence the final size): option \verb|-density <n>| (its unit is \texttt{dpi})
+      \item Reduce size: \verb|-size <n>%| the output will have be the \verb|n|\% of the initial size
+      \item Mirror image: \verb|-flip| vertical (meaning top becomes bottom) axis, \verb|-flop| horizontal axis (meaning right becomes left)
     \end{itemize}
   \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: nice and easy utility to modify \texttt{pdf} files
     \begin{itemize}
-      \item Extract and/or merge
+      \item Extract and/or merge: Examples of accepted ranges: \texttt{'1,6-9'}, \texttt{'-2,4,6'}
+\begin{verbatim}
+pdfjam [options] -- file_1.pdf ['<page_range>'] \
+                   [file_2.pdf ['<page_range>'] ...]
+\end{verbatim}
+      \item Rotate: Commands specified for certain angles are available: \verb!pdf90|180|270 <in.pdf>!
+      \item A similar utility with a wider range of capabilities is \href{https://www.ghostscript.com/doc/current/Use.htm}{\texttt{ghostscript}}
+      \item In fact, under the hood \texttt{pdfjam} calls \LaTeX{} and loads the pdf into a page. This is enough most of the time, however, if the pdf has non-standard dimensions, let say smaller than A4, this will result in a blank A4 page with the pdf at the center. To fit to the size, use \texttt{ghostscript} (for the pages, the option \texttt{-sPageList} is also available and accepts ranges)
     \end{itemize}
 \begin{verbatim}
-pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...]
+gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -dPSFitPage \
+   -dFirstPage=2 -dLastPage=5 -o out.pdf in.pdf
 \end{verbatim}
-    \begin{itemize}
-      \item Rotate: Commands specified for certain angles are available: \verb!pdf90|180|270 <in.pdf>!
-    \end{itemize}
   \item Job management:
     \begin{itemize}
-      \item \verb|pgrep [options] <pattern>|: print info, especially the job-IDs, of all the jobs matching \verb|<pattern>|. Option \verb|-l| lists the names as well (and not only the IDs).
       \item \verb|kill [options] <job_ID>|: kill (send \texttt{SIGTERM} to) the job denoted by \verb|<job_ID>|.
+      \item \verb|pgrep [options] <pattern>|: print info, especially the job-IDs, of all the jobs matching \verb|<pattern>|. Option \verb|-l| lists the names as well (and not only the IDs).
       \item \verb|pkill [options] <pattern>|: as \verb|kill| but looks for matches in job names before (as \verb|pgrep|).
+      \item Options for \verb!pgrep|pkill!
+        \begin{itemize}
+          \item \verb|-c|: count
+          \item \verb|-l|: lists names, \verb|-a|: lists fully
+          \item \verb!-n|-o!: newest/oldest only
+          \item \verb|-x|: select if name is exact
+          \item \verb|-u UID|: only for user \verb|UID|
+          \item \verb|-s SIG|: send signal \verb|SIG|
+        \end{itemize}
     \end{itemize}
   \item \verb|[h]top|: \verb|top| (and its user-friendly version \verb|htop|) gives an overview of a running system. One can find, for instance and just to name the most useful features, which jobs are running and how much memory or processors are used.
     \begin{itemize}
@@ -903,17 +1233,24 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
   \item \texttt{df}: check disk space info about the system (mnemonic: \emph{d}isk \emph{f}ree / \emph{f}ilesystem)
   \item \texttt{time}: run programs and summarize system resource usage (from \texttt{man}). \verb|time my_script.sh|; get the execution time of the script. More insight \href{https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1/556411#556411}{here}.
   \item \texttt{uname}: print system info
+  \item ``Safely remove'' disks from command line: use \texttt{udisksctl} as explained \href{https://askubuntu.com/questions/532586/what-is-the-command-line-equivalent-of-safely-remove-drive}{here}:
+\begin{verbatim}
+udisksctl unmount -b /dev/sdX
+udisksctl power-off -b /dev/sdX
+\end{verbatim}
   \item Con\emph{cat}enate files and print to standard output (basically print the content to screen)
     \begin{itemize}
       \item \verb|cat [<opt>] file [file2 [...]]|
       \item \verb|tac [<opt>] file [file2 [...]]| as above but reverse order of the lines
     \end{itemize}
-  \item \verb|cp [source] [dest]|: copy \texttt{source} into \texttt{dest}
+  \item \verb|cp [options] <source> [dest]|: copy \texttt{source} into \texttt{dest} (if omitted, "\texttt{.}")
     \begin{itemize}
-      \item \verb|-t|: target. \verb|cp -t dest -- [source]| is equivalent to \verb|cp [source] [dest]|
+      \item \verb|-t|: target. \verb|cp -t dest -- <source>| is equivalent to \verb|cp <source> [dest]|
       \item \verb|-r|: recursive, useful for directories
-      \item \verb|-u|: copy only if there is no file with the same name in \texttt{dest} or if \texttt{source} is newer
+      \item \verb|-u|: copy only if there is no file with the same name in \texttt{dest} or if \texttt{source} is newer (mnemonic: \emph{u}nique)
       \item \verb|-p|: preserve mode, ownership, and time-stamps
+      \item \verb|-l|: (hard) link source instead of copy
+      \item \verb|-L|: if \texttt{source} is a (symbolic) link, copy the file it points to instead of copying the link
     \end{itemize}
   \item \verb|crontab|: job scheduling. It allows one to regularly run some commands or scripts. Tutorial \href{https://www.adminschoice.com/crontab-quick-reference}{here} or \href{https://www.computerhope.com/unix/ucrontab.htm}{here}.
   \item \texttt{tee}: read from standard input and write to standard output \textbf{\&} files. Useful when you want to save the output of a command to file but you still want to read it on screen. E.g.
@@ -941,14 +1278,42 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] [file_2.pdf ['<page_range>'] ...
       \item \verb|-d|: \emph{d}elete. \verb!echo Maaan | tr -d a! gives \texttt{Mn}
       \item \verb|-s|: \emph{s}queeze. \verb!echo Maaan | tr -s a e! replaces each sequence of repeated \texttt{a}'s with a single occurrence of \texttt{e}, hence it gives \texttt{Men}.
     \end{itemize}
+  \item \texttt{xargs}: use standard output to build commands (you can think of it as a more powerful way of piping). Have a look at some tutorials \href{https://shapeshed.com/unix-xargs/}{here} and \href{https://www.thegeekstuff.com/2013/12/xargs-examples/}{here}. Typical call is (the 0-related flags deal with files with spaces in their names)
+\begin{verbatim}
+find . -name foo -print0 | xargs -0 rm
+\end{verbatim}
+    \begin{itemize}
+      \item \texttt{-t}: print the command
+      \item \texttt{-p}: prompt a user-confirmation before executing the command
+      \item \texttt{-n <n>}: group the inputs by \texttt{n}. That is, instead of (braces added for the sake of explanation) \verb|{1} {2} {3} {4}|, with \texttt{-n 2} one gets \verb|{1 2} {3 4}|.
+      \item \texttt{-I}: enables \texttt{xargs} to execute multiple commands. In this case, \verb|%| is the placeholder for the input (sort of \verb|{}| in \verb|find -exec|)
+      \item \texttt{-a <file>}: read from \texttt{file} instead of standard output
+    \end{itemize}
+  \item \texttt{cut}: cut out part of the content of the input. Typical call is:
+\begin{verbatim}
+cut -f 2-5 text.txt
+\end{verbatim}
+    print only columns (\texttt{f}ields) 2 to 5 of the content of file \verb|text.txt|.
+    \begin{itemize}
+      \item \verb|-f <list>| (or \verb|--fields|): print only fields in the list
+      \item \verb|-b <list>| (or \verb|--bytes|): same as above but with bytes
+      \item \verb|-c <list>| (or \verb|--characters|): same as above but with characters
+      \item \verb|-d <,>|: use \verb|<,>| as delimiter for fields
+      \item List examples: \texttt{n} or \texttt{n-m} or \texttt{-n} or \texttt{n-}
+    \end{itemize}
   \item \texttt{getopts}: built-in command of \texttt{bash} which allows to parse options and arguments passed to a script. Two quick and well-done tutorials can be found \href{https://www.computerhope.com/unix/bash/getopts.htm}{here} and \href{https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/}{here}. We provide a hand-made example: \autoref{lst:getopt_ex}.
     \begin{itemize}
       \item Typically, one calls \verb|while getopts ":<option_list>" opt; do [...] done|. One may want to use a \verb|case| environment to deal with the options.
       \item Here above, \verb|option_list| contains the list of accepted options. If the option is followed by a \verb|:| (colon) it means that it requires arguments. The argument is stored in the macro \verb|$OPTARG|.
       \item \verb|\?| stands for an invalid/unknown option, \verb|:| (colon) for an option for which an argument is required but not provided.
     \end{itemize}
-  \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}.
-  \item Create QR-codes: \href{https://www.qrcode-monkey.com/}{here} is a pretty simple, 100\% free and highly customazible QR-code generator.
+  \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}. E.g.: consider the following \texttt{path/to/file.txt}. Then \texttt{dirname} returns \texttt{path/to}, whereas \texttt{basename} \texttt{file.txt}.
+  \item Convert from HEX to RGB colors from command line
+\begin{verbatim}
+hex="11001A"
+printf "%d %d %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2}
+\end{verbatim}
+  \item Create QR-codes: \href{https://www.qrcode-monkey.com/}{here} is a pretty simple, 100\% free and highly customizable QR-code generator.
 \end{itemize}
 
 \begin{lstlisting}[language=bash,numbers=left,float,frame=single,caption={script.sh, an example for \texttt{getopts}},label={lst:getopt_ex},numberfirstline=true,stepnumber=5,firstnumber=1]
