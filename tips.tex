@@ -1433,13 +1433,23 @@ Now comes the real part about using \texttt{sphinx}. I am no wiz, I just figured
 pandoc --from=markdown --to=html -o out.html in.md
 \end{verbatim}
   \item Guides, cheat-sheet and tutorial:
-    \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{Git-Hub}-flavoured},
+    \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{GitHub}-flavoured},
     \href{https://daringfireball.net/projects/markdown/syntax}{official}, quick
     \href{https://commonmark.org/help/}{cheat-sheet} and a
     \href{https://agea.github.io/tutorial.md/}{tutorial} and
     \href{https://enterprise.github.com/downloads/en/markdown-cheatsheet.pdf}{cheat sheet again}.
   \item Official \texttt{GitHub} \href{https://docs.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax}{documentation}.
   \item Citations, references, bibliography: \href{https://stackoverflow.com/questions/26587527/cite-a-paper-using-github-markdown-syntax}{here}.
+  \item Math\&Equations:
+    \begin{itemize}
+      \item \texttt{GitLab} has native support for equations (\LaTeX-like): inline with \verb|$`\alpha`$| (backticks), display with
+\begin{verbatim}
+```math
+\alpha
+```
+\end{verbatim}
+      \item \texttt{GitHub} flavored cannot. However, there seems to be some workarounds, see \href{https://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog}{here} (linking to third-party render) or \href{https://gist.github.com/cyhsutw/d5983d166fb70ff651f027b2aa56ee4e}{here} (write \LaTeX{} code inside a \texttt{jupyter} notebook)
+    \end{itemize}
   \item \texttt{grip}: \texttt{python}-based script which allows you to have a \texttt{GitHub} rendering of your documents (needs internet to send request for translation to \texttt{GitHub}).
 \end{itemize}
 
