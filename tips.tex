@@ -62,16 +62,36 @@ or sometimes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Shell}
 \label{sec:shell}
-There are different version of shells scripting, such as \texttt{bash}, \texttt{sh}, \texttt{zsh}; they have some differences in commands and syntax (but I do not know them \verb|\o/|).
+There are different version of shells scripting, such as \texttt{bash}, \texttt{sh}, \texttt{zsh}; they have some differences in commands and syntax (but I do not know them \verb|\o/|). I will use \texttt{bash}.
 
-In this first part, we cover basic stuff about the shell. For useful terminal commands and tools, see the next sub-sections.
+\subsection{Shell (\texttt{bash}) basics}
+In this section, we cover basic stuff about the shell. For useful terminal commands and tools, see the next sub-sections.
 \begin{itemize}
   \item Of course I'm not the first to write tips, and certainly not the one who knows the most, so here a couples of tips lists, especially about shortcuts: \href{https://www.techrepublic.com/article/20-terminal-shortcuts-developers-need-to-know/}{here} and \href{https://www.howtogeek.com/howto/ubuntu/keyboard-shortcuts-for-bash-command-shell-for-ubuntu-debian-suse-redhat-linux-etc/}{here} and \href{https://devhints.io/bash}{here}.
+    \begin{itemize}
+      \item Cut \& yank: \texttt{<C-K>} cut (or \emph{k}ill) from cursor to end of line, \texttt{<C-U>} cut from cursor to beginning of line, \texttt{<C-W>} cut (blank-delimited) word just before the cursor, \texttt{<C-Y>} yank (paste).
+      \item \texttt{<C-S-E>}: expand alias.
+      \item \texttt{<C-R>}: search in the command history while typing.
+      \item \texttt{<A-.>}: insert arguments of the previous (run) command;
+      \item \texttt{<C-X-E>}: continue editing the bash command you are writing in the predefined editor.
+      \item \texttt{!}: repeat stuff as explained \href{https://www.redhat.com/sysadmin/bash-bang-commands}{here}.
+      \item Use braces (curly brackets) \verb|{ }| to save typing. Examples
+        \begin{itemize}
+          \item \verb|cp file_{orig,bkp}| expands to \verb|cp file_orig file_bkp|
+          \item \verb|evince work{1,2,3}.pdf| expands to \verb|evince work1.pdf work2.pdf work3.pdf|
+        \end{itemize}
+    \end{itemize}
   \item Default applications: often we don't know the name of the programs that we use, for instance, for opening a pdf. Here some of them
     \begin{itemize}
       \item \texttt{evince} for pdf.
       \item \texttt{eog} for images.
       \item \texttt{nautilus} for file explorer.
+    \end{itemize}
+  \item Customize your terminal
+    \begin{itemize}
+      \item Pimp your \texttt{bash} by modifying the file \texttt{.bashrc} in your home (load modules that you want by default, set global variables,\ldots) and define personal shortcuts in \texttt{.bash\_aliases}, again in your home (verify that it is loaded in \texttt{.bashrc}).
+      \item Preceding a terminal command with a backslash will tell the shell to run the command itself and not the alias with the same name if it exists.
+      \item In \texttt{bash}, the keyboard combo \texttt{Ctrl+Alt+E} expands aliases and variables that you writing.
     \end{itemize}
   \item Run in background:
     \begin{itemize}
@@ -95,7 +115,7 @@ fi
 \end{verbatim}
     \end{itemize}
   \item Operator \texttt{*} expands to all the files whose name does not start with "\texttt{.}". Hence, hidden files (as well as current directory "\texttt{.}", and parent directory "\texttt{..}" are not included).
-  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[| (cf. \autoref{sec:misc}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{ssec:awk}) or \texttt{python} (\autoref{sec:python}) or \texttt{bc} (\autoref{sec:misc}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
+  \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[| (cf. \autoref{ssec:shell_tools}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{ssec:awk}) or \texttt{python} (\autoref{sec:python}) or \texttt{bc} (\autoref{ssec:shell_tools}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
   \item Conditional statements: \href{https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs}{here}
   \item Pipes: \verb!|! connects standard output of one command to standard input of another.
   \item File descriptors:
@@ -105,8 +125,10 @@ fi
       \item Standard error
     \end{enumerate}
   \item Use output of commands (for instance, to define a variable or a command)
-  \item Brackets: \verb|$(cmd)|
-  \item Backticks: \verb|`cmd`|
+    \begin{itemize}
+      \item Brackets: \verb|$(cmd)|
+      \item Backticks: \verb|`cmd`|
+    \end{itemize}
   \item \href{https://www.gnu.org/software/bash/manual/bash.html#Redirections}{Redirection}: use \verb|>| to redirect, \verb|>&| to duplicate and redirect
     \begin{itemize}
       \item Redirect \texttt{stdout} to \texttt{stderr}: \verb|<cmd> 1>&2|
@@ -120,33 +142,57 @@ fi
 cmd 2>&1 >/dev/null | pipe_receiver
 \end{verbatim}
       \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \verb|>>|.
-      \item You may want to check out \texttt{tee} in \ref{sec:misc}.
+      \item You may want to check out \texttt{tee} in \ref{ssec:shell_tools}.
     \end{itemize}
-  \item Use braces (curly brackets) \verb|{ }| to save typing. Examples
+  \item Input:
     \begin{itemize}
-      \item \verb|cp file_{orig,bkp}| expands to \verb|cp file_orig file_bkp|
-      \item \verb|evince work{1,2,3}.pdf| expands to \verb|evince work1.pdf work2.pdf work3.pdf|
+      \item \emph{Here}-strings: feed the content of a variable to a command with \verb|<<<|: \verb|grep [] <<< $var|
+      \item \emph{Here}-documents: feed the content of a file created on-the-run to a command with  \verb|<<|:
+\begin{verbatim}
+grep [] <<EOF
+First line
+Second line
+EOF
+\end{verbatim}
+        The keyword \texttt{EOF} is arbitrary (one can choose it freely) and delimits the beginning and the end of the document
     \end{itemize}
-  \item Manipulating strings:
+  \item Strings manipulation:
     \begin{itemize}
       \item A quick \href{https://sookocheff.com/post/bash/bash-string-operators/}{guide}, or the official \href{https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html}{manual}.
       \item Extract substring: \verb|${string:position:length}|. For more details have a look \href{https://stackoverflow.com/questions/1405611/how-to-extract-the-first-two-characters-of-a-string-in-shell-scripting}{here}.
+      \item Remove pattern
+        \begin{itemize}
+          \item Starting match: shortest \verb|${variable#pattern}|; longest \verb|${variable##pattern}|
+          \item Ending match: shortest \verb|${variable%pattern}|; longest \verb|${variable%%pattern}|
+        \end{itemize}
+      \item Replace pattern: first \verb|{$variable/pattern/replace}|; all \verb|{$variable//pattern/replace}|
       \item Operator \verb|=~|: \verb|${string} =~ ${regex}| gives true if \verb|string| matches the provided regex syntax.
     \end{itemize}
   \item In a script, adding at the beginning \verb|set -e| will make the script exit immediately as soon as one of its commands finishes with a non-zero status (when it fails).
-  \item For option management \verb|getopts| is recommended, see \autoref{sec:misc}.
+  \item For option management \verb|getopts| is recommended, see \autoref{ssec:shell_tools}.
   \item Arrays: have a look \href{https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays}{here}. Access with \verb|${list[$i]}|
-  \item Loops: have a look \href{https://www.cyberciti.biz/faq/bash-for-loop/}{here}.
-  \item Combine loops and arrays: some examples
+  \item Loops:
+    \begin{itemize}
+      \item For loops: have a look \href{https://www.cyberciti.biz/faq/bash-for-loop/}{here}. Quick examples:
 \begin{verbatim}
 for n in one two three; do [...] done
-# or
+# {START..END} or {START..END..INCREMENT}
+for n in {1..10}; do [...] done
+for n in {1..10..2}; do [...] done
+# 3-expression form (( INIT; COND; STEP )), C-like
+for (( n=0; n<10; n++ )); do [...] done
+\end{verbatim}
+      \item While loops: \verb|while []; do [] done|
+      \item Emulating do-while: see first two answers \href{https://stackoverflow.com/questions/16489809/emulating-a-do-while-loop-in-bash}{here}
+      \item Combine loops and arrays: some examples
+\begin{verbatim}
 for n in (one two three); do [...] done
 #
 list=(one two three)
 for n in ${list[@]}; do [...] done # Items only
 for i in ${!list[@]}; do [...] done # Indeces only
 \end{verbatim}
+    \end{itemize}
   \item Notifications and dialogue windows: we really like the old-school terminal, but sometimes nice GUI stuffs and visual aides make life easier. Consider this: you launch a script which takes a really long time, so from the terminal you switch to do other stuff. It would be nice to be alerted when the said script finishes. I am still working on an audio signal, but consider these two options:
     \begin{itemize}
       \item \verb|notify-send "Title" "Body"|: a little notification pop-up
@@ -157,16 +203,31 @@ for i in ${!list[@]}; do [...] done # Indeces only
           \item \verb|--timeout=<n>|: how long the widget should stay
         \end{itemize}
     \end{itemize}
-  \item Aliases
-    \begin{itemize}
-      \item Pimp your \texttt{bash} by modifying the file \texttt{.bashrc} in your home (load modules that you want by default, set global variables,\ldots) and define personal shortcuts in \texttt{.bash\_aliases}, again in your home (verify that it is loaded in \texttt{.bashrc}).
-      \item Preceding a terminal command with a backslash will tell the shell to run the command itself and not the alias with the same name if it exists.
-      \item In \texttt{bash}, the keyboard combo \texttt{Ctrl+Alt+E} expands aliases and variables that you writing.
-    \end{itemize}
   \item Quitting
     \begin{itemize}
       \item \verb|exit [error_number]|: quit the current section. That's exactly what you wish, if you are in a script or in a \texttt{ssh} connection. However, if you try it in a terminal or in a function, it will close the terminal.
       \item In order to quit a function without closing the terminal / script, use \verb|kill -INT $$|
+    \end{itemize}
+  \item Parallelize loops:
+    \begin{itemize}
+      \item Use background commands with \verb|&|: see \href{https://unix.stackexchange.com/questions/103920/parallelize-a-bash-for-loop/103922}{here}
+\begin{verbatim}
+for {...}; do
+  do_something() &
+done
+\end{verbatim}
+        Mind that this will spawn as many sub-processes as iterations in the loops, no matter the number of available cores
+      \item As before, but limiting the number of processes: see \href{https://stackoverflow.com/questions/38774355/how-to-parallelize-for-loop-in-bash-limiting-number-of-processes}{here}
+\begin{verbatim}
+num_procs=$1
+num_jobs="\j"  # The prompt escape for number of jobs currently running
+for {...}; do
+  while (( ${num_jobs@P} >= num_procs )); do
+    wait -n
+  done
+  do_something() &
+done
+\end{verbatim}
     \end{itemize}
 \end{itemize}
 
@@ -327,6 +388,7 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
   find <mydir> -name <filename>
 \end{verbatim}
   \begin{itemize}
+    \item In the previous examples, use \verb|-wholename| (instead of simply \verb|-name|) if you provide the path as well
     \item \verb|-regex|: similar to \texttt{name} but one can use regex syntax to write the pattern. The type can be chosen with \verb|-regextype| (ex. \texttt{sed}). Notice that \texttt{find} always prepends \verb|./| to the path so you may want to start your pattern with something like \verb|.*/|
     \item Case-insensitive search: use \verb|-iname| or \verb|-iregex| as you would use their parent options
   \end{itemize}
@@ -509,10 +571,42 @@ cmd="ls"
 echo "I will now $cmd in dir"
 eval $cmd dir
 \end{verbatim}
+  \item Working with remote servers:
+    \begin{itemize}
+      \item \texttt{ssh}
+        \begin{itemize}
+          \item Connect to server: \verb|ssh [opt] [user@]server|. A new session open (a password may be requested). Use option \verb|-X| (or \verb|-Y|) to enable forwarding of the GUI, that is enabling GUI programs on the server
+          \item Run command on a server: \verb|ssh [opt] [user@]server cmd| (or \verb|'cmd'|)
+        \end{itemize}
+      \item Transfer data, \texttt{rsync} or \texttt{scp}: \verb|rsync file.txt server:/home/user/path/to|. Notice the colon.
+        \begin{itemize}
+          \item \texttt{scp}: it's the inter-server equivalent of \texttt{cp}, it has basically the same options and usage
+            \begin{itemize}
+              \item In order to copy hidden files append a dot "\texttt{.}". E.g.:
+\begin{verbatim}
+scp -r [...] source/. user@server:dest/
+\end{verbatim}
+                If \texttt{source} is the current directory it is better to do (incompatibility introduced by 2019 standard): \verb|scp -r [...] $(pwd) user@server:dest/|. However, a good alternative for this kind of needs is \verb|rsync|
+            \end{itemize}
+          \item \texttt{rsync}: has a syntax similar to \texttt{mv} or \texttt{cp}. As the name suggests, it is a sort of synchronization tool, hence you can customize the effect so that only most recent and freshly edited files are moved. Indeed, it can be use entirely locally, for instance to update a copy / backup. If no destination is provided, \texttt{rsync} will behave similarly to \texttt{ls}.
+            \begin{itemize}
+              \item \verb|--copy-links|: copy as file \texttt{vs.} \verb|--links|: copy as link.
+            \end{itemize}
+          \item ATTENTION: \texttt{scp} and \texttt{rsync} load the \texttt{.bashrc} and fail if it produces an output to \texttt{stdout} (for instance, if they contain commands such as \texttt{echo}). The workaround is to move those commands into \texttt{.bash\_profile} (or just send the output to \verb|/dev/null| if it is not important)
+        \end{itemize}
+    \end{itemize}
   \item Download with command line: \texttt{wget} and \texttt{curl}
     \begin{itemize}
       \item Basic stuff \href{https://linuxconfig.org/download-file-from-url-on-linux-using-command-line}{here}
       \item With proxy \href{https://www.cyberciti.biz/faq/linux-unix-curl-command-with-proxy-username-password-http-options/}{here}; \verb|-x| option with \texttt{curl}; with \texttt{wget} you may want to export environmental variable \verb|http[s]_proxy|.
+    \end{itemize}
+  \item \verb|date [+"FMT"]|: get current date/time. Some of the instructions to build the format string follow:
+    \begin{itemize}
+      \item \verb|%H|, \verb|%M|, \verb|%S|: hours, minutes, seconds
+      \item \verb|%T|, \verb|%r|, \verb|%R|: \verb|%H:%M:%S|, hour in 12-hours format, hour in 24-hours format
+      \item \verb|%Y| (\verb|%y|), \verb|%m|, \verb|%W|, \verb|%d|: year (last two digits only), month, week, day
+      \item \verb|%F|, \verb|%D|: equivalent to \verb|%Y-%m-%d| and \verb|%m/%d/%y| respectively
+      \item \verb|%x|, \verb|%X|: respectively, date and hours according to region setting
     \end{itemize}
   \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
 \begin{verbatim}
@@ -554,6 +648,11 @@ wc [options] <file>
       \item Strings: \verb!-z|-n! true if zero | nonzero, compare with \verb|=| and \verb|!=|
       \item Integers: \verb|-eq| equal, \verb|-ne| not-equal, \verb!-gt|-ge! (resp.~\verb!-lt|-le!) greater than | greater or equal (resp.~less)
       \item Files: \verb!-ot|-nt! older|newer than, \verb|-e| exists, \verb|-f| regular file, \verb|-d| directory
+      \item Combine: \verb|[ a = a ] && [ b = b ]|, for or use \verb!||!. To construct multilevel conditions, one should escape parentheses
+      \item ATTENTION: operator \verb|[[| (double square brackets) is a \texttt{bash} improvement of \texttt{test}, and allows more stuff (see this \href{https://stackoverflow.com/a/47576482}{comparison}), such as:
+        \begin{itemize}
+          \item \verb|$lhs =~ <regex>|: check if \verb|$lhs| match the given pattern
+        \end{itemize}
     \end{itemize}
   \item \verb|touch <file>|: modify the file access and/or modification date. If the file doesn't exist, an empty one will be created (unless specific options are given). For more details and all the options, have a look at its \texttt{man} page.\\
   Why should one use it?
@@ -591,7 +690,7 @@ gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -dPSFitPage \
       \item Options for \verb!pgrep|pkill!
         \begin{itemize}
           \item \verb|-c|: count
-          \item \verb|-l|: lists names, \verb|-a|: lists fully
+          \item \verb!-l|-a!: lists names/fully
           \item \verb!-n|-o!: newest/oldest only
           \item \verb|-x|: select if name is exact
           \item \verb|-u UID|: only for user \verb|UID|
