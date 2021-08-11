@@ -1529,6 +1529,89 @@ Useful options of \texttt{plot}-like commands:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\texttt{R}}
+\begin{itemize}
+  \item Docs
+    \begin{itemize}
+      \item \texttt{R} \href{https://cran.r-project.org/manuals.html}{manuals}
+      \item An \href{https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf}{intro} to \texttt{R}
+      \item Other \href{https://www.r-project.org/other-docs.html}{docs}
+      \item \href{https://www.rdocumentation.org/}{Browse} functions and packages
+    \end{itemize}
+  \item The \href{https://www.tidyverse.org/}{\texttt{tidyverse}}: a collection of useful library for data science. Here they are, find related cheat-sheets at the provided links
+    \begin{itemize}
+      \item \href{https://ggplot2.tidyverse.org/}{\texttt{ggplot2}}: plotting
+      \item \href{https://dplyr.tidyverse.org/}{\texttt{dplyr}}: data manipulation
+      \item \href{https://tidyr.tidyverse.org/}{\texttt{tidyr}}: create and manage tidy data
+      \item \href{https://readr.tidyverse.org/}{\texttt{readr}}: utilities for reading data
+      \item \href{https://purrr.tidyverse.org/}{\texttt{purrr}}: working with functions and vectors (basically, stuff as \verb|map()|)
+      \item \href{https://tibble.tidyverse.org/}{\texttt{tibble}}: modern version of data sets
+      \item \href{https://stringr.tidyverse.org/}{\texttt{stringr}}: working with strings
+      \item \href{https://forcats.tidyverse.org/}{\texttt{forcats}}: working with factors
+    \end{itemize}
+  \item \href{https://github.com/rstudio/reticulate}{\texttt{reticulate}}: get the best of \texttt{python} in \texttt{R}
+  \item \texttt{R} is \textbf{1-based} (access first element of something with 1, \verb|a[1]|)
+  \item Unload a package: \verb|detach('package:<pkg>', unload=TRUE)|
+  \item \verb|cbind| / \verb|rbind|: combine by columns or rows, respectively
+  \item Data frames:
+    \begin{itemize}
+      \item Extract rows - use positional index: \verb|row <- df[1:5,10:15|
+      \item Extract columns - use headers: as lists / vectors \verb|df$col1| (use dollar sign to access), as data frame \verb|cols <- data.frame(df$col1, df$col2)|
+    \end{itemize}
+  \item Statistical analysis
+    \begin{itemize}
+      \item An \href{https://cran.r-project.org/web/packages/HSAUR/vignettes/Ch_introduction_to_R.pdf}{intro} (well, at least a chapter)
+      \item A cheat-sheet \href{https://www.dummies.com/programming/r/statistical-analysis-with-r-for-dummies-cheat-sheet/}{\emph{for dummies}}
+    \end{itemize}
+  \item Plotting and stuff: we will use \href{https://ggplot2.tidyverse.org/}{\texttt{ggplot2}}
+    \begin{itemize}
+      \item Basics:
+\begin{verbatim}
+plt <- ggplot(data = <data>) +
+       <function>(mapping = aes(<args>)) [+
+       <theme> [+ <color> [ +
+       ggtitle('.') [+ xlab('.') [+ ylab('.')]]
+       ]]]
+plt
+\end{verbatim}
+        \begin{itemize}
+          \item \verb|function| can be, for instance, \verb|geom_point| for scatter-plots, \verb|geom_boxplot|,\ldots
+          \item \verb|aes| sets the aesthetic of the plot, for instance, \texttt{linetype}, \texttt{color}\ldots{} For instance, with scatter-plots, if you want to color the points according to a categorical variable \texttt{cat}, you can use \verb|color = cat|
+          \item \verb|theme|: choose the theme of the current plot: \verb|theme_classic()|, \verb|theme_bw()|,\ldots
+          \item \verb|color| sets additional colors, basically, \verb|scale_fill_manual| or \verb|scale_color_manual| according to the type of plot
+          \item \verb|ggtitle|, \verb!x|ylab!: plot title and x/y labels
+        \end{itemize}
+      \item Colors: a couple of \href{http://www.sthda.com/english/wiki/ggplot2-colors-how-to-change-colors-automatically-and-manually#change-colors-by-groups}{tutorials} with \href{https://www.datanovia.com/en/blog/ggplot-colors-best-tricks-you-will-love/}{examples}
+      \item Themes: set and \href{https://bookdown.org/rdpeng/RProgDA/building-a-new-theme.html}{pimp} \href{https://ggplot2.tidyverse.org/reference/theme_get.html}{your theme} (all options \href{https://ggplot2.tidyverse.org/reference/theme.html}{here})
+    \end{itemize}
+  \item \texttt{Rstudio} is possibly the most well-known and used IDE for \texttt{R}
+    \begin{itemize}
+      \item The \texttt{notebook} mode provide a very handy way of working with \texttt{R}. It is really similar to the one proposed with \texttt{jupyter} and \texttt{python}. Indeed, one can add the \texttt{R} engine to \texttt{jupyter}. However, the \texttt{R}-notebooks use the \href{https://rmarkdown.rstudio.com/index.html}{\texttt{Rmarkdown}} language (here is a \href{https://raw.githubusercontent.com/rstudio/cheatsheets/master/rmarkdown-2.0.pdf}{cheat-sheet} and a \href{https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf}{reference guide}, both are also available in the \texttt{Help} tab of \texttt{Rstudio}), which is indeed similar to \texttt{markdown} (see \autoref{sec:markdown}).
+      \item \texttt{Rmarkdown} and plots: plots are usually included in the rendering. However, issues may arise when plots are inside loops. In this case, force them to appear with a \verb|print| statement
+      \item \href{https://support.rstudio.com/hc/en-us/articles/200713843?version=1.4.1717&mode=desktop}{Debugging} with \texttt{Rstudio}
+\begin{verbatim}
+for (i in 1:n) {
+  plt <- <your_plot>
+  print(plt)
+}
+\end{verbatim}
+    \end{itemize}
+  \item Read from any file: use \href{https://stat.ethz.ch/R-manual/R-devel/library/utils/html/read.table.html}{\texttt{read.table}}. One may choose between lots of options: \texttt{header}, \texttt{sep}, \texttt{dec}, \texttt{na.strings}, \texttt{comment.char},\ldots
+  \item \href{https://stackoverflow.com/questions/46085274/is-there-a-string-formatting-operator-in-r-similar-to-pythons}{Formatting strings}
+  \item \href{https://www.geeksforgeeks.org/printing-output-of-an-r-program/}{Several ways} of printing
+  \item \href{https://www.datamentor.io/r-programming/factor/}{Factors}: a class for categorical variables
+  \item Two packages may contain functions with the same names, hence the function from the most recently loaded package will prevail and mask the others. \href{https://stackoverflow.com/questions/39137110/what-does-the-following-object-is-masked-from-packagexxx-mean}{Here} is a brief explanation. See a work around to specify the function: \verb|<package>::foo|
+  \item \verb|lapply(lst, foo[, args])|: apply to every element of list or vector \verb|lst| function \verb|foo| with arguments \verb|args| if provided / needed. It returns a list / vector with the same dimension as \verb|lst|. Linked functions:
+    \begin{itemize}
+      \item \verb|sapply|: more user-friendly version of \verb|lapply| returning vector, matrix or array
+      \item \verb|vapply|: as \verb|sapply| but the return value will have a pre-defined type, the same as \verb|foo|
+      \item An alternative is the \verb|map| function from \texttt{purrr}: \href{https://stackoverflow.com/questions/45101045/why-use-purrrmap-instead-of-lapply}{here} is a comparison. Basically, \verb|map| is more user-friendly, it is smart, meaning that it can interpret more compact inputs hence saving you some keystrokes, all the related functions are more consistent (among the \verb|*apply|-like functions, some has the function as first arguments, others the functions)
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{ImageJ} - \texttt{Fiji}}
 \texttt{ImageJ} is a \texttt{Java}-based image processing program especially adapted to scientific researches. \texttt{Fiji} Is Just \texttt{ImageJ}, with many many plugins (you are advised to use this latter). Just a couple of tools that I have used (so that I don't forget them)
 \begin{itemize}
