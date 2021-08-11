@@ -1147,10 +1147,36 @@ for (short int i=0; i < 3; i++){
       \item When installing/upgrading problems may occur with older versions of the \texttt{C} compiler, \texttt{GCC}: try and force \texttt{C99} standard by setting \texttt{CFLAGS} before installing: \verb|export CFLAGS='-std=c99'|
     \end{itemize}
   \item Format strings: several ways are available, have a look \href{https://realpython.com/python-string-formatting/}{here}
+    \begin{itemize}
+      \item Old-style, ``\verb|%|'': \verb|'Hi, %s!' % 'Bob'|
+        \begin{itemize}
+          \item \verb|"Hi, %s! It's %s" % ('Bob','Alice')|
+          \item \verb|"Hi, %(v1)s! It's %(v2)s" % {'v1':'Bob','v2':Alice'}|
+        \end{itemize}
+      \item New-style, \verb|str.format()|: \verb|'Hi, {}!.format('Bob')'|, \verb|'Hi, {:#s}!'.format('Bob')|
+        \begin{itemize}
+          \item \verb|"Hi, {0}! It's {1}".format('Bob','Alice')| (or \verb|{<n>:#s}| for instance))
+          \item \verb|"Hi, {v1}! It's {v2}".format(v1='Bob',v2='Alice')| (or \verb|{<var>:#s}| for instance)
+        \end{itemize}
+      \item \texttt{f}-strings, \verb|f'[.]'|: \verb|who='Bob'; greet=f'Hi, {who}!'| (or \verb|greet = f'Hi, {who:#s}!'|)
+        \begin{itemize}
+          \item \verb|v1='Bob'; v2='Alice'; greet="Hi, {v1}! It's {v2}"|
+          \item Brackets need to be escaped: e.g.~\verb|fr'{3}'| gives \verb|3|,  \verb|fr'{{3}}'| gives \verb|{3}|. Moreover
+\begin{verbatim}
+test=TEST
+print(f'This is a {test}')
+# This is a TEST
+print(f'This is a {{test}}')
+# This is a {{test}}
+\end{verbatim}
+        \end{itemize}
+      \item Raw-strings: identified by \texttt{r}, the backslash is interpreted as backslash (automatically escaped). For instance, \verb|'\n'| leads to a newline, \verb|r'\n'| leads to \verb|\n|.
+      \item Combine \texttt{f}- and \texttt{r}-strings: just use \verb|fr'...'|
+    \end{itemize}
   \item \verb|pass|: does nothing. But it is useful as place holder
 \begin{lstlisting}[language=python]
 class This:
-  pass # Remember to wrtite this
+  pass # Remember to write this
 \end{lstlisting}
   \item \verb|try ... expect| and alike: An example
 \begin{lstlisting}[language=python]
@@ -1176,56 +1202,6 @@ def zero_or_square(n):
 for i in zero_or_square(5):
   print(i)
 \end{lstlisting}
-  \item Data structures (the \href{https://docs.python.org/3/library/stdtypes.html}{manual} of all the predefined types) and how to create them
-    \begin{itemize}
-      \item Dictionaries: \verb|d = {'key':item}|
-      \item Lists: \verb|l = [1, 2]|
-      \item Tuples: \verb|t = (1, 2)|. ATTENTION: tuples are similar to lists, however they are immutable, for instance, you won't be able to do: \verb|t[0] = 2|
-      \item Sets: \verb|s = {1, 2}|. Unordered, unique elements.
-        \begin{itemize}
-          \item Frozen sets: \verb|f = frozenset{[1, 2]}|. As sets, but immutable.
-        \end{itemize}
-    \end{itemize}
-  \item Access arrays, lists:
-    \begin{itemize}
-      \item Operator square brackets, 0-based, separate dimensions with commas ``\texttt{,}''
-      \item Negative indices means starting from the end, hence \texttt{a[-1]} is the last element
-      \item \verb|a[start:end:range]|: \verb|a[i:j:n]| gives every \texttt{n}-th elements starting from \texttt{i} to \texttt{j}. If \texttt{i} (resp.~\texttt{j}) is omitted, defaults to first, \texttt{0}, (resp.~last, \texttt{-1}) element. E.g.: \verb|a[::2]| yields every other element.
-      \item \verb|a[start:end]|: \verb|a[i:j]|: elements from \texttt{i} to \texttt{j}. If \texttt{i} (resp.~\texttt{j}) is omitted, defaults to first, \texttt{0}, (resp.~last, \texttt{-1}) element
-      \item E.g.: \verb|l[::-1| reverse the list
-      \item ``\verb|:|'': everything. \verb|a[:,n]|: the \texttt{n}-th column
-    \end{itemize}
-  \item Lists, let \verb|l| be a list of natural integers for the sake of simplicity (notation: \verb|i| stands for index, \verb|n| for natural integer)
-    \begin{itemize}
-      \item Insertion, elimination: \verb|l.append(n)| (in-place, it returns \verb|None|), \verb|l.insert(i,n)| \verb|l.remove(n)|, \verb|l.pop(i)| (remove \texttt{i}-th element, default 0)
-      \item It accepts \verb|l.max()|
-      \item Loop both on indices and values: \verb|for i, v in enumerate(l):|
-      \item Initialize (list comprehension): \verb|l = [0 for _ in range(3)]|
-      \item Search for: \verb|l.index(n)|
-      \item Reverse: \verb|l.reverse()| in-place, \verb|l[::-1]|
-      \item Sorting: \verb|l.sort()| in-place, \verb|sorted(l)| returns a new list
-      \item List comprehension: \href{https://www.programiz.com/python-programming/list-comprehension}{here}.
-    \end{itemize}
-  \item Dictionaries: have a look \href{https://realpython.com/python-dicts/}{here}
-    \begin{itemize}
-      \item In recent versions, they are ordered
-      \item Create: empty \verb|d = {}| or \verb|d = dict()|; not empty \verb|d={key:value}| or \verb|dict()| plus list of tuples. \verb|key| and \verb|value| can be of any (?) type.
-      \item Add new item or update existing: \verb|d[key]=value|, \verb|d.update| accepts either another dictionary object or an iterable of key/value pairs (as tuples or other iterables of length two)
-      \item Access: by key \verb|d[k]=val|; by index \verb|d[2]=val|; \verb|d.get(<key>[, <default>])| returns the value if \texttt{k} is a key (otherwise, \texttt{default})
-      \item \verb|d.items()|: returns a list of key-value pairs
-      \item \verb|d.keys()|: returns a list of keys
-      \item \verb|d.values()|: returns a list of values
-      \item \verb|d.pop(k,[default])|: If \texttt{k} is in the dictionary, removes it and return its value, else return \texttt{default}
-      \item \verb|d.clear()|: remove everything
-    \end{itemize}
-  \item Sets: Operation and stuff (see \href{https://realpython.com/python-sets/}{here})
-    \begin{itemize}
-      \item Union (any element): \verb!s1 | s2! or better \verb|s1.union(s2)|
-      \item Intersection (elements in both): \verb|s1 & s2| or \verb|s1.intersection(s2)|
-      \item Difference (elements in \verb|s1| only): \verb|s1 - s2| or \verb|s1.difference(s2)|
-      \item Symmetric difference (not in intersection): \verb|s1 ^ s2| or \verb|s1.symmetric_difference(s2)|
-      \item And many others: \verb|s1.isdisjoint(s2)|, \verb|s1.issubset(s2)| or \verb|s1 <= s2| or \verb|s1 < s2| for proper subset\ldots
-    \end{itemize}
   \item Ternary operator:
 \begin{lstlisting}[language=python]
 msg = "True" if condition else "False"
@@ -1253,6 +1229,27 @@ msg = arg_msg or "Your message here"
           \item As long as there is a \texttt{==}, you can use the \verb|[not] in| keyword
         \end{itemize}
     \end{itemize}
+  \item Run shell commands from \texttt{python} script
+    \begin{itemize}
+      \item \verb|os.system('echo Ciao')|
+      \item It is advised to used the \href{https://docs.python.org/3/library/subprocess.html#subprocess.Popen.communicate}{\texttt{subprocess}} module and its \texttt{run} function or the more flexible \texttt{Popen} class
+        \begin{itemize}
+          \item The argument is a list of strings which joined form the command
+\begin{verbatim}
+list_dir = subprocess.Popen(["ls", "-l"])
+\end{verbatim}
+          \item Mind that, differently from \verb|os.system|, \texttt{subprocess} does not wait for the command to finish, hence the python script continues. In order to wait use the \texttt{wait} method.
+\begin{verbatim}
+list_dir = subprocess.Popen(["ls", "-l"])
+list_dir.wait()
+\end{verbatim}
+          \item These \href{https://stackoverflow.com/questions/13332268/how-to-use-subprocess-command-with-pipes}{two} \href{https://stackoverflow.com/questions/295459/how-do-i-use-subprocess-popen-to-connect-multiple-processes-by-pipes}{examples} address the piping. For instance, one can store the output in a \texttt{PIPE} object so that it can be fed to a second command
+\begin{verbatim}
+ps = subprocess.Popen(('ps', '-A'), stdout=subprocess.PIPE)
+output = subprocess.check_output(('grep', 'process_name'), stdin=ps.stdout)
+\end{verbatim}
+        \end{itemize}
+    \end{itemize}
   \item \texttt{numpy} and the \texttt{axis} keyword
     \begin{itemize}
       \item TL;DR: \verb|axis=0| acts by column, \verb|axis=1| by row. Hence,
@@ -1274,10 +1271,16 @@ x.sum(axis=1) # Gives [4, 4, 4]
     \end{itemize}
   \item \texttt{matplotlib}
     \begin{itemize}
+      \item List of accepted key for \texttt{rcParams} \href{https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.rcParams}{here}
       \item \texttt{matplotlib.ion()} switch the interaction with the plot on, so that \texttt{plt.plot()} is not blocking and the plot can be kept and redrawn multiple times. This of course works in a plot environment, if you use it on a script the plot will disappear as soon as the script reaches its end.
       \item 3D plots. A nice introduction can be found \href{https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html}{here}. To activate 3D-plotting (scatter, surface, mesh plot or any other) the axis should be called with \lstinline[language=python]{projection='3d'} which should be imported as follows: \lstinline[language=python]{from mpl_toolkits import mplot3d}
     \end{itemize}
   \item Argument parsing: \href{https://docs.python.org/3/library/argparse.html#module-argparse}{\texttt{argparse}}
+  \item Working with datasets:
+    \begin{itemize}
+      \item \href{https://pandas.pydata.org/docs/user_guide/10min.html}{\texttt{pandas}}
+      \item \href{http://xarray.pydata.org/en/stable/user-guide/index.html}{\texttt{xarray}}
+    \end{itemize}
   \item Progress bar: \href{https://github.com/tqdm/tqdm#manual}{\texttt{tqdm}}
   \item \href{https://mypy.readthedocs.io/en/stable/index.html}{\texttt{mypy}}: write annotations indicating the types of your variables, parameters, and return values, then run \texttt{mypy} to check if your code is coherent (are you assigning a list to a variable that should a dictionary? and so on\ldots). The annotations do not interfere with the code when you are running directly the script.
   \item Statistics and data analysis:
@@ -1285,6 +1288,109 @@ x.sum(axis=1) # Gives [4, 4, 4]
       \item \texttt{scipy.stats}: hypothesis testing and all the basics.
       \item \texttt{statsmodels}: regressions.
       \item \href{https://seaborn.pydata.org/introduction.html}{\texttt{seaborn}}: powerful data visualization tool.
+    \end{itemize}
+  \item \texttt{jupyter} notebooks
+    \begin{itemize}
+      \item Download images in batch: \href{https://github.com/damienmarlier51/JupyterNotebookImageExporter}{\texttt{junix}}
+      \item Use \LaTeX{} commands, see \href{https://stackoverflow.com/questions/13208286/how-to-write-latex-in-ipython-notebook}{here}
+      \end{itemize}
+\end{itemize}
+
+\subsection{Data structures}
+Let us discuss the native data structures. The \href{https://docs.python.org/3/library/stdtypes.html}{manual} of all the predefined types.
+\subsubsection{General intro}
+The most common types (and how to create them) are:
+\begin{itemize}
+  \item Dictionaries: \verb|d = {'key':item}|
+  \item Lists: \verb|l = [1, 2]|
+  \item Tuples: \verb|t = (1, 2)|. ATTENTION: tuples are similar to lists, however they are immutable, for instance, you won't be able to do: \verb|t[0] = 2|
+  \item Sets: \verb|s = {1, 2}|. Unordered, unique elements.
+    \begin{itemize}
+      \item Frozen sets: \verb|f = frozenset{[1, 2]}|. As sets, but immutable.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Access and indexing}
+\begin{itemize}
+  \item Operator square brackets, 0-based, separate dimensions with commas ``\texttt{,}''
+  \item Negative indices means starting from the end, hence \texttt{a[-1]} is the last element
+  \item \verb|a[start:end:range]|: \verb|a[i:j:n]| gives every \texttt{n}-th elements starting from \texttt{i} to \texttt{j}. If \texttt{i} (resp.~\texttt{j}) is omitted, defaults to first, \texttt{0}, (resp.~last, \texttt{-1}) element. E.g.: \verb|a[::2]| yields every other element.
+  \item \verb|a[start:end]|: \verb|a[i:j]|: elements from \texttt{i} to \texttt{j}. If \texttt{i} (resp.~\texttt{j}) is omitted, defaults to first, \texttt{0}, (resp.~last, \texttt{-1}) element
+  \item E.g.: \verb|l[::-1]| reverse the list
+  \item ``\verb|:|'': everything. \verb|a[:,n]|: the \texttt{n}-th column
+\end{itemize}
+
+Dictionaries are different since they work with a hash table and on can access the elements with the related key.
+
+\subsubsection{Lists}
+Lists, let \verb|l| be a list of natural integers for the sake of simplicity (notation: \verb|i| stands for index, \verb|n| for natural integer)
+\begin{itemize}
+  \item Insertion, elimination: \verb|l.append(n)|, \verb|l.insert(i,n)| \verb|l.remove(n)|, \verb|l.pop(i)| (remove \texttt{i}-th element, default 0). Methods \texttt{append} and \texttt{remove} return \texttt{None}.
+  \item It accepts \verb|l.max()|
+  \item Loop both on indices and values: \verb|for i, v in enumerate(l):|
+  \item Initialize (list comprehension): \verb|l = [0 for _ in range(3)]|
+  \item Search for: \verb|l.index(n)|
+  \item Reverse: \verb|l.reverse()| in-place, \verb|l[::-1]|
+  \item Sorting: \verb|l.sort()| in-place, \verb|sorted(l)| returns a new list
+  \item List comprehension: \href{https://www.programiz.com/python-programming/list-comprehension}{here}.
+\end{itemize}
+
+\subsubsection{Dictionaries}
+Have a look \href{https://realpython.com/python-dicts/}{here}
+\begin{itemize}
+  \item In recent versions, they are ordered
+  \item Create: empty \verb|d = {}| or \verb|d = dict()|; not empty \verb|d={key:value}| or \verb|dict()| plus list of tuples. \verb|key| and \verb|value| can be of any (?) type.
+  \item Add new item or update existing: \verb|d[key]=value|, \verb|d.update| accepts either another dictionary object or an iterable of key/value pairs (as tuples or other iterables of length two)
+  \item Access: by key \verb|d[k]=val|; by index \verb|d[2]=val|; \verb|d.get(<key>[, <default>])| returns the value if \texttt{k} is a key (otherwise, \texttt{default})
+  \item \verb|d.items()|: returns a list of key-value pairs
+  \item \verb|d.keys()|: returns a list of keys
+  \item \verb|d.values()|: returns a list of values
+  \item \verb|d.pop(k,[default])|: If \texttt{k} is in the dictionary, removes it and return its value, else return \texttt{default}
+  \item \verb|d.clear()|: remove everything
+\end{itemize}
+
+\subsubsection{Sets}
+Operation and stuff (see \href{https://realpython.com/python-sets/}{here})
+\begin{itemize}
+  \item Union (any element): \verb!s1 | s2! or better \verb|s1.union(s2)|
+  \item Intersection (elements in both): \verb|s1 & s2| or \verb|s1.intersection(s2)|
+  \item Difference (elements in \verb|s1| only): \verb|s1 - s2| or \verb|s1.difference(s2)|
+  \item Symmetric difference (not in intersection): \verb|s1 ^ s2| or \verb|s1.symmetric_difference(s2)|
+  \item And many others: \verb|s1.isdisjoint(s2)|, \verb|s1.issubset(s2)| or \verb|s1 <= s2| or \verb|s1 < s2| for proper subset\ldots
+\end{itemize}
+
+\subsection{Files\&Co}
+Open'n'Close
+\begin{itemize}
+  \item Open: \verb|f = open('path/to/file.txt', 'w')|
+    \begin{itemize}
+      \item The second argument is the mode. For instance, \verb|w| for writing (creates file if it doesn't exist), \verb|a| for appending (creates file if it doesn't exist), \verb|r| for reading (error if file doesn't exist), \verb|x| for creating a file (error if file already exists), \verb|t| for using text mode (default) or \verb|b| for using binary mode. For instance, for reading in binary use \verb|'rt'|
+    \end{itemize}
+  \item Close \verb|f.close()|
+  \item Use the \verb|with| construction which closes the file by itself
+\begin{verbatim}
+with open('path/to/file.txt', 'w') as f:
+  # [do stuff]
+\end{verbatim}
+\end{itemize}
+
+Reading
+\begin{itemize}
+  \item Read one line and store it: \verb|line = f.readline()|
+  \item Read \emph{all} the lines and store them in a list: \verb|lines = f.readlines()|
+  \item Read the content and store it in a string: \verb|cont = f.read()|
+    \begin{itemize}
+      \item Pass a number to specify how many characters to read: \verb|c = f.read(5)|
+    \end{itemize}
+  \item Conveniently loop line by line: \verb|for line in f:| (also \verb|enumerate|, for instance)
+\end{itemize}
+
+Writing
+\begin{itemize}
+  \item Write a string: \verb|f.write(s)|
+  \item Write a list of strings: \verb|f.writlines(l)|
+    \begin{itemize}
+      \item It does NOT automatically add the newline after each string
     \end{itemize}
 \end{itemize}
 
