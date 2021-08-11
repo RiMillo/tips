@@ -947,9 +947,10 @@ $ git config [--global] alias.pr 'pull ---rebase'
 \end{verbatim}
   \item Ignore files from the syncing:
     \begin{itemize}
-      \item Add them to \texttt{.gitignore}. Since \texttt{.gitignore} itself is synchronized, the exclusion is global and will stay in the tree, meaning that any new clone of the repository will see it;
+      \item Add them to \texttt{.gitignore}. Since \texttt{.gitignore} itself is synchronized, the exclusion is global and will stay in the tree, meaning that any new clone of the repository will see it; one can also add \texttt{.gitignore} to itself;
       \item Add them to \texttt{.git/info/exclude}. This is local and impacts only the local directory and clone of the repository.
     \end{itemize}
+  \item \texttt{git} \textbf{cannot} track empty directories. Hence, one should include a dummy file and add it to the tree. Some people use \verb|.gitkeep| as naming convention for this dummy file.
   \item Push a new project to \href{https://github.com/}{GitHub} for the first time: follow \href{https://help.github.com/en/github/importing-your-projects-to-github/adding-an-existing-project-to-github-using-the-command-line}{this}.
   \item \texttt{git bisect}: help to find the commit causing the bug by a bisection procedure
     \begin{itemize}
