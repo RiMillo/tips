@@ -429,6 +429,7 @@ find . -name "*.log" -exec sh -c "tac {} | grep -m1 pattern" \;
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Compressing: \texttt{tar} \& \texttt{zip}}
+\subsubsection{\texttt{tar}}
 \texttt{tar} is a utility which creates archives
 \begin{itemize}
   \item Basic usage:
@@ -458,9 +459,13 @@ tar -xf archived.tar
       \item \verb|-j|, \verb|--bzip2|
       \item \verb|-J|, \verb|xz|
     \end{itemize}
+  \item Compress an existing tarball: see \href{https://unix.stackexchange.com/questions/457949/how-to-turn-a-tar-file-to-a-tgz-file}{here}
+\begin{verbatim}
+gzip < my_files.tar > my_files.tgz
+\end{verbatim}
 \end{itemize}
 
-\medskip
+\subsubsection{\texttt{zip}}
 A cross-platform extension for compressed files is \texttt{zip}. To compress simply run
 \begin{verbatim}
 zip [options] <compressed_file>.zip <files_to_compress>
@@ -468,6 +473,12 @@ zip [options] <compressed_file>.zip <files_to_compress>
 By default it adds links as hard-files (and not as links). Option \verb|-r| (mneno: \emph{r}ecursive) include also {sub}directories and their files.
 
 To deflate, run \verb|unzip <compressed_file>.zip|
+
+\subsubsection{\texttt{gzip}}
+\texttt{gzip} is a compression format for Unixes.
+\begin{verbatim}
+gzip [options] <compressed_file>.gz <files_to_compress>
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
