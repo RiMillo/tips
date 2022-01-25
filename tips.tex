@@ -1175,34 +1175,39 @@ for (short int i=0; i < 3; i++){
     \end{enumerate}
   \item \texttt{pip}: allows you to download and update python libraries
     \begin{itemize}
-      \item Typical call: \verb|pip install <package>|. Add options \verb!--upgrade|-U! to upgrade.
+      \item Typical call: \verb|pip install <package>|. Add options \verb!--upgrade|-U! to upgrade. In recent versions, \verb|python3 -m pip [...]| is advised.
+      \item One may add a configuration file, see \href{https://pip.pypa.io/en/stable/topics/configuration/}{here}
       \item You'll need access to some directories, thus it is advised to have a local install: pass option \verb|--user|.
-      \item Proxy: pass the option \verb|--proxy=user@server.dom:port|. However, it might not work if some dependencies have to be downloaded as well. In that case, try exporting the shell variables \verb|HTTP_PROXY=<proxy>| and \verb|HTTPS_PROXY=<proxy>|.
+    \item Proxy: pass the option \verb|--proxy=user@server.dom:port|. However, it might not work if some dependencies have to be downloaded as well. In that case, try exporting the shell variables \verb|HTTP_PROXY=<proxy>| and \verb|HTTPS_PROXY=<proxy>|. It might be helpful to add a line in the configuration file as explained \href{https://stackoverflow.com/questions/43473041/how-to-configure-pip-per-config-file-to-use-a-proxy-with-authentification}{here}
       \item Get list of outdated packages: \verb|pip list --outdated|.
       \item When installing/upgrading problems may occur with older versions of the \texttt{C} compiler, \texttt{GCC}: try and force \texttt{C99} standard by setting \texttt{CFLAGS} before installing: \verb|export CFLAGS='-std=c99'|
+      \item Select a specific version of the package: \verb|python3 -m pip install package==6.66|
     \end{itemize}
-  \item Format strings: several ways are available, have a look \href{https://realpython.com/python-string-formatting/}{here}
+  \item A nice \href{https://medium.com/@anushkhabajpai/top-data-science-cheat-sheets-ml-dl-python-r-sql-maths-statistics-5239d4568225}{post} with cheat-sheets for several \texttt{python} libraries (as well as \texttt{R} and ML)
+  \item Format strings: several ways are available, have a look \href{https://realpython.com/python-string-formatting/}{here}, but also \href{https://pyformat.info/}{here} and to the \href{https://docs.python.org/3.10/library/string.html#format-string-syntax}{doc}
     \begin{itemize}
       \item Old-style, ``\verb|%|'': \verb|'Hi, %s!' % 'Bob'|
         \begin{itemize}
           \item \verb|"Hi, %s! It's %s" % ('Bob','Alice')|
           \item \verb|"Hi, %(v1)s! It's %(v2)s" % {'v1':'Bob','v2':Alice'}|
         \end{itemize}
-      \item New-style, \verb|str.format()|: \verb|'Hi, {}!.format('Bob')'|, \verb|'Hi, {:#s}!'.format('Bob')|
+      \item New-style, \verb|str.format()|: \verb|'Hi, {}!.format('Bob')'|, \verb|'Hi, {:s}!'.format('Bob')|
         \begin{itemize}
-          \item \verb|"Hi, {0}! It's {1}".format('Bob','Alice')| (or \verb|{<n>:#s}| for instance))
-          \item \verb|"Hi, {v1}! It's {v2}".format(v1='Bob',v2='Alice')| (or \verb|{<var>:#s}| for instance)
+          \item \verb|"Hi, {0}! It's {1}".format('Bob','Alice')| (or \verb|{<n>:s}| for instance))
+          \item \verb|"Hi, {v1}! It's {v2}".format(v1='Bob',v2='Alice')| (or \verb|{<var>:s}| for instance)
         \end{itemize}
-      \item \texttt{f}-strings, \verb|f'[.]'|: \verb|who='Bob'; greet=f'Hi, {who}!'| (or \verb|greet = f'Hi, {who:#s}!'|)
+      \item \texttt{f}-strings, \verb|f'[.]'|: \verb|who='Bob'; greet=f'Hi, {who}!'| (or \verb|greet = f'Hi, {who:s}!'|)
         \begin{itemize}
           \item \verb|v1='Bob'; v2='Alice'; greet="Hi, {v1}! It's {v2}"|
-          \item Brackets need to be escaped: e.g.~\verb|fr'{3}'| gives \verb|3|,  \verb|fr'{{3}}'| gives \verb|{3}|. Moreover
+          \item Braces need to be escaped: e.g.~\verb|fr'{3}'| gives \verb|3|,  \verb|fr'{{3}}'| gives \verb|{3}|. Moreover, with variables:
 \begin{verbatim}
-test=TEST
+test = 'TEST'
 print(f'This is a {test}')
 # This is a TEST
 print(f'This is a {{test}}')
-# This is a {{test}}
+# This is a {test}
+print(f'This is a {{{test}}}') # 2 for escaping, 1 for variable
+# This is a {TEST}
 \end{verbatim}
         \end{itemize}
       \item Raw-strings: identified by \texttt{r}, the backslash is interpreted as backslash (automatically escaped). For instance, \verb|'\n'| leads to a newline, \verb|r'\n'| leads to \verb|\n|.
@@ -1224,7 +1229,29 @@ else:
 finally:
     # This code is always run, with or without exception
 \end{lstlisting}
-  \item ``\verb|_|'': placeholder for unused parameter
+    \begin{itemize}
+      \item One can use several \texttt{except} zones to catch different exceptions
+\begin{lstlisting}[language=python]
+except Exception_1:
+    # If error of type Exception_1
+except Exception_2:
+    # If error of type Exception_2
+except Exception:
+    # If any other error type, except Keyboard interrupt
+\end{lstlisting}
+      \item Print traceback with \verb|traceback.format_exc()| from module \texttt{traceback}
+    \end{itemize}
+  \item The underscore: see \href{https://dbader.org/blog/meaning-of-underscores-in-python}{here}
+  \item Unpacking operators: \verb|*| iterable unpacking, and \verb|**| dictionary unpacking, see \href{https://geekflare.com/python-unpacking-operators/}{here}
+  \item ``\verb|_|'': placeholder for unused arguments / returns
+    \begin{itemize}
+      \item It can be unpacked with \verb|*| (see above)
+\begin{verbatim}
+a = [1, 2, 3, 4, 5]
+first, *_, last = a
+print(first, last) # 1 5
+\end{verbatim}
+    \end{itemize}
   \item \href{https://wiki.python.org/moin/Generators}{Generators}: Generator functions allow you to declare a function that behaves like an iterator, i.e.~it can be used in a for loop. This is faster than creating lists on purpose. Brief \href{https://www.programiz.com/python-programming/generator}{intro}. Generators do not \emph{return}, they \emph{yield}. An example
 \begin{lstlisting}[language=python]
 def zero_or_square(n):
@@ -1245,8 +1272,18 @@ msg = "True" if condition else "False"
 \begin{lstlisting}[language=python]
 msg = arg_msg or "Your message here"
 \end{lstlisting}
+  \item Default function arguments: if containers or complex types, prefer using \verb|None| as default parameter then defining it inside the function. See \href{https://www.geeksforgeeks.org/default-arguments-in-python/}{here}. This allows to avoid the following (often unwanted) behaviour (it happens also with mutable containers such as dictionaries):
+\begin{lstlisting}[language=python]
+def foo(l = [], a = 5):
+  l.append(0)
+  a += 1
+  print(a, l)
+foo() # Prints: 6 [0]
+foo() # Prints: 6 [0,0]
+\end{lstlisting}
   \item Classes: random stuff about classes (hidden) methods
     \begin{itemize}
+      \item \verb|@staticmethod| vs \verb|@classmethod|: some info \href{https://www.geeksforgeeks.org/class-method-vs-static-method-python/}{here}
       \item \verb|__init__(self[,args])|: creator
       \item \verb|__call__(self[,args])|: overload operator \verb|( )|
       \item \verb|__getitem__(self, key)|: overload evaluation with operator \verb|[ ]|, e.g.~\verb|a = obj[n]|
@@ -1258,12 +1295,62 @@ msg = arg_msg or "Your message here"
           \item The in-place versions of the above mentioned operators are: \verb|__iadd__| for \verb|+=|, \verb|__isub__| for \verb|-=|,\ldots
         \end{itemize}
       \item \verb|__int__(self)|: overload cast \verb|int(<n>)|. Same applies for \verb|str|, \verb|float|
+        \begin{itemize}
+          \item The cast to \verb|str| allows one to use function \verb|print()| directly
+        \end{itemize}
       \item \verb|__eq__(self,other)|: overload \verb|==|. Similarly, \verb!__ne|lt|le|gt|ge__!
         \begin{itemize}
           \item If \texttt{eq} not present, \texttt{==} is ensured by \texttt{is} (checks the ID)
           \item As long as there is a \texttt{==}, you can use the \verb|[not] in| keyword
         \end{itemize}
     \end{itemize}
+  \item Profiling: see \href{https://docs.python.org/3/library/profile.html}{here}, basically use \texttt{cProfile}. One can use it as script to profile another script:
+\begin{verbatim}
+python -m cProfile script.py
+\end{verbatim}
+    \begin{itemize}
+      \item Options: \verb|-s <stat>| sort by statistic \texttt{stat} (e.g.~time, number of calls,\ldots), \verb|-o output.log| output file
+    \end{itemize}
+  \item Copying in \texttt{python}, shallow- vs.~deep-copy: \href{https://www.programiz.com/python-programming/shallow-deep-copy}{here}
+    \begin{itemize}
+      \item See \href{https://stackoverflow.com/a/46939443}{this SO answer} for an example of create a method \texttt{copy} for a custom class
+    \end{itemize}
+  \item Function arguments: have a look \href{https://www.python-course.eu/python3_passing_arguments.php}{here}
+    \begin{itemize}
+      \item \emph{by-value} or \emph{by-reference}? Basically if immutable \emph{by-value}, otherwise \emph{by-reference}. In fact, the real mode is \emph{by object reference}!
+      \item Using \texttt{*} (star) and \texttt{**} double-star
+      \item \ldots{}similarly for \texttt{args} and \texttt{kwargs}: have a look \href{https://realpython.com/python-kwargs-and-args/}{here}
+    \end{itemize}
+  \item Type hints: one can provide types to variable, arguments and return values of a function. These hints \textbf{won't} be used by \texttt{python} (e.g.~it isn't \texttt{C}). Type hints are for developers and for IDEs: basically they make the code simpler to read (very useful when developing code to which other user will interface) and help IDEs to infer types of objects in order to offer better prediction.
+    \begin{itemize}
+      \item To go further: \href{https://stackoverflow.com/a/32558710}{here}, \href{https://www.infoworld.com/article/3630372/get-started-with-python-type-hints.html}{here}
+      \item Use module \href{https://docs.python.org/3/library/typing.html}{\texttt{typing}} which provide types for built-in structures such as \texttt{Dict}, \texttt{Tuple}, \texttt{List},\ldots
+      \item An example below
+\begin{lstlisting}[language=python]
+from typing import List, Dict
+# Variables: the followings are equivalent
+n: int = 10
+#
+n: int
+n = 10
+#
+n = 10 # type: int # Another comment
+#
+l : List[int] = list(range(5))
+#
+d : Dict[str, int] = {'Brasil': 5, "Italy": 4, "France": 2}
+# Functions
+def fib(n : int, label : str) -> int:
+  a, b = 0, 1
+  while b < n:
+    a, b = b, a + b
+  print(label)
+  return a
+\end{lstlisting}
+      \item Let us be clear: \texttt{python} basically discards type hints, hence the following won't raise any warnings nor errors: \verb|name : int = 'Ajeje'|
+      \item \href{https://mypy.readthedocs.io/en/stable/index.html}{\texttt{mypy}}: write annotations indicating the types of your variables, parameters, and return values, then run \texttt{mypy} to check if your code is coherent (are you assigning a list to a variable that should a dictionary? and so on\ldots). The annotations do not interfere with the code when you are running directly the script.
+    \end{itemize}
+  \item \texttt{python} is nice, \texttt{C} is better: hence why not \href{https://cython.readthedocs.io/en/latest/index.html}{\texttt{Cython}}?
   \item Run shell commands from \texttt{python} script
     \begin{itemize}
       \item \verb|os.system('echo Ciao')|
@@ -1285,24 +1372,68 @@ output = subprocess.check_output(('grep', 'process_name'), stdin=ps.stdout)
 \end{verbatim}
         \end{itemize}
     \end{itemize}
-  \item \texttt{numpy} and the \texttt{axis} keyword
+  \item \href{https://numpy.org/doc/stable/index.html}{\texttt{numpy}}
     \begin{itemize}
-      \item TL;DR: \verb|axis=0| acts by column, \verb|axis=1| by row. Hence,
+      \item \texttt{numpy} and the \texttt{axis} keyword
+        \begin{itemize}
+          \item TL;DR: \verb|axis=0| acts over a column, \verb|axis=1| over a row. Hence,
 \begin{lstlisting}[language=python]
 x=numpy.ones([3,4])
 x.sum(axis=0) # Gives [3, 3, 3, 3]
 x.sum(axis=1) # Gives [4, 4, 4]
 \end{lstlisting}
-      \item The value of \texttt{axis} indicate on which dimension the operation is done (in a certain sens, which direction collapses after the operation).
-      \item The value correspond to the index of the direction in, for instance, the result of \verb|numpy.size()|. Think about it: above \verb|x| was a 3-rows-4-columns matrix. Then, \verb|x.size() # =(3,4)|
+          \item The value of \texttt{axis} indicate on which dimension the operation is done (in a certain sense, which direction collapses after the operation).
+          \item The value correspond to the index of the direction in the result of \verb|size()|, for instance. Think about it: above \verb|x| was a 3-rows and 4-columns matrix. Then, \verb|x.size() # =(3,4)|
+        \end{itemize}
+      \item From matrix to array:
+        \begin{itemize}
+          \item \texttt{flatten} returns a copy
+          \item \texttt{ravel} does it in place
+        \end{itemize}
+      \item Sorting \& alike
+        \begin{itemize}
+          \item Get a indexes with \verb|np.argmin| and \verb|np.argsort|
+        \end{itemize}
+      \item Types
+        \begin{itemize}
+          \item Change type with \verb|.astype(<type>)|. It usually copy the array, hence allocating memory, however one can avoid this by adding arguments \texttt{copy=False}
+          \item A \texttt{np} array can have type string, however all the elements have to have the same length. If it is not the case, one may try generic type \texttt{object}
+        \end{itemize}
+    \end{itemize}
+  \item \href{https://docs.python.org/3/library/functools.html}{\texttt{functools}}: functions for callable objects (e.g.~functions)
+    \begin{itemize}
+      \item \verb|partial(foo, *args, **kwargs)|: Return a new partial object which when called will behave like \texttt{foo} called with the positional arguments \texttt{args} and keyword arguments \texttt{kwargs}.
+\begin{verbatim}
+def foo(a,b): print(f'a:{a}, b:{b}')
+ptf_a = partial(foo, 3) # argument a is 3
+ptf_a(4) # print a:3, b:4
+ptf_b = partial(foo, b=3) # argument b is 3
+ptf_b(4) # print a:4, b:3
+\end{verbatim}
+        \begin{itemize}
+          \item For class methods use \texttt{partialmethod}
+        \end{itemize}
+      \item \verb|reduce(foo, iter)|: reduce iterable \texttt{iter} by function \texttt{foo}. For instance if \texttt{foo} is addition, then reducing will be equivalent to accumulate
+    \end{itemize}
+  \item \href{https://docs.python.org/3/library/itertools.html}{\texttt{itertools}}: functions for creating iterators for efficient looping
+    \begin{itemize}
+      \item \verb|reduce(foo, iter)|: as \texttt{map} but will star elements of \texttt{iter} (that is \verb|*iter[0]|)
     \end{itemize}
   \item \href{https://docs.python.org/3/library/tkinter.html}{\texttt{tkinter}}: manage windows and dialogue
-  \item \texttt{args} and \texttt{kwargs}: have a look \href{https://realpython.com/python-kwargs-and-args/}{here}
-  \item Parallelization: Couple of resources:
     \begin{itemize}
-      \item \href{https://docs.python.org/3/library/multiprocessing.html}{\texttt{multiprocessing}} module.
-      \item \href{https://docs.python.org/3/library/threading.html}{\texttt{threading}} module.
+      \item \href{https://tkcalendar.readthedocs.io/en/stable/index.html}{Calendar}
+    \end{itemize}
+  \item Concurrency, Parallelization, Threading, Asynchronous programming: Couple of resources:
+    \begin{itemize}
       \item An \href{https://www.machinelearningplus.com/python/parallel-processing-python/}{intro} with simple examples.
+      \item Overviews of \href{https://realpython.com/python-concurrency/}{concurrency} and \href{https://realpython.com/async-io-python/}{asynchronous programming}
+      \item \href{https://docs.python.org/3/library/multiprocessing.html}{\texttt{multiprocessing}} module.
+        \begin{itemize}
+          \item Get ID of pool workers: \href{https://stackoverflow.com/questions/10190981/get-a-unique-id-for-worker-in-python-multiprocessing-pool}{here}
+          \item Use proxy-objects and \texttt{Manager}'s if you want objects to be modified inside the parallel functions (for instance if you want to append to lists,\ldots)
+        \end{itemize}
+      \item \href{https://docs.python.org/3/library/threading.html}{\texttt{threading}} module.
+      \item \href{https://docs.python.org/3/library/asyncio.html}{\texttt{asyncio}} module.
     \end{itemize}
   \item \texttt{matplotlib}
     \begin{itemize}
@@ -1316,8 +1447,20 @@ x.sum(axis=1) # Gives [4, 4, 4]
       \item \href{https://pandas.pydata.org/docs/user_guide/10min.html}{\texttt{pandas}}
       \item \href{http://xarray.pydata.org/en/stable/user-guide/index.html}{\texttt{xarray}}
     \end{itemize}
+  \item \texttt{pandas}
+    \begin{itemize}
+      \item Access data: \verb|df.loc[row,col]| works with labels. Slices, arrays, booleans are accepted. \verb|df.at[row,col]|, same but can access a scalar value only (no slices), hence its faster. There are also equivalent version that works with index: \verb|df.iloc[]|, \verb|df.iat[]|. See \href{https://stackoverflow.com/questions/28754603/indexing-pandas-data-frames-integer-rows-named-columns}{here} for hybrid access.
+        \begin{itemize}
+          \item Pay attention to whether the function returns a view or a copy, see \href{https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#indexing-view-versus-copy}{here}
+        \end{itemize}
+    \end{itemize}
   \item Progress bar: \href{https://github.com/tqdm/tqdm#manual}{\texttt{tqdm}}
-  \item \href{https://mypy.readthedocs.io/en/stable/index.html}{\texttt{mypy}}: write annotations indicating the types of your variables, parameters, and return values, then run \texttt{mypy} to check if your code is coherent (are you assigning a list to a variable that should a dictionary? and so on\ldots). The annotations do not interfere with the code when you are running directly the script.
+    \begin{itemize}
+      \item \href{https://www.analyticsvidhya.com/blog/2021/05/how-to-use-progress-bars-in-python/}{here} is a nice show of what is capable
+      \item Standard usage: \verb|for i in tqdm.tqdm(range(6))|, \verb|for l in tqdm.tqdm(my_list)|
+      \item Manual usage, with \texttt{with}: \verb|with tqdm.tqdm(...) as bar: [iterate] bar.update()|. In this case you have to update manually
+      \item It could deal with parallel code, it uses a wrapper to \texttt{multiprocessing}, have a look \href{https://tqdm.github.io/docs/contrib.concurrent/}{here}
+    \end{itemize}
   \item Statistics and data analysis:
     \begin{itemize}
       \item \texttt{scipy.stats}: hypothesis testing and all the basics.
@@ -1351,7 +1494,12 @@ The most common types (and how to create them) are:
   \item Negative indices means starting from the end, hence \texttt{a[-1]} is the last element
   \item \verb|a[start:end:range]|: \verb|a[i:j:n]| gives every \texttt{n}-th elements starting from \texttt{i} to \texttt{j}. If \texttt{i} (resp.~\texttt{j}) is omitted, defaults to first, \texttt{0}, (resp.~last, \texttt{-1}) element. E.g.: \verb|a[::2]| yields every other element.
   \item \verb|a[start:end]|: \verb|a[i:j]|: elements from \texttt{i} to \texttt{j}. If \texttt{i} (resp.~\texttt{j}) is omitted, defaults to first, \texttt{0}, (resp.~last, \texttt{-1}) element
-  \item E.g.: \verb|l[::-1]| reverse the list
+  \item If \texttt{n} is negative, then \texttt{i} should be greater then \texttt{j} and the order is reversed. Some examples:
+    \begin{itemize}
+      \item \verb|a[::-1]| list in reversed order
+      \item \verb|a[-1:-5:-1]| last five elements in reversed order
+      \item \verb|a[10:0:-2]| (equivalent to \verb|a[10::-2]|, notice \texttt{0} omitted): from tenth to first element
+    \end{itemize}
   \item ``\verb|:|'': everything. \verb|a[:,n]|: the \texttt{n}-th column
 \end{itemize}
 
@@ -1362,11 +1510,29 @@ Lists, let \verb|l| be a list of natural integers for the sake of simplicity (no
 \begin{itemize}
   \item Insertion, elimination: \verb|l.append(n)|, \verb|l.insert(i,n)| \verb|l.remove(n)|, \verb|l.pop(i)| (remove \texttt{i}-th element, default 0). Methods \texttt{append} and \texttt{remove} return \texttt{None}.
   \item It accepts \verb|l.max()|
+    \begin{itemize}
+      \item Argmax:
+\begin{verbatim}
+index_max = max(range(len(l)), key = l.__getitem__)
+# or
+from operator import itemgetter
+index_max = max(range(len(l)), key = itemgetter)
+\end{verbatim}
+    \end{itemize}
   \item Loop both on indices and values: \verb|for i, v in enumerate(l):|
   \item Initialize (list comprehension): \verb|l = [0 for _ in range(3)]|
   \item Search for: \verb|l.index(n)|
   \item Reverse: \verb|l.reverse()| in-place, \verb|l[::-1]|
   \item Sorting: \verb|l.sort()| in-place, \verb|sorted(l)| returns a new list
+    \begin{itemize}
+      \item Argsort:
+\begin{verbatim}
+l = sorted(range(len(l)), key = l.__getitem__)
+# or
+from operator import itemgetter
+l = sorted(range(len(l)), key = itemgetter)
+\end{verbatim}
+    \end{itemize}
   \item List comprehension: \href{https://www.programiz.com/python-programming/list-comprehension}{here}.
 \end{itemize}
 
@@ -1374,14 +1540,19 @@ Lists, let \verb|l| be a list of natural integers for the sake of simplicity (no
 Have a look \href{https://realpython.com/python-dicts/}{here}
 \begin{itemize}
   \item In recent versions, they are ordered
-  \item Create: empty \verb|d = {}| or \verb|d = dict()|; not empty \verb|d={key:value}| or \verb|dict()| plus list of tuples. \verb|key| and \verb|value| can be of any (?) type.
-  \item Add new item or update existing: \verb|d[key]=value|, \verb|d.update| accepts either another dictionary object or an iterable of key/value pairs (as tuples or other iterables of length two)
+  \item Create: empty \verb|d = {}| or \verb|d = dict()|; not empty \verb|d={key:value}| or \verb|dict()| plus list of tuples. \verb|key| has to be hashable and \verb|value| can be of any type.
+  \item Add new item or update existing:
+    \begin{itemize}
+      \item \verb|d[key] = value|
+      \item \verb|d.update(<>)|: accepts either another dictionary object or an iterable of key/value pairs (as tuples or other iterables of length two). If keyword arguments are specified, the dictionary is then updated with those key/value pairs: \verb|d.update(red=1, blue=2)|
+    \end{itemize}
   \item Access: by key \verb|d[k]=val|; by index \verb|d[2]=val|; \verb|d.get(<key>[, <default>])| returns the value if \texttt{k} is a key (otherwise, \texttt{default})
   \item \verb|d.items()|: returns a list of key-value pairs
   \item \verb|d.keys()|: returns a list of keys
   \item \verb|d.values()|: returns a list of values
   \item \verb|d.pop(k,[default])|: If \texttt{k} is in the dictionary, removes it and return its value, else return \texttt{default}
   \item \verb|d.clear()|: remove everything
+  \item \verb|for k in d| loops over keys
 \end{itemize}
 
 \subsubsection{Sets}
@@ -1392,6 +1563,26 @@ Operation and stuff (see \href{https://realpython.com/python-sets/}{here})
   \item Difference (elements in \verb|s1| only): \verb|s1 - s2| or \verb|s1.difference(s2)|
   \item Symmetric difference (not in intersection): \verb|s1 ^ s2| or \verb|s1.symmetric_difference(s2)|
   \item And many others: \verb|s1.isdisjoint(s2)|, \verb|s1.issubset(s2)| or \verb|s1 <= s2| or \verb|s1 < s2| for proper subset\ldots
+\end{itemize}
+
+\subsubsection{Tuples}%
+\begin{itemize}
+  \item Tuples are immutable
+  \item Addition extends tuples
+\begin{verbatim}
+(1, 0) + (0,-1) # Gives (1, 0, 0, -1)
+\end{verbatim}
+  \item Tuples have support for comparisons and it works element-wise. Hence, a ``\texttt{t1} greater than \texttt{t2}'' (for two-elements tuples) works roughly as follows:
+\begin{verbatim}
+def tuple_gt(t1, t2):
+  if t1[0] > t2[0]:
+    return True
+  elif t1[0] < t2[0]:
+    return False
+  else:
+    # Here t1[0] = t2[0]
+    return t1[1] > t2[1]
+\end{verbatim}
 \end{itemize}
 
 \subsection{Files\&Co}
@@ -1558,6 +1749,7 @@ files = "file1 file2 file3"
 plot for [i=1:words(files)] word(files, i).'.dat' lc rgb word(colors, i)
 \end{verbatim}
 \end{itemize}
+
 Useful options of \texttt{plot}-like commands:
 \begin{itemize}
   \item \verb!linecolor|lc!: e.g. \verb|lc "black"|. For more advance setting: \verb|linetype rgb "<parameters>"|
