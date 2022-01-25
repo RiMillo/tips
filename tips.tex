@@ -1614,13 +1614,17 @@ do for [j=1:10] {
       \item \href{https://stringr.tidyverse.org/}{\texttt{stringr}}: working with strings
       \item \href{https://forcats.tidyverse.org/}{\texttt{forcats}}: working with factors
     \end{itemize}
+  \item Install given version of package: from package \texttt{devtools} use, for instance,
+\begin{verbatim}
+install_version("ggplot2",version="0.9.1"[,repos="http://cran.us.r-project.org"])
+\end{verbatim}
   \item \href{https://github.com/rstudio/reticulate}{\texttt{reticulate}}: get the best of \texttt{python} in \texttt{R}
   \item \texttt{R} is \textbf{1-based} (access first element of something with 1, \verb|a[1]|)
   \item Unload a package: \verb|detach('package:<pkg>', unload=TRUE)|
   \item \verb|cbind| / \verb|rbind|: combine by columns or rows, respectively
   \item Data frames:
     \begin{itemize}
-      \item Extract rows - use positional index: \verb|row <- df[1:5,10:15|
+      \item Extract rows - use positional index: \verb|row <- df[1:5,10:15]|
       \item Extract columns - use headers: as lists / vectors \verb|df$col1| (use dollar sign to access), as data frame \verb|cols <- data.frame(df$col1, df$col2)|
     \end{itemize}
   \item Statistical analysis
@@ -1648,6 +1652,7 @@ plt
         \end{itemize}
       \item Colors: a couple of \href{http://www.sthda.com/english/wiki/ggplot2-colors-how-to-change-colors-automatically-and-manually#change-colors-by-groups}{tutorials} with \href{https://www.datanovia.com/en/blog/ggplot-colors-best-tricks-you-will-love/}{examples}
       \item Themes: set and \href{https://bookdown.org/rdpeng/RProgDA/building-a-new-theme.html}{pimp} \href{https://ggplot2.tidyverse.org/reference/theme_get.html}{your theme} (all options \href{https://ggplot2.tidyverse.org/reference/theme.html}{here})
+      \item Nice tricks about \href{http://www.sthda.com/english/wiki/ggplot2-scatter-plots-quick-start-guide-r-software-and-data-visualization}{scatter-plots}.
     \end{itemize}
   \item \texttt{Rstudio} is possibly the most well-known and used IDE for \texttt{R}
     \begin{itemize}
@@ -1674,6 +1679,10 @@ for (i in 1:n) {
     \end{itemize}
 \end{itemize}
 
+\subsection{Notes on statistics and data analysis}
+\begin{itemize}
+  \item QQ-plots and how to analyze them: \href{https://www.ucd.ie/ecomodel/Resources/QQplots_WebVersion.html}{here}
+\end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
