@@ -1516,6 +1516,7 @@ Here is a [link](#section-one) to the previous section.
 \begin{verbatim}
 plot "file.dat" using 1:2 [options]
 \end{verbatim}
+  \item Size of the picture: \verb|set <width>,<height>|
   \item Multiple plots in the same picture. Usually, when executing \texttt{plot}, the old picture is cleared. To plot several curves separate them with a comma or use \verb|replot|. Indeed, the following
 \begin{verbatim}
 plot "file.dat" u 1:2 [options], "file2.dat" u 1:3 [options]
@@ -1560,7 +1561,7 @@ plot for [i=1:words(files)] word(files, i).'.dat' lc rgb word(colors, i)
 Useful options of \texttt{plot}-like commands:
 \begin{itemize}
   \item \verb!linecolor|lc!: e.g. \verb|lc "black"|. For more advance setting: \verb|linetype rgb "<parameters>"|
-  \item \verb!with|w!: lines and marks \verb|linespoints|, lines/marks only \verb!lines|points!, \verb|impulses|
+  \item \verb!with|w!: lines and marks \verb|linespoints|, lines/marks only \verb!lines|points!, \verb|impulses| (default: \verb|points| only)
   \item \verb|pointtype <n>| (or \verb|pt|): set style \texttt{n} for the point. There are also \verb|pointsize| (or \verb|ps|)
   \item \verb|title "<legend_entry>"|. If columns have names, \verb|title columnhead|
   \item \verb!linewidth|w!
@@ -1569,6 +1570,24 @@ Useful options of \texttt{plot}-like commands:
       \item \verb|dt N|: predefined type
       \item \verb|dt "<pattern>"|: custom pattern where \verb|pattern| is a combination of dots, hyphens, underscores and spaces
       \item ATTENTION: set dash type before giving line type: \verb|plot x:sin(x) dt 1 w linespoints|
+    \end{itemize}
+  \item Check out \verb!linetype|lt! too (doc \href{http://www.gnuplot.info/docs_4.2/node62.html}{here})
+\end{itemize}
+
+General coding tips:
+\begin{itemize}
+  \item Define variables: \verb|var="this_is_a_var"|, \verb|list="this is a list"|
+  \item Concatenate, ``\texttt{.}'' (dot): \verb|"var holds '".var."'"|
+  \item Number of words in a list: \verb|words(list)|
+  \item Loops:
+    \begin{itemize}
+      \item General structure
+\begin{verbatim}
+do for [j=1:10] {
+  # do something
+}
+\end{verbatim}
+      \item Even inside commands: \verb|plot for [i=1:100] 'data'.i.'.dat' u 1:2 title 'Flow '.i|
     \end{itemize}
 \end{itemize}
 
