@@ -905,6 +905,11 @@ For inexperienced users who want to perform simple tasks, such as looking at the
     \begin{itemize}
       \item Getting the latest commits: \verb|git pull|. One may want to add the \verb|--rebase| option so that your non yet published commits stay on top of the tree.
       \item Publish the latest local commits: \verb|git push|. It is always better to do a \verb|git pull --rebase| before pushing in order to avoid conflicts.
+    \end{itemize}
+  \item Pushing
+    \begin{itemize}
+      \item Push a new branch: \verb|git push -u origin <branch>|: \verb|-u| set the upstream reference at the same time
+      \item Push a new project to \href{https://github.com/}{GitHub} for the first time: follow \href{https://help.github.com/en/github/importing-your-projects-to-github/adding-an-existing-project-to-github-using-the-command-line}{this}.
       \item Damn! You have just pushed a commit and you realize just now that it needs an amend. Modify it in you local repository then force-push it, have a look \href{https://stackoverflow.com/questions/179123/how-to-modify-existing-unpushed-commit-messages}{here}.
     \end{itemize}
   \item Rename a branch:
@@ -928,6 +933,15 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item \texttt{-3}: if the patch does not apply cleanly for a certain file, falls back to the version of the most recent common commit between the current tree and the one coming with the patch, and propose a 3-way merge (current, patch, and ancestor),
       \item \verb|--reject|: when the application fails, tells \texttt{git} to apply as many modifications as possible and to temporarily skip the impossible ones. The rejected modification will be stored in \texttt{*.rej} files. The application has to be completed manually (you will have to personally modify the files)
     \end{itemize}
+  \item \texttt{git revert SHA1}: cancel the modifications done by commit \texttt{SHA1}. More info on the \href{https://git-scm.com/docs/git-revert}{man page} and \href{https://stackoverflow.com/a/4114122}{this answer}.
+  \item Add a file but then ignore it. This is quite a common situation: in a multi-developer project, there is a base configuration file and each dev customize it as they wish. One would like to keep the file into the repo, and also not to follow it. The solution is explained \href{https://stackoverflow.com/questions/3319479/can-i-git-commit-a-file-and-ignore-its-content-changes}{here}: add it then change the index
+\begin{verbatim}
+git update-index --assume-unchanged <file>
+\end{verbatim}
+    To undo:
+\begin{verbatim}
+git update-index --no-assume-unchanged <file>
+\end{verbatim}
   \item \texttt{git log}: show the commit logs. \href{https://git-scm.com/docs/git-log}{Manual}
     \begin{itemize}
       \item \texttt{-<n>}, \texttt{-n <n>}: limit the number of commits to output
@@ -973,7 +987,6 @@ $ git config [--global] alias.pr 'pull ---rebase'
       \item Add them to \texttt{.git/info/exclude}. This is local and impacts only the local directory and clone of the repository.
     \end{itemize}
   \item \texttt{git} \textbf{cannot} track empty directories. Hence, one should include a dummy file and add it to the tree. Some people use \verb|.gitkeep| as naming convention for this dummy file.
-  \item Push a new project to \href{https://github.com/}{GitHub} for the first time: follow \href{https://help.github.com/en/github/importing-your-projects-to-github/adding-an-existing-project-to-github-using-the-command-line}{this}.
   \item \texttt{git bisect}: help to find the commit causing the bug by a bisection procedure
     \begin{itemize}
       \item \verb|start|: initialize the procedure.
