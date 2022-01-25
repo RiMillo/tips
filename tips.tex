@@ -1683,6 +1683,88 @@ for (i in 1:n) {
 \begin{itemize}
   \item QQ-plots and how to analyze them: \href{https://www.ucd.ie/ecomodel/Resources/QQplots_WebVersion.html}{here}
 \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Computer Vision with \texttt{OpenCV}}
+\texttt{OpenCV} is available for \texttt{C}, \texttt{python}, \texttt{Java}, and even \texttt{Android}. We'll try to be consistent and use \texttt{python} code examples, however, some of the provided links may concern other languages. In any case, the tip will give the function to use and, if it is not the language of your predilection, you just have to adapt the call to the function to the language. In fact, most of the time, we deal with general question about computer vision and not with the subtleties of a particular implementation.
+
+Another popular computer vision \texttt{python} library is \href{https://scikit-image.org/}{\texttt{scikit-image}}.
+
+\begin{itemize}
+  \item Docs and tutorials:
+    \begin{itemize}
+      \item \href{https://docs.opencv.org/3.4/index.html}{Official documentation} with tutorials and Doxygen with all functions
+        \begin{itemize}
+          \item There are also nice \href{https://opencv24-python-tutorials.readthedocs.io/en/latest/index.html}{\texttt{ReadTheDocs} tutorials}. It dates back to 2016, but the general and basic ideas remains the same.
+        \end{itemize}
+      \item O'Reilly books
+        \begin{itemize}
+          \item \href{https://www.bogotobogo.com/cplusplus/files/OReilly%20Learning%20OpenCV.pdf}{With \texttt{C}}
+            \item \href{http://programmingcomputervision.com/downloads/ProgrammingComputerVision_CCdraft.pdf}{With \texttt{python}} (draft)
+        \end{itemize}
+      \item \href{https://www.pyimagesearch.com/}{\texttt{pyimagesearch}}: it is one of the best and well-known pages online for learning and working with computer vision problems (included machine learning techniques applied to vision applications)
+        \begin{itemize}
+          \item You may want to check put its \texttt{python} library, \href{https://github.com/jrosebr1/imutils}{\texttt{imutils}} which simplifies using \texttt{OpenCV}
+        \end{itemize}
+      \item \href{https://www.geeksforgeeks.org/}{\texttt{GeeksForGeeks}} has nice tutorials on \texttt{OpenCv}
+    \end{itemize}
+  \item The bases. \texttt{OpenCV} images are simply \texttt{numpy} matrices where each element of the matrix correspond to a pixel. However, there are some things that are worth mentioning explicitly. Let \texttt{W} and \texttt{H} be, respectively, the width and height in pixels of an image:
+    \begin{itemize}
+      \item The origin, the pixel (0, 0), is the top left corner of the image
+      \item The vertical direction, let's call it \texttt{y}, grows downwards: \texttt{y=0} corresponds to top edge, \texttt{y=H} corresponds to the bottom edge
+      \item \texttt{x} and \texttt{y} coordinates are switched, hence: \verb|im[y,x,:]|
+      \item For one-channel images (e.g.~gray scale), the matrix dimension is 2, that means that the shape is \texttt{(H,W)}; for \texttt{RGB} (however, see below) and \texttt{HSV} is 3, last dimension being 3, that means that the shape is \texttt{(H,W,3)}.
+      \item \texttt{OpenCV} uses \texttt{BGR} instead of the \emph{usual} \texttt{RGB} structure. Hence, if you want to use \texttt{matplotlib} to show an image, one should convert it, here are two possible ways to perform the conversion
+\begin{verbatim}
+# Use OpenCV functions
+img_cvt = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+# Use python: inverse order of last dimensionim[:,:,::-1]
+img_cvt = im[:,:,::-1]
+\end{verbatim}
+      \item Extract the green channel of an image: \verb|green = im[:,:,1]|. Use \texttt{0} for blue, or \texttt{2} for red
+      \item Crop an image: simply use \texttt{numpy} slices
+\begin{verbatim}
+crop = im[y_0:y_1, x_0:x_1, :]
+\end{verbatim}
+      \item \texttt{GBR} formats accepts values in $[0,\,255]^3$, \texttt{HSV} in $[0,\,120]\times[0,\,255]\times[0,\,255]$
+      \item The type of an element of a standard image is \verb|numpy.uint8|
+    \end{itemize}
+  \item \href{https://docs.opencv.org/4.5.2/d9/d61/tutorial_py_morphological_ops.html}{Morphological transformations}: erosion (separate zones), dilation (merge zones), opening (erosion then dilation), closing (dilation then erosion),\ldots
+  \item Thresholding: roughly speaking, in its simplest case, one chooses a threshold \texttt{T}, then all pixels with values less than \texttt{T} are set to \texttt{0}, the others to a user-defined value. See \href{https://docs.opencv.org/3.4/db/d8e/tutorial_threshold.html}{these} \href{https://www.pyimagesearch.com/2021/04/28/opencv-thresholding-cv2-threshold/}{three} \href{https://www.pyimagesearch.com/2021/05/12/adaptive-thresholding-with-opencv-cv2-adaptivethreshold/}{tutorials}.
+\begin{verbatim}
+# Simplest thresholding
+T = 125; final_value = 255
+_, th = cv.threshold(im, T, final_value, cv.THRESH_BINARY)
+\end{verbatim}
+  \item Color-range--based segmentation. We give the rule of thumb for using \texttt{inRange} as presented in the \href{https://docs.opencv.org/3.1.0/df/d9d/tutorial_py_colorspaces.html}{tutorials}: let \texttt{clr[RGB]} (or whatever other color code) the target color; transform it into \texttt{HSV}, \texttt{clr[HSV]} (usually, it has full \texttt{S} and \texttt{V} values, which in \texttt{OpenCV} translates to 255: for instance \texttt{blue[HSV]=[120,255,255]}); then use as lower bound \texttt{[clr[HSV][H]-D, L, L]} and as upper bound \texttt{[clr[HSV][H]+D, 255, 255]} with \texttt{D=10} and \texttt{L=50}. You may adjust \texttt{D} and \texttt{L}.
+\begin{verbatim}
+clr = cv.cvtColor(np.uint8([[[R,G,B]]]), cv.COLOR_RGB2HSV)
+D = 10; L = 100
+lower = np.uint8([clr[0,0,0]-D,  L,  L])
+upper = np.uint8([clr[0,0,0]+D,255,255])
+# Segmentation
+mask = cv.inRange(hsv.copy(), lower, upper)
+\end{verbatim}
+    \begin{itemize}
+      \item Red colors can be hard to extract, see for instance \href{https://stackoverflow.com/a/32523532}{here}
+      \item Segmentation with black and white can be a little tricky. One may try to use simple thresholding, otherwise see this \href{https://stackoverflow.com/a/25401596}{answer}.
+    \end{itemize}
+  \item Histogram and histogram / lighting correction: see \href{https://docs.opencv.org/4.5.0/d5/daf/tutorial_py_histogram_equalization.html}{here}
+    \begin{itemize}
+      \item Histogram equalization, \verb|equalizeHist| works globally on the image. Sometimes, the results does not meet the expectations
+      \item CLAHE works locally, on a small windows, \verb|createCLAHE([clip,tile])|. The results are often more natural than those obtained with the histogram equalization. CLAHE needs two parameters: the tile is the window, the clip is a threshold. If an histogram bin is above this limit, the related pixels are redistributed uniformly.
+    \end{itemize}
+  \item Intensity transformation: see \href{https://www.geeksforgeeks.org/python-intensity-transformation-operations-on-images/}{here} and \href{https://docs.opencv.org/4.5.0/dc/dfe/group__intensity__transform.html}{here} for the functions already included in \texttt{OpenCV} but only in \texttt{C}
+  \item Example of image matching and alignment: \href{https://www.pyimagesearch.com/2020/08/31/image-alignment-and-registration-with-opencv/}{here}
+  \item Camera calibration:
+    \begin{itemize}
+      \item Simple camera calibration, that is, for instance, fix lens deformations: use chessboard and/or AruCo, see basic stuff, insights and small tutorial \href{https://docs.opencv.org/master/dc/dbb/tutorial_py_calibration.html}{here}
+      \item Fisheye cameras is trickier. Have a look at this \href{https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0}{medium post}, this \href{https://docs.opencv.org/3.2.0/dd/d12/tutorial_omnidir_calib_main.html}{tutorial} but also this \href{https://stackoverflow.com/a/53500300}{SO answer} (and its referenced \href{http://paulbourke.net/dome/fish2/}{link})
+    \end{itemize}
+\end{itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
