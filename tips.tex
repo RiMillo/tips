@@ -31,6 +31,7 @@
   basicstyle=\ttfamily,
   keywordstyle=\color{blue},
 }
+\usepackage[normalem]{ulem}
 
 \usepackage{hyperref}
 
@@ -1450,6 +1451,17 @@ pandoc --from=markdown --to=html -o out.html in.md
     \href{https://agea.github.io/tutorial.md/}{tutorial} and
     \href{https://enterprise.github.com/downloads/en/markdown-cheatsheet.pdf}{cheat sheet again}.
   \item Official \texttt{GitHub} \href{https://docs.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax}{documentation}.
+  \item Special text: \textit{italic} \verb|*italic*| or \verb|_italic_|; \textbf{bold} \verb|**bold**| or \verb|__italic__|; code / \texttt{typewriter} \verb|`typewriter`| (backticks); \sout{strikethrough} \verb|~strikethrough~| or \verb|~~strikethrough~~|
+    \item Links: e.g.~\verb|[Shown label](https://link.to)|
+      \begin{itemize}
+        \item One can even link sections of the current file (notice: all lowercase letters, blanks converted into dashes):
+\begin{verbatim}
+# Section One
+Here is a section.
+# Section Two
+Here is a [link](#section-one) to the previous section.
+\end{verbatim}
+      \end{itemize}
   \item Citations, references, bibliography: \href{https://stackoverflow.com/questions/26587527/cite-a-paper-using-github-markdown-syntax}{here}.
   \item Math\&Equations:
     \begin{itemize}
