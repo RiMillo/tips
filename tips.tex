@@ -362,6 +362,7 @@ Tricks:
 \begin{itemize}
   \item Start from the end: \verb!tac <files> | grep [options] <pattern>! (Add a pipe to \texttt{tac} to recover the original order).
   \item Print even if the match is not found \verb!grep -E '^|<pattern>' <file>!. Special character \verb|^| means "beginning of the line", hence it is always found. Why should one use it? with the option \verb|--color| (usually enabled by default) \verb|grep| highlights the matches. Here, the command find the beginning of the line, which cannot be highlighted, hence it prints the line, if it finds the pattern as well it will highlight it.
+  \item Non-greedy: add ``\texttt{?}'' after quantifier: e.g.~\verb|^.*?}| *everything until first closing brace.
 \end{itemize}
 
 Types:
@@ -603,6 +604,7 @@ scp -r [...] source/. user@server:dest/
           \item \texttt{rsync}: has a syntax similar to \texttt{mv} or \texttt{cp}. As the name suggests, it is a sort of synchronization tool, hence you can customize the effect so that only most recent and freshly edited files are moved. Indeed, it can be use entirely locally, for instance to update a copy / backup. If no destination is provided, \texttt{rsync} will behave similarly to \texttt{ls}.
             \begin{itemize}
               \item \verb|--copy-links|: copy as file \texttt{vs.} \verb|--links|: copy as link.
+              \item \verb|--info=progress2|: progress bar for global transfer (not per file)
             \end{itemize}
           \item ATTENTION: \texttt{scp} and \texttt{rsync} load the \texttt{.bashrc} and fail if it produces an output to \texttt{stdout} (for instance, if they contain commands such as \texttt{echo}). The workaround is to move those commands into \texttt{.bash\_profile} (or just send the output to \verb|/dev/null| if it is not important)
         \end{itemize}
@@ -651,7 +653,7 @@ wc [options] <file>
   \item \texttt{uniq}: filter for repeated adjacent lines. Let me stress: only adjacent lines are checked
     \begin{itemize}
       \item \verb|-c|: prefix line with number of occurrences
-      \item \verb|-d|: print repeated lines only occ
+      \item \verb|-d|: print repeated lines only
       \item \verb|-u|: print unique lines only
     \end{itemize}
   \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one. A little syntax:
@@ -678,6 +680,7 @@ wc [options] <file>
       \item Choose density|quality (and hence the final size): option \verb|-density <n>| (its unit is \texttt{dpi})
       \item Reduce size: \verb|-size <n>%| the output will have be the \verb|n|\% of the initial size
       \item Mirror image: \verb|-flip| vertical (meaning top becomes bottom) axis, \verb|-flop| horizontal axis (meaning right becomes left)
+      \item Extract images from an animated \texttt{gif}: \verb|convert in.gif out.png| and it will save images like \texttt{out-0.png}, \texttt{out-1.png}, \texttt{out-2.png}\ldots
     \end{itemize}
   \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: nice and easy utility to modify \texttt{pdf} files
     \begin{itemize}
@@ -790,6 +793,13 @@ cut -f 2-5 text.txt
       \item \verb|-c <list>| (or \verb|--characters|): same as above but with characters
       \item \verb|-d <,>|: use \verb|<,>| as delimiter for fields
       \item List examples: \texttt{n} or \texttt{n-m} or \texttt{-n} or \texttt{n-}
+    \end{itemize}
+  \item \texttt{comm}: compare two files: \verb|comm -<n> <(sort file_1) <(sort file_2)|
+    \begin{itemize}
+      \item Files must be \textbf{sorted}
+      \item Variable \texttt{n} is a combination of \texttt{1}, \texttt{2}, and \texttt{3}. \texttt{1} / \texttt{2} means suppress lines unique to \verb|file_1/2|, \texttt{3} means suppress shared lines
+      \item Keep lines from \verb|file_1| only \verb|comm -23 <(sort file_1) <(sort file_2)|
+      \item Keep lines from \verb|file_2| only \verb|comm -13 <(sort file_1) <(sort file_2)|
     \end{itemize}
   \item \texttt{getopts}: built-in command of \texttt{bash} which allows to parse options and arguments passed to a script. Two quick and well-done tutorials can be found \href{https://www.computerhope.com/unix/bash/getopts.htm}{here} and \href{https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/}{here}. We provide a hand-made example in the appendix, \autoref{lst:getopt_ex}.
     \begin{itemize}
