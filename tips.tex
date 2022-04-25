@@ -612,6 +612,11 @@ scp -r [...] source/. user@server:dest/
             \begin{itemize}
               \item \verb|--copy-links|: copy as file \texttt{vs.} \verb|--links|: copy as link.
               \item \verb|--info=progress2|: progress bar for global transfer (not per file)
+              \item \verb|--exclude=<pattern>|: exclude files matching the pattern. \verb|--exclude-from=<file>|: read a file where each line is a pattern, if a file matches one of them, it is excluded
+              \item \verb|--include=<pattern>|: it's more a \emph{NEVER EXCLUDE} than an include. For an \emph{include-only}--like process, look \href{https://unix.stackexchange.com/questions/2161/rsync-filter-copying-one-pattern-only}{here}: basically, exclude everything, then include back and include back again the \emph{only}
+\begin{verbatim}
+rsync --include='*.pdf' --include='*/' --exclude='*' src dest
+\end{verbatim}
             \end{itemize}
           \item ATTENTION: \texttt{scp} and \texttt{rsync} load the \texttt{.bashrc} and fail if it produces an output to \texttt{stdout} (for instance, if they contain commands such as \texttt{echo}). The workaround is to move those commands into \texttt{.bash\_profile} (or just send the output to \verb|/dev/null| if it is not important)
         \end{itemize}
@@ -883,7 +888,18 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item Forgot a file in your last commit or want to modify it? \verb|git commit --amend| add the staged modifications to the last commit.
       \item Commit with the same message as the original (after a reset, or with the \verb|--amend| option): \verb|git commit -c ORIG_HEAD|.
     \end{itemize}
-  \item \href{https://www.conventionalcommits.org/en/v1.0.0/}{Conventional commits}: a style-guide for writing commits messages
+  \item Writing good commit messages
+    \begin{itemize}
+      \item \href{https://www.conventionalcommits.org/en/v1.0.0/}{Conventional commits}: a style-guide for writing commits messages. The main structure is ``\texttt{<type>[(scope)][!]: <Short description>}'' where:
+        \begin{itemize}
+          \item \texttt{type} is one of the following: \texttt{fix}, \texttt{feat}, \texttt{chore}, \texttt{docs}, \texttt{improvement}, \texttt{perf}, \texttt{refactor}, \texttt{test}, \texttt{ci}, \texttt{build}
+          \item \texttt{scope}, in parentheses, is optional and tells to which part of the repository the modifications are applied
+          \item \texttt{!} is optional and signals that the commit is important, for instance introduces a new cool features, remove the support for a particular case/library\ldots
+          \item Example: ``\texttt{feat(api)!: Add access to low-level config}''
+          \item Why should you write like this? It provides a template which is quite easy to understand. Moreover, some tools allows one to automatically analyze the commit history and extract insightful information based on this syntax and can provide a changelog.
+        \end{itemize}
+      \item Link a commit to an issues: it suffices to quote the issue number anywhere in the commit message as such \verb|#xxx| where \texttt{xxx} is the issue number. Moreover, one can directly close an issue with a similar strategy, more details \href{https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue}{here}: for instance put \verb|close #xxx| in the commit message
+    \end{itemize}
   \item For all merging-related commands (\texttt{am}, \texttt{merge}, \texttt{cherry-pick}, \texttt{rebase}, \verb|pull --rebase|...), if errors occur, you can use
     \begin{itemize}
       \item \verb|git <command> --continue|: the problems have been solved, tells \texttt{git} to continue what it was doing,
@@ -918,7 +934,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item Push a new branch: \verb|git push -u origin <branch>|: \verb|-u| set the upstream reference at the same time
       \item Push a new project to \href{https://github.com/}{GitHub} for the first time: follow \href{https://help.github.com/en/github/importing-your-projects-to-github/adding-an-existing-project-to-github-using-the-command-line}{this}.
       \item Damn! You have just pushed a commit and you realize just now that it needs an amend. Modify it in you local repository then force-push it, have a look \href{https://stackoverflow.com/questions/179123/how-to-modify-existing-unpushed-commit-messages}{here}.
-      \item Push except the last commit: \href{https://stackoverflow.com/questions/8879375/git-push-push-all-commits-except-the-last-one}{here}
+      \item Push except the last commit: \href{https://stackoverflow.com/questions/8879375/git-push-push-all-commits-except-the-last-one}{here}, \verb|git push origin HEAD^:master|
     \end{itemize}
   \item Rename a branch:
     \begin{itemize}
@@ -1348,7 +1364,7 @@ n = 10 # type: int # Another comment
 #
 l : List[int] = list(range(5))
 #
-d : Dict[str, int] = {'Brasil': 5, "Italy": 4, "France": 2}
+d : Dict[str, int] = {'Brazil': 5, "Italy": 4, "France": 2}
 # Functions
 def fib(n : int, label : str) -> int:
   a, b = 0, 1
@@ -1361,6 +1377,15 @@ def fib(n : int, label : str) -> int:
       \item \href{https://mypy.readthedocs.io/en/stable/index.html}{\texttt{mypy}}: write annotations indicating the types of your variables, parameters, and return values, then run \texttt{mypy} to check if your code is coherent (are you assigning a list to a variable that should a dictionary? and so on\ldots). The annotations do not interfere with the code when you are running directly the script.
     \end{itemize}
   \item \texttt{python} is nice, \texttt{C} is better: hence why not \href{https://cython.readthedocs.io/en/latest/index.html}{\texttt{Cython}}?
+  \item Dealing with \texttt{zip} files: module \href{https://docs.python.org/3/library/zipfile.html}{\texttt{zipfile}}. See a discussion \href{https://realpython.com/python-zipfile/}{here}. For instance, use without extracting
+\begin{lstlisting}[language=python]
+with zipfile.ZipFile('my_file.zip', mode='r') as archive:
+  # Get list of files in archive
+  fl = archive.namelist()
+  for f in fl:
+    with open(f, 'r') as op_f:
+      # Do something
+\end{lstlisting}
   \item Run shell commands from \texttt{python} script
     \begin{itemize}
       \item \verb|os.system('echo Ciao')|
@@ -1400,6 +1425,7 @@ x.sum(axis=1) # Gives [4, 4, 4]
           \item \texttt{flatten} returns a copy
           \item \texttt{ravel} does it in place
         \end{itemize}
+      \item \texttt{numpy} and memory: here is an interesting \href{https://pythonspeed.com/articles/numpy-memory-views/}{article}
       \item Sorting \& alike
         \begin{itemize}
           \item Get a indexes with \verb|np.argmin| and \verb|np.argsort|
@@ -1450,6 +1476,8 @@ ptf_b(4) # print a:4, b:3
       \item List of accepted key for \texttt{rcParams} \href{https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.rcParams}{here}
       \item \texttt{matplotlib.ion()} switch the interaction with the plot on, so that \texttt{plt.plot()} is not blocking and the plot can be kept and redrawn multiple times. This of course works in a plot environment, if you use it on a script the plot will disappear as soon as the script reaches its end.
       \item Equal unit-length for x and y-axis: \verb|plt.gca().set_aspect('equal', adjustable = 'box')|
+      \item Remove axis (no axis, no ticks, no labels, etc): \verb|ax.axis('off')|
+      \item Every names color \href{https://matplotlib.org/stable/gallery/color/named_colors.html}{here}
       \item 3D plots. A nice introduction can be found \href{https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html}{here}. To activate 3D-plotting (scatter, surface, mesh plot or any other) the axis should be called with \lstinline[language=python]{projection='3d'} which should be imported as follows: \lstinline[language=python]{from mpl_toolkits import mplot3d}
     \end{itemize}
   \item Argument parsing: \href{https://docs.python.org/3/library/argparse.html#module-argparse}{\texttt{argparse}}
@@ -1481,7 +1509,7 @@ ptf_b(4) # print a:4, b:3
   \item \texttt{jupyter} notebooks
     \begin{itemize}
       \item Download images in batch: \href{https://github.com/damienmarlier51/JupyterNotebookImageExporter}{\texttt{junix}}
-      \item Use \LaTeX{} commands, see \href{https://stackoverflow.com/questions/13208286/how-to-write-latex-in-ipython-notebook}{here}
+      \item Use \LaTeX{} commands, see \href{https://stackoverflow.com/questions/13208286/how-to-write-latex-in-ipython-notebook}{here} or, even better, \href{https://jupyterbook.org/content/math.html}{here}
       \end{itemize}
 \end{itemize}
 
@@ -1696,7 +1724,7 @@ Here is a [link](#section-one) to the previous section.
 \alpha
 ```
 \end{verbatim}
-      \item \texttt{GitHub} flavored cannot. However, there seems to be some workarounds, see \href{https://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog}{here} (linking to third-party render) or \href{https://gist.github.com/cyhsutw/d5983d166fb70ff651f027b2aa56ee4e}{here} (write \LaTeX{} code inside a \texttt{jupyter} notebook)
+      \item \texttt{GitHub} flavored cannot. However, there seems to be some workarounds, see \href{https://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog}{here} (linking to third-party render) or \href{https://gist.github.com/cyhsutw/d5983d166fb70ff651f027b2aa56ee4e}{here} (write \LaTeX{} code inside a \texttt{jupyter} notebook, for tips about \LaTeX{} and \texttt{jupyter} see \texttt{python} section, \ref{sec:python}, and/or \href{https://jupyterbook.org/content/math.html}{here})
     \end{itemize}
   \item \texttt{grip}: \texttt{python}-based script which allows you to have a \texttt{GitHub} rendering of your documents (needs internet to send request for translation to \texttt{GitHub}).
 \end{itemize}
