@@ -115,6 +115,11 @@ echo FAIL
 fi
 \end{verbatim}
     \end{itemize}
+  \item \texttt{echo}: print to screen
+    \begin{itemize}
+      \item Change colors: see \href{https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux}{here} (remember \verb|-e| and to ``close'' the color)
+      \item Fonts: see \href{https://askubuntu.com/questions/528928/how-to-do-underline-bold-italic-strikethrough-color-background-and-size-i}{here} (see before)
+    \end{itemize}
   \item Operator \texttt{*} expands to all the files whose name does not start with "\texttt{.}". Hence, hidden files (as well as current directory "\texttt{.}", and parent directory "\texttt{..}" are not included).
   \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[| (cf. \autoref{ssec:shell_tools}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{ssec:awk}) or \texttt{python} (\autoref{sec:python}) or \texttt{bc} (\autoref{ssec:shell_tools}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
   \item Conditional statements: \href{https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs}{here}
@@ -340,6 +345,7 @@ Some useful options:
   \item \texttt{-v}, \verb|--invert-match|: get lines with that do \emph{not} match the \texttt{pattern};
   \item \texttt{-e}, \verb|--regexp=<pattern>|: look for \texttt{pattern}. This can be used, for example if \texttt{pattern} starts with a dash (\texttt{-}); similar options are \verb!-E|F|G|P!
   \item \texttt{-i}, \verb|--ignore-case|: search is case-\emph{i}nsensitive;
+  \item \texttt{-I: exclude binary files;}
   \item \texttt{-h}: without filename (mnemonic: \emph{h}ead)
   \item \texttt{-H}: with filename (mnemonic: \emph{H}ead)
   \item \texttt{-n}: show line number;
@@ -351,6 +357,7 @@ Some useful options:
   \item \texttt{-L}, \verb|--files-without-matches|: \emph{L}ist only the file names in which no match is found;
   \item \texttt{-q}: \emph{q}uiet, return just the exit status code (0 or 1 corresponding to, respectively, true or false) according to whether it have found a match or not;
   \item \verb|--include=<pattern>|: consider only files matching \texttt{pattern}. For example for only \TeX{} sources
+  \item \verb|--label=<label>|: show matches from \texttt{stdin} as coming from file \texttt{label}. This is nice to have when combining with \texttt{find} (cf.~\autoref{ssec:find})
 \begin{verbatim}
 grep --include=\*.tex -r "O Bella Ciao" .
 \end{verbatim}
@@ -373,12 +380,28 @@ Types:
   \item \texttt{-F}, \verb|--fixed-strings|, exclude regexp
 \end{itemize}
 
-The version \texttt{zgrep} (with the same options) allows to search into compressed/\emph{z}ipped files.
+\texttt{grep}'ing non-text files:
+\begin{itemize}
+  \item Archives: The version \texttt{zgrep} (with the same options) allows to search into compressed/\emph{z}ipped files.
+  \item PDF: two ways, see this \href{https://unix.stackexchange.com/questions/6704/how-can-i-grep-in-pdf-files}{SO question}, they both involve some external utilities
+    \begin{itemize}
+      \item Using \texttt{pdfgrep}: just use it as you would use \texttt{grep}
+      \item Using \texttt{pdftotext}: convert pdf to text, pipe it, and \texttt{grep} it. By defaults it creates a \texttt{.txt} file, so mind the dash which makes it skip this
+\begin{verbatim}
+pdftotext to_search.pdf - | grep pattern
+# Combined with find
+find /path -name '*.pdf' -exec \
+  sh -c 'pdftotext "{}" - | grep -H --label="{}" --color " pattern"' \;
+\end{verbatim}
+    \end{itemize}
+\end{itemize}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\texttt{find}}
+\label{ssec:find}
 It allows to find files in a tree and apply a command to them:
 \begin{verbatim}
   find [options] <path> <command>
@@ -413,6 +436,9 @@ find . -name "*.log" -exec grep -Hn --color "pattern" {} +
     \verb|{}| stands for the matching files; the first version will execute as many calls as the numbers of matching files, the second (tries to) appends all the files in an single list of arguments (hence saving the calls to the script). If you would like to use a pipe in your \texttt{exec} command, use \texttt{sh} like below, or have a look \href{https://stackoverflow.com/questions/307015/how-do-i-include-a-pipe-in-my-linux-find-exec-command}{here}.
 \begin{verbatim}
 find . -name "*.log" -exec sh -c "tac {} | grep -m1 pattern" \;
+#
+find /path -name '*.pdf' -exec \
+  sh -c 'pdftotext "{}" - | grep -H --label="{}" --color " pattern"' \;
 \end{verbatim}
   \begin{itemize}
     \item Mind that \texttt{find} does not know the content of \texttt{.bashrc} and alike, hence one could not use aliases (its \texttt{ls} command might be stripped-down with respect to what one is used to, you may want to consider adding some user-friendly options).
@@ -957,6 +983,23 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item \texttt{-3}: if the patch does not apply cleanly for a certain file, falls back to the version of the most recent common commit between the current tree and the one coming with the patch, and propose a 3-way merge (current, patch, and ancestor),
       \item \verb|--reject|: when the application fails, tells \texttt{git} to apply as many modifications as possible and to temporarily skip the impossible ones. The rejected modification will be stored in \texttt{*.rej} files. The application has to be completed manually (you will have to personally modify the files)
     \end{itemize}
+  \item Stashing: sometimes modifications are not yet ready for a commit but you have to go checkout another branch and \texttt{git} won't let you because of the modifications. That's where stashing comes in: it's a heap, a space where one can put modifications without them being in the official history. The state will be restored to \texttt{HEAD} (possibly the staged changes remain). Of course, one can recover them afterwards.
+    \begin{itemize}
+      \item Stash modifications: \texttt{git stash}
+        \begin{itemize}
+          \item Stashes are just like commit, hence one can give a message, use \verb|-m 'Message'|
+          \item By default, it stashes all the modifications on any files in the \texttt{git} view. One can select a specific file \verb|git stash -- file.txt|
+        \end{itemize}
+      \item Recover a stash: \texttt{git stash pop}
+        \begin{itemize}
+          \item It actually performs to actions: apply the stash and delete it from the heap
+          \item By default, it takes the stash on the top of the heap, the last sent in, however one can select a specific one \verb|git stash pop stash@{n}|
+        \end{itemize}
+      \item Delete a stash without applying it: \texttt{git stash drop}
+        \begin{itemize}
+          \item See above to choose a specific stash
+        \end{itemize}
+    \end{itemize}
   \item \texttt{git revert SHA1}: cancel the modifications done by commit \texttt{SHA1}. More info on the \href{https://git-scm.com/docs/git-revert}{man page} and \href{https://stackoverflow.com/a/4114122}{this answer}.
   \item Add a file but then ignore it. This is quite a common situation: in a multi-developer project, there is a base configuration file and each dev customize it as they wish. One would like to keep the file into the repo, and also not to follow it. The solution is explained \href{https://stackoverflow.com/questions/3319479/can-i-git-commit-a-file-and-ignore-its-content-changes}{here}: add it then change the index
 \begin{verbatim}
@@ -1322,15 +1365,17 @@ int res = add_10(5) // 15
       \item Create: \verb|python3 -m venv <env_name>|. The argument \verb|env_name| is arbitrary: let's fix it to \verb|test|
       \item Activate: \verb|source test/bin/activate|. From now on the python version of the virtual element is loaded, you may check this with \verb|which python|. Hence, for instance, \verb|pip| will install packages in the virtual environment only
       \item Deactivate: \verb|deactivate|
+      \item Remove: just \verb|rm -rf <env_name>|
     \end{enumerate}
   \item \texttt{pip}: allows you to download and update python libraries
     \begin{itemize}
       \item Typical call: \verb|pip install <package>|. Add options \verb!--upgrade|-U! to upgrade. In recent versions, \verb|python3 -m pip [...]| is advised.
       \item One may add a configuration file, see \href{https://pip.pypa.io/en/stable/topics/configuration/}{here}
       \item You'll need access to some directories, thus it is advised to have a local install: pass option \verb|--user|.
-    \item Proxy: pass the option \verb|--proxy=user@server.dom:port|. However, it might not work if some dependencies have to be downloaded as well. In that case, try exporting the shell variables \verb|HTTP_PROXY=<proxy>| and \verb|HTTPS_PROXY=<proxy>|. It might be helpful to add a line in the configuration file as explained \href{https://stackoverflow.com/questions/43473041/how-to-configure-pip-per-config-file-to-use-a-proxy-with-authentification}{here}
+      \item Proxy: pass the option \verb|--proxy=user@server.dom:port|. However, it might not work if some dependencies have to be downloaded as well. In that case, try exporting the shell variables \verb|HTTP_PROXY=<proxy>| and \verb|HTTPS_PROXY=<proxy>|. It might be helpful to add a line in the configuration file as explained \href{https://stackoverflow.com/questions/43473041/how-to-configure-pip-per-config-file-to-use-a-proxy-with-authentification}{here}
       \item Get list of outdated packages: \verb|pip list --outdated|.
       \item Get a list of currently installed packages with versions: \verb|pip freeze > [file.txt]|
+      \item Install from a requirements file (see freezing just above): \verb|pip install -r [file.txt]|
       \item When installing/upgrading problems may occur with older versions of the \texttt{C} compiler, \texttt{GCC}: try and force \texttt{C99} standard by setting \texttt{CFLAGS} before installing: \verb|export CFLAGS='-std=c99'|
       \item Select a specific version of the package: \verb|python3 -m pip install package==6.66|
     \end{itemize}
@@ -1869,6 +1914,10 @@ Here is a [link](#section-one) to the previous section.
       \item \texttt{GitHub} flavored cannot. However, there seems to be some workarounds, see \href{https://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog}{here} (linking to third-party render) or \href{https://gist.github.com/cyhsutw/d5983d166fb70ff651f027b2aa56ee4e}{here} (write \LaTeX{} code inside a \texttt{jupyter} notebook, for tips about \LaTeX{} and \texttt{jupyter} see \texttt{python} section, \ref{sec:python}, and/or \href{https://jupyterbook.org/content/math.html}{here})
     \end{itemize}
   \item \texttt{grip}: \texttt{python}-based script which allows you to have a \texttt{GitHub} rendering of your documents (needs internet to send request for translation to \texttt{GitHub}).
+  \item Draw graphs and charts with \href{https://mermaid-js.github.io/mermaid/#/}{\texttt{mermaid}}: all the info about syntax and configuration are in the link
+    \begin{itemize}
+      \item A \href{https://mermaid-js.github.io/mermaid-live-editor}{live editor}
+    \end{itemize}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2177,6 +2226,8 @@ usage () {
 prfx=""
 sffx=""
 
+OPTIND=1 # Variable used by getopts, reset if it has already been used
+
 while getopts ":hp:s:" opt; do
   case "${opt}" in
     h )
@@ -2201,6 +2252,8 @@ while getopts ":hp:s:" opt; do
       ;;
   esac
 done
+
+shift $((OPTIND-1)) # Shift processed options
 
 echo "PFX = ${prfx}"
 echo "SFX = ${sffx}"
