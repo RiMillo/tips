@@ -1450,6 +1450,15 @@ int res = add_10(5) // 15
       \item Select a specific version of the package: \verb|python3 -m pip install package==6.66|
     \end{itemize}
   \item A nice \href{https://medium.com/@anushkhabajpai/top-data-science-cheat-sheets-ml-dl-python-r-sql-maths-statistics-5239d4568225}{post} with cheat-sheets for several \texttt{python} libraries (as well as \texttt{R} and ML)
+  \item Load custom modules: one takes advantage of \verb|sys.path| which is a list of directories where \texttt{python} looks for module. Suppose that you want to import module \texttt{myMod} which is in \texttt{/path/to}, then a typical call would be
+\begin{lstlisting}[language=python]
+import sys
+sys.path.append('/path/to')
+# or...
+sys.path.insert(0, '/path/to')
+# Now one can import
+import myMod
+\end{lstlisting}
   \item Format strings: several ways are available, have a look \href{https://realpython.com/python-string-formatting/}{here}, but also \href{https://pyformat.info/}{here} and to the \href{https://docs.python.org/3.10/library/string.html#format-string-syntax}{doc}
     \begin{itemize}
       \item Old-style, ``\verb|%|'': \verb|'Hi, %s!' % 'Bob'|
@@ -1586,6 +1595,20 @@ foo() # Prints: 6 [0,0]
           \item As long as there is a \texttt{==}, you can use the \verb|[not] in| keyword
         \end{itemize}
     \end{itemize}
+  \item Printing colors: e.g.
+\begin{lstlisting}[language=python]
+class Bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+print(f'{Bcolors.FAIL}FAILED{Bcolors.ENDC}')
+\end{lstlisting}
   \item Profiling: see \href{https://docs.python.org/3/library/profile.html}{here}, basically use \texttt{cProfile}. One can use it as script to profile another script:
 \begin{verbatim}
 python -m cProfile script.py
