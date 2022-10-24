@@ -1029,6 +1029,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item \verb|--start-number <n>|: the patches are numbered starting from \texttt{n};
       \item \texttt{-N}: commits are unnumbered.
     \end{itemize}
+  \item Get current branch: \verb|git branch --show-current|
   \item \href{https://git-scm.com/docs/git-merge}{Merge} a branch: \verb|git merge [options] <to_merge>| incorporate all the commits of \verb|o_merge| onto the current branch. Some info also on \href{https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-request-merges}{\texttt{GitHub}}.
     \begin{itemize}
       \item If the history of the current and to-be-merged branch split, then an additional, automatically-generated commit is added (it is usually called ``Merge branch [\ldots]''). To avoid that, you can try to rebase \verb|branch_to_merge| over the final brunch, and possibly use the option \verb|--ff-only|.
@@ -1102,7 +1103,14 @@ $ git config [--global] alias.pr 'pull ---rebase'
 \end{verbatim}
   \item Proxy: some info are given \href{https://gist.github.com/evantoli/f8c23a37eb3558ab8765}{here}. Try to simply run (from wherever)
 \begin{verbatim}
-  $ git config --global http.proxy <server>:<port>
+$ git config --global http.proxy <server>:<port>
+\end{verbatim}
+  \item List of files modified by a commit: from this \href{https://stackoverflow.com/a/424142/12152457}{SO's answer} (see also comments)
+\begin{verbatim}
+$ git diff-tree --no-commit-id --name-only -r <sha> # For scripts
+# try also --name-status (gives info if modified, added, deleted, mode changes)
+# or...
+$ git show --pretty="" --name-only <sha>
 \end{verbatim}
   \item Ignore files from the syncing:
     \begin{itemize}
