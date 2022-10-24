@@ -110,9 +110,9 @@ In this section, we cover basic stuff about the shell. For useful terminal comma
 \begin{verbatim}
 some_command
 if [ $? -eq 0 ]; then
-echo OK
+  echo OK
 else
-echo FAIL
+  echo FAIL
 fi
 \end{verbatim}
     \end{itemize}
@@ -235,6 +235,46 @@ for {...}; do
   do_something() &
 done
 \end{verbatim}
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Debugging \texttt{bash}}
+\begin{itemize}
+  \item Tools:
+  \begin{itemize}
+    \item The \href{https://bashdb.sourceforge.net/}{BASH Debugger Project}, or \texttt{bashdb} is a debugger (no kidding?!) with syntax similar to \texttt{gdb}
+    \item \href{https://github.com/koalaman/shellcheck}{Shell Check}, it can be integrated in \texttt{vim}
+    \item An \href{https://marketplace.visualstudio.com/items?itemName=rogalmic.bash-debug}{extension} for \texttt{VisualStudio}
+  \end{itemize}
+  \item Some \href{https://www.linuxtopia.org/online_books/advanced_bash_scripting_guide/debugging.html}{insights}
+  \item Native options:
+    \begin{itemize}
+      \item What
+        \begin{itemize}
+          \item \verb|-e|: exit as soon as an error is detected (command returning non-zero code)
+          \item \verb|-n|: check for syntax errors without running the script
+          \item \verb|-v|: echo every command before executing it
+          \item \verb|-x|: echo the result of each command
+          \item \verb|-u|: make the script fail if an undefined variables is used
+          \item \verb|-o pipefail|: prevent error in a pipeline from being masked
+        \end{itemize}
+      \item How
+        \begin{itemize}
+          \item As command line options: \verb|sh -v my_script.sh|
+          \item Add to certain zones only via \verb|set -x; [...] set +x|
+\begin{lstlisting}[language=sh]
+do_stuff
+set -x # Activate option
+# The option is ON for the following commands
+do_something
+set +x # Deactivate option
+# The option is OFF for the following commands
+do_something_else
+\end{lstlisting}
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 
@@ -516,6 +556,19 @@ zip [options] <compressed_file>.zip <files_to_compress>
 gzip [options] <compressed_file>.gz <files_to_compress>
 \end{verbatim}
 
+\subsubsection{\texttt{7zip}}
+\begin{itemize}
+  \item Base command is \texttt{7z*}, it can be installed with \texttt{p7zip}
+  \item Create zip
+\begin{verbatim}
+7za a <compressed_file>.7z <files_to_compress>
+\end{verbatim}
+  \item Extract zip: \texttt{command} can be \texttt{e} (extract without directories), or \texttt{x} (with full paths)
+\begin{verbatim}
+7za <command> <compressed_file>.7z
+\end{verbatim}
+\end{itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -712,10 +765,11 @@ wc [options] <file>
     \begin{itemize}
       \item Changing the modification date of a file will force a smart compiler such as \verb|make| to re-run the compilation.
     \end{itemize}
-  \item \href{http://www.imagemagick.org/script/convert.php}{\texttt{convert}}: very powerful tool for manipulating images (part of the \href{https://imagemagick.org/index.php}{\texttt{image magick}} suite, some \href{http://www.imagemagick.org/script/command-line-processing.php}{tips})
+  \item \href{http://www.imagemagick.org/script/convert.php}{\texttt{convert}}: very powerful tool for manipulating images (part of the \href{https://imagemagick.org/index.php}{\texttt{ImageMagick}} suite, some \href{http://www.imagemagick.org/script/command-line-processing.php}{tips})
     \begin{itemize}
       \item Convert: \verb|convert test.<ext1> test.<ext2>| the extension can be \texttt{pdf}, \texttt{jpg}, \texttt{png},\ldots
       \item Rotate: \verb|-rotate <deg>|
+      \item Put images side by side: use \href{https://legacy.imagemagick.org/Usage/montage/}{\texttt{montage}} (which is part of the \texttt{ImageMagick} suite, \href{https://imagemagick.org/script/montage.php}{indeed}), see \href{https://stackoverflow.com/questions/20737061/merge-images-side-by-side-horizontally}{here}. E.g.\ \verb|montage img_[01234].png -tile 2x2 -geometry 10x10 out.png|, where \verb|-tile| gives set the structure of the final image and \verb|-geometry| the spacing between images
       \item Choose density|quality (and hence the final size): option \verb|-density <n>| (its unit is \texttt{dpi})
       \item Reduce size: \verb|-size <n>%| the output will have be the \verb|n|\% of the initial size
       \item Mirror image: \verb|-flip| vertical (meaning top becomes bottom) axis, \verb|-flop| horizontal axis (meaning right becomes left)
@@ -852,6 +906,7 @@ cut -f 2-5 text.txt
 hex="11001A"
 printf "%d %d %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2}
 \end{verbatim}
+  \item \href{https://pandoc.org/}{\texttt{pandoc}}: convert from and to (almost) any markup languages, such as \LaTeX{}, \texttt{markdown}, \texttt{html}, Word, \texttt{reStructured Text}, \texttt{epub}, \texttt{pdf},\ldots
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
