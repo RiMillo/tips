@@ -1978,12 +1978,12 @@ Now comes the real part about using \texttt{sphinx}. I am no wiz, I just figured
 pandoc --from=markdown --to=html -o out.html in.md
 \end{verbatim}
   \item Guides, cheat-sheet and tutorial:
+    \href{https://docs.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax}{official \texttt{GitHub} documentation},
     \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{GitHub}-flavoured},
     \href{https://daringfireball.net/projects/markdown/syntax}{official}, quick
     \href{https://commonmark.org/help/}{cheat-sheet} and a
     \href{https://agea.github.io/tutorial.md/}{tutorial} and
     \href{https://enterprise.github.com/downloads/en/markdown-cheatsheet.pdf}{cheat sheet again}.
-  \item Official \texttt{GitHub} \href{https://docs.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax}{documentation}.
   \item Special text: \textit{italic} \verb|*italic*| or \verb|_italic_|; \textbf{bold} \verb|**bold**| or \verb|__italic__|; code / \texttt{typewriter} \verb|`typewriter`| (backticks); \sout{strikethrough} \verb|~strikethrough~| or \verb|~~strikethrough~~|
     \item Links: e.g.\ \verb|[Shown label](https://link.to)|
       \begin{itemize}
@@ -1995,7 +1995,30 @@ Here is a section.
 Here is a [link](#section-one) to the previous section.
 \end{verbatim}
       \end{itemize}
-  \item Citations, references, bibliography: \href{https://stackoverflow.com/questions/26587527/cite-a-paper-using-github-markdown-syntax}{here}.
+    \item Images: similar to links, prepend a ``!'': \verb|![Alternative description text](path/to/img.png)|
+      \begin{itemize}
+        \item The image is rendered \textbf{inline}
+        \item Without the ``!'', it will be a link
+        \item URLs are accepted as valid path, especially in READMEs for online repositories.
+        \item See \href{https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#images}{this section} of the GitHub documentation for notions about relative paths
+        \item Centering images: \texttt{markdown} does not support it and one should switch to \texttt{html} syntax. Mind that not all \texttt{markdown} interpreters can deal with \texttt{html}, however, rest assure, GitHub and GitLab can. See \href{https://stackoverflow.com/questions/12090472/how-do-i-center-an-image-in-the-readme-md-file-on-github}{here}
+\begin{verbatim}
+<p align="center">
+  <img src="path/to/img.png" alt="Alternative description text"/>
+</p>
+\end{verbatim}
+      \end{itemize}
+  \item Citations, references, bibliography: similar to links, see \href{https://stackoverflow.com/questions/26587527/cite-a-paper-using-github-markdown-syntax}{here}.
+    \begin{itemize}
+      \item Reference sections
+\begin{verbatim}
+# A section
+...
+[Link to the section](#a-section)
+\end{verbatim}
+      \item Reference a point: create an anchor with \texttt{html}, \verb|<a name="ref"></a>| then reference it. See \href{https://stackoverflow.com/a/7335259/12152457}{here}
+      \item Reference a enumeration item: that's not that straight-forward and take advantage of \texttt{html} syntax, have a look \href{https://stackoverflow.com/a/37148268/12152457}{here}
+    \end{itemize}
   \item Math\&Equations:
     \begin{itemize}
       \item \texttt{GitLab} has native support for equations (\LaTeX-like): inline with \verb|$`\alpha`$| (backticks), display with
