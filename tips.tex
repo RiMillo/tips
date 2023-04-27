@@ -516,7 +516,7 @@ tar -xf archived.tar
   \item Additional options:
     \begin{itemize}
       \item \verb|t|, \verb|-t|, \verb|--list|: list the files.
-      \item \verb|r|, \verb|-r|, \verb|--append|: add files to an existing archive.
+      \item \verb|r|, \verb|-r|, \verb|--append|: add files to an existing archive. Does not work on compressed files.
       \item \verb|u|, \verb|-u|, \verb|--update|: add to the archive only the files which are already present and which have been modified.
       \item \verb|A|, \verb|-A|, \verb|--catenate|, \verb|--concatenate|: concatenate archives.
       \item Symbolic links: by default, \texttt{tar} keeps the links. If in the archive one wants a \emph{copy} of the \emph{original} file to which the link points to, option \verb!-h|--deeference! should be used.
@@ -774,6 +774,7 @@ wc [options] <file>
       \item Reduce size: \verb|-size <n>%| the output will have be the \verb|n|\% of the initial size
       \item Mirror image: \verb|-flip| vertical (meaning top becomes bottom) axis, \verb|-flop| horizontal axis (meaning right becomes left)
       \item Extract images from an animated \texttt{gif}: \verb|convert in.gif out.png| and it will save images like \texttt{out-0.png}, \texttt{out-1.png}, \texttt{out-2.png}\ldots
+      \item Write text on image: see \href{https://stackoverflow.com/questions/23236898/add-text-on-image-at-specific-point-using-imagemagick}{here}
     \end{itemize}
   \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: nice and easy utility to modify \texttt{pdf} files
     \begin{itemize}
@@ -916,9 +917,36 @@ printf "%d %d %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2}
 \subsection{\texttt{valgrind}}
 Some useful options:
 \begin{itemize}
-  \item Check and track memory leaks: \verb|--leak-check=full| \verb|--track-origins=yes|
   \item Log file: \verb|--log-file=<filename>|
-  \item Reachable / possibly-lost: \verb!--show-reachable=yes|no --show-possibly-lost=yes|no!
+  \item Check and track memory leaks: \verb|--leak-check=full| \verb|--track-origins=yes|
+    \begin{itemize}
+      \item Reachable / possibly-lost: \verb!--show-reachable=yes|no --show-possibly-lost=yes|no!
+    \end{itemize}
+  \item Profiling: \verb|--tool=callgrind|. A file with a name similar to \path{callgrind.out.<pid>} (where \texttt{pid} is a long number) is created with all the events registered. One can open it with \texttt{qcachegrind} or \texttt{kcachegrind}
+    \begin{itemize}
+      \item \href{https://www.cs.cmu.edu/afs/cs.cmu.edu/project/cmt-40/Nice/RuleRefinement/bin/valgrind-3.2.0/docs/html/cl-manual.html}{Manual}
+      \item \href{https://stackoverflow.com/a/50781312/12152457}{How to interpret \texttt{qcachegrind}}
+      \item Profiling a subset of the program: one might be interested in profiling only a part of the program, or even only a function (for instance to have results that are not polluted by other functions, to speed up a little bit). This can be done in several ways:
+        \begin{itemize}
+          \item Add \texttt{callgrind} macros to the code, see \href{https://cta-redmine.irap.omp.eu/projects/gammalib/wiki/How_to_use_valgrind}{here} (use option \verb|--collect-atstart=no|)
+\begin{verbatim}
+#include <valgrind/callgrind.h>
+
+int main()
+{
+  foo1();
+  CALLGRIND_START_INSTRUMENTATION;
+  CALLGRIND_TOGGLE_COLLECT;
+  bar1();
+  CALLGRIND_TOGGLE_COLLECT;
+  CALLGRIND_STOP_INSTRUMENTATION;
+  foo2();
+}
+\end{verbatim}
+          \item Toggle the collection at entry/exit of a function: use options \verb|--collect-atstart=no| \verb|"--toggle-collect=bar1(int, int)"|. It is very picky, hence keep the quotes, put the full signature with arguments separated by a comma and a space; for class methods: \verb|Foo::bar1()|. See \href{https://valgrind-users.narkive.com/2YLNcvE8/callgrind-toggle-collect-on-a-class-function}{here} and \href{https://stackoverflow.com/questions/13688185/callgrind-profile-a-specific-part-of-my-code}{here}
+          \item Start the program and activate with \verb|callgrind_control -i on|
+        \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -981,6 +1009,12 @@ For inexperienced users who want to perform simple tasks, such as looking at the
           \item Why should you write like this? It provides a template which is quite easy to understand. Moreover, some tools allows one to automatically analyze the commit history and extract insightful information based on this syntax and can provide a changelog.
         \end{itemize}
       \item Link a commit to an issues: it suffices to quote the issue number anywhere in the commit message as such \verb|#xxx| where \texttt{xxx} is the issue number. Moreover, one can directly close an issue with a similar strategy, more details \href{https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue}{here}: for instance put \verb|close #xxx| in the commit message
+    \end{itemize}
+  \item Tagging: e.g.\ adding things like \texttt{v1.0}, have a look \href{https://git-scm.com/book/en/v2/Git-Basics-Tagging}{here}
+    \begin{itemize}
+      \item Add: \verb|git tag -a <tagname> -m"<message>"|
+      \item Publish: by default, the git push command doesn't transfer tags to remote servers. You will have to explicitly push tags to a shared server: \verb|git push origin <tagname>|, or for all tags at once \verb|git push origin --tags|
+      \item Delete: it should be done in two steps. First, delete locally \verb|git tag -d <tagname>|, then publish \verb|git push origin --delete <tagname>|
     \end{itemize}
   \item For all merging-related commands (\texttt{am}, \texttt{merge}, \texttt{cherry-pick}, \texttt{rebase}, \verb|pull --rebase|...), if errors occur, you can use
     \begin{itemize}
@@ -1056,6 +1090,12 @@ For inexperienced users who want to perform simple tasks, such as looking at the
         \begin{itemize}
           \item See above to choose a specific stash
         \end{itemize}
+    \end{itemize}
+  \item List files followed bu \texttt{git}: \verb|git ls-tree <SHA1>|. Advised options:
+    \begin{itemize}
+      \item \verb|--full-tree|: start from the root of the repository
+      \item \verb|-r|: recursive
+      \item \verb|--name-only|
     \end{itemize}
   \item \texttt{git revert SHA1}: cancel the modifications done by commit \texttt{SHA1}. More info on the \href{https://git-scm.com/docs/git-revert}{man page} and \href{https://stackoverflow.com/a/4114122}{this answer}.
   \item Add a file but then ignore it. This is quite a common situation: in a multi-developer project, there is a base configuration file and each dev customize it as they wish. One would like to keep the file into the repo, and also not to follow it. The solution is explained \href{https://stackoverflow.com/questions/3319479/can-i-git-commit-a-file-and-ignore-its-content-changes}{here}: add it then change the index
@@ -1134,6 +1174,28 @@ $ git show --pretty="" --name-only <sha>
   \item Sometimes the \texttt{.git} directory (where all the \texttt{git} magic happens) is larger than the projects itself: imaging having to store all the commits, changes,\ldots{} \href{https://stackoverflow.com/questions/5277467/how-can-i-clean-my-git-folder-cleaned-up-my-project-directory-but-git-is-sti}{Here} you find how to do a little house-keeping. \verb|git gc| might be an option, as well.
   \item \href{https://git-scm.com/docs/git-filter-branch}{\texttt{git filter-branch}}: modify the tree according to filters.
 
+\end{itemize}
+
+\subsection{GitLab API}
+Users can manage and control a GitLab project via an API. This includes uploading files, creating commits / tags / release / branches, trigger pipeline,\ldots
+\begin{itemize}
+  \item To access the API an authentication method should be used: either Oauth2 or simply an access token with API rights. The commands given below will use this latter method. To create a token, go to project \texttt{Preferences}, then \texttt{Access Tokens}
+  \item The (numeric) ID of the project is necessary, actually, more generally all the URL of the project. It is different from the name of the project. It can be found in the examples \texttt{Preferences > CI/CD > General pipelines > Pipeline triggers}. Keep the URL until the numeric ID.
+  \item The complete guide is \href{https://docs.gitlab.com/ee/api/}{here}, but, beware it is huge!
+  \item Typically, a request will take the form of a call to the project API via \texttt{curl}, just open a terminal and launch
+\begin{verbatim}
+ curl --header "PRIVATE-TOKEN: "<your_token>" \
+      --request POST \
+      --something \
+      "https://example.gitlab.com/api/v4/projects/<ID>/<something>"
+\end{verbatim}
+    where one has to use an access token and the numeric ID recovered in previous points. In what follows, we give what should replace the ``\texttt{something}'' above.
+  \item \href{https://docs.gitlab.com/ee/api/projects.html#upload-a-file}{Upload a file} (it can be later used in a release):
+\begin{verbatim}
+curl [...] --form "file=@relative/path/to/file.txt \
+      "https://example.gitlab.com/api/v4/projects/<ID>/uploads"
+\end{verbatim}
+    If the uploaded succeeded, the path to the online resource is returned / print to screen.
 \end{itemize}
 
 
@@ -1333,13 +1395,14 @@ j = 42; // ok, 42 i s an rvalue
       \item \texttt{const volatile}: a variable that cannot be modified by the code but can still be modified by an external action.
     \end{itemize}
   \item \texttt{const} member methods \& \texttt{mutable} attributes: A method can be defined as \texttt{const}, this means that the function cannot change the attributes of the object (you can see this as forcing the pointer \texttt{this} to be \texttt{const})\ldots \emph{UNLESS} an attribute was declared \texttt{mutable}: in that case it can be modified even in \texttt{const} methods
-  \item \href{https://en.cppreference.com/w/cpp/language/lambda}{Lambda functions}: \verb|[ captures ] ( params ) <qualifier> { body }|
+  \item \href{https://en.cppreference.com/w/cpp/language/lambda}{Lambda functions}: \verb|[ captures ] ( params ) <qualifier> -> ret_type { body }|
     \begin{itemize}
       \item \verb|captures|: The capture list defines the outside variables that are accessible from within the lambda function body. The list may starts with a default capture, \verb|&| by reference, or \verb|=| by copy
       \item \verb|params|, \verb|body|: as any functions
       \item The qualifier \texttt{mutable} tells that the things captured by copy are modifiable
+      \item The return type \verb|ret_type| is not mandatory, otherwise it is inferred from the \texttt{return} statement.
     \end{itemize}
-  \item \texttt{->} in function definition: it is used to define the return type. This is necessary, for instance, when one wants to use \texttt{decltype} with one of the parameters. See \href{https://stackoverflow.com/a/22515589/12152457}{here}
+  \item \texttt{->} in function definition: it is used to define the return type, see above with lambda functions. This is necessary, for instance, when one wants to use \texttt{decltype} with one of the parameters. See \href{https://stackoverflow.com/a/22515589/12152457}{here}
     \begin{lstlisting}[language=C++]
 template <typename T1, typename T2>
 auto foo(T1 a, T2 b) -> decltype(a + b);
@@ -1561,6 +1624,7 @@ msg = "True" if condition else "False"
 \end{lstlisting}
     or suppose that you have an argument which can be passed or not (hence in this case equal to \verb|None|)
 \begin{lstlisting}[language=python]
+\tikzexternaldisable
 msg = arg_msg or "Your message here"
 \end{lstlisting}
   \item Default function arguments: if containers or complex types, prefer using \verb|None| as default parameter then defining it inside the function. See \href{https://www.geeksforgeeks.org/default-arguments-in-python/}{here}. This allows to avoid the following (often unwanted) behaviour (it happens also with mutable containers such as dictionaries):
@@ -1706,6 +1770,7 @@ x.sum(axis=1) # Gives [4, 4, 4]
           \item \texttt{ravel} does it in place
         \end{itemize}
       \item \texttt{numpy} and memory: here is an interesting \href{https://pythonspeed.com/articles/numpy-memory-views/}{article}
+      \item To complete the above item, see the \href{https://numpy.org/doc/stable/user/basics.copies.html}{official doc} about views and copies
       \item Sorting \& alike
         \begin{itemize}
           \item Get a indexes with \verb|np.argmin| and \verb|np.argsort|
@@ -1753,6 +1818,28 @@ ptf_b(4) # print a:4, b:3
     \end{itemize}
   \item \texttt{matplotlib}
     \begin{itemize}
+      \item An example showing the basics
+\begin{lstlisting}[language=python]
+x  = np.linspace(0,1,20)
+y1 = 2*x + 1
+y2 = x**2
+plt.plot(x, y1, marker="o", color = "red", linestyle='dashed')
+plt.plot(x, y2, marker="*", color = "green") # Same plot
+plt.legend([r"$y=2*x+1$", r"$y=x^2$"])
+# or directly, then just called legend
+plt.plot(x, y1, label=r"$y=2*x+1$")
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.title(r"Title with LaTeX $\alpha$")
+plt.tight_layout()
+plt.savefig("myfig.jpg", dpi=400) # dpi ~ quality
+# or
+plt.savefig("myfig.png", dpi=400, transparent=True)
+# consider also...
+plt.semilogx(...)
+plt.semilogy(...)
+plt.loglog(...)
+\end{lstlisting}
       \item List of accepted key for \texttt{rcParams} \href{https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.rcParams}{here}
       \item \texttt{matplotlib.ion()} switch the interaction with the plot on, so that \texttt{plt.plot()} is not blocking and the plot can be kept and redrawn multiple times. This of course works in a plot environment, if you use it on a script the plot will disappear as soon as the script reaches its end.
       \item Equal unit-length for x and y-axis: \verb|plt.gca().set_aspect('equal', adjustable = 'box')|
@@ -1788,7 +1875,13 @@ ptf_b(4) # print a:4, b:3
     \end{itemize}
   \item \texttt{jupyter} notebooks
     \begin{itemize}
-      \item Download images in batch: \href{https://github.com/damienmarlier51/JupyterNotebookImageExporter}{\texttt{junix}}
+      \item Plots and semi-prints (I mean what you get when in a \texttt{python} interface you run "\texttt{a}", \texttt{a} being a variable, and not "\texttt{print(a)}") overwrite. To make them stay, use \verb|plt.show()| for plots or simply \verb|print()| for other stuff
+      \item Download images:
+        \begin{itemize}
+          \item "(Shift + ) Right click > Save image as..." easy-peasy.
+          \item Download images in batch: \href{https://github.com/damienmarlier51/JupyterNotebookImageExporter}{\texttt{junix}}
+          \item Here the gist (used by the \texttt{junix} above): images are stored as ASCII strings in base64. Recover the data-string associated with an image: open the \texttt{ipynb} with a simple editor, there you will find a structure composed of dictionaries and lists, find the items associated to the image, they are inside a \texttt{data} cell and their key is \texttt{image/<type>} with \texttt{type} being \texttt{png}, for instance. Mind to remove \verb|\n| at the end if present. Use base64 utilities to convert the string into image: you can use \texttt{base64} \texttt{bash} command with option \verb|-d| (see \href{https://askubuntu.com/questions/907540/how-to-decode-an-image-string-using-base64-in-command-line}{here}) or \texttt{python} \verb|base64.b64decode|
+        \end{itemize}
       \item Use \LaTeX{} commands, see \href{https://stackoverflow.com/questions/13208286/how-to-write-latex-in-ipython-notebook}{here} or, even better, \href{https://jupyterbook.org/content/math.html}{here}
       \end{itemize}
 \end{itemize}
@@ -1820,6 +1913,19 @@ The most common types (and how to create them) are:
       \item \verb|a[10:0:-2]| (equivalent to \verb|a[10::-2]|, notice \texttt{0} omitted): from tenth to first element
     \end{itemize}
   \item ``\verb|:|'': everything. \verb|a[:,n]|: the \texttt{n}-th column
+  \item Use objects \texttt{slice} to build indexing instances:
+    \begin{itemize}
+      \item \texttt{slice(N)}: from beginning to \texttt{N}, equivalent to ``\texttt{:N}''
+      \item \texttt{slice(N, M)}: from \texttt{N} to \texttt{M}, equivalent to ``\texttt{N:M}''
+        \begin{itemize}
+          \item \texttt{slice(None, M)}: equivalent to \texttt{slice(M)}
+          \item \texttt{slice(N, None)}: equivalent to ``\texttt{N:}''
+        \end{itemize}
+      \item \texttt{slice(N,M,q)}: from \texttt{N} to \texttt{M} but only every \texttt{q} elements, equivalent to ``\texttt{N:M:q}''
+        \begin{itemize}
+          \item Usage of \texttt{None} instead of \texttt{N} and/or \texttt{M} leads to the same behaviour as the item above
+        \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 Dictionaries are different since they work with a hash table and on can access the elements with the related key.
