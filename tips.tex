@@ -2079,41 +2079,63 @@ Now comes the real part about using \texttt{sphinx}. I am no wiz, I just figured
 \begin{itemize}
   \item \texttt{markdown} files are usually used for \texttt{README} and such.
   \item Common extension: \texttt{.md}, \texttt{.markdown}
-  \item Compile them with \texttt{pandoc} in order to get an \texttt{html}, for instance, that you can open with a browser.
+  \item Compile them with \texttt{pandoc} in order to get an \texttt{html} or a \texttt{pdf}, for instance, that you can open with a browser.
 \begin{verbatim}
 pandoc --from=markdown --to=html -o out.html in.md
 \end{verbatim}
-  \item Guides, cheat-sheet and tutorial:
-    \href{https://docs.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax}{official \texttt{GitHub} documentation},
-    \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{GitHub}-flavoured},
-    \href{https://daringfireball.net/projects/markdown/syntax}{official}, quick
-    \href{https://commonmark.org/help/}{cheat-sheet} and a
+  \item Guides, cheat-sheets and tutorials:
+    \href{https://daringfireball.net/projects/markdown/syntax}{official \texttt{markdown}},
+    \href{https://docs.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax}{\texttt{GitHub}-flavoured},
+    \href{https://docs.gitlab.com/ee/user/markdown.html}{\texttt{GitLab}-flavoured},
+    \href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{\texttt{GitHub} cheat-sheet},
+    quick \href{https://commonmark.org/help/}{cheat-sheet} and a
     \href{https://agea.github.io/tutorial.md/}{tutorial} and
     \href{https://enterprise.github.com/downloads/en/markdown-cheatsheet.pdf}{cheat sheet again}.
   \item Special text: \textit{italic} \verb|*italic*| or \verb|_italic_|; \textbf{bold} \verb|**bold**| or \verb|__italic__|; code / \texttt{typewriter} \verb|`typewriter`| (backticks); \sout{strikethrough} \verb|~strikethrough~| or \verb|~~strikethrough~~|
-    \item Links: e.g.\ \verb|[Shown label](https://link.to)|
-      \begin{itemize}
-        \item One can even link sections of the current file (notice: all lowercase letters, blanks converted into dashes):
+  \item Links: e.g.\ \verb|[Shown label](https://link.to)|
+    \begin{itemize}
+      \item One can even link sections of the current file (notice: all lowercase letters, blanks converted into dashes):
 \begin{verbatim}
 # Section One
 Here is a section.
 # Section Two
 Here is a [link](#section-one) to the previous section.
 \end{verbatim}
-      \end{itemize}
-    \item Images: similar to links, prepend a ``!'': \verb|![Alternative description text](path/to/img.png)|
-      \begin{itemize}
-        \item The image is rendered \textbf{inline}
-        \item Without the ``!'', it will be a link
-        \item URLs are accepted as valid path, especially in READMEs for online repositories.
-        \item See \href{https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#images}{this section} of the GitHub documentation for notions about relative paths
-        \item Centering images: \texttt{markdown} does not support it and one should switch to \texttt{html} syntax. Mind that not all \texttt{markdown} interpreters can deal with \texttt{html}, however, rest assure, GitHub and GitLab can. See \href{https://stackoverflow.com/questions/12090472/how-do-i-center-an-image-in-the-readme-md-file-on-github}{here}
+    \end{itemize}
+  \item Images: similar to links, prepend a ``!'': \verb|![Alternative description text](path/to/img.png)|
+    \begin{itemize}
+      \item The image is rendered \textbf{inline}
+      \item Without the ``!'', it will be a link
+      \item URLs are accepted as valid path, especially in READMEs for online repositories.
+      \item See \href{https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#images}{this section} of the GitHub documentation for notions about relative paths
+      \item Centering images: \texttt{markdown} does not support it and one should switch to \texttt{html} syntax. Mind that not all \texttt{markdown} interpreters can deal with \texttt{html}, however, rest assure, GitHub and GitLab can. See \href{https://stackoverflow.com/questions/12090472/how-do-i-center-an-image-in-the-readme-md-file-on-github}{here}
 \begin{verbatim}
-<p align="center">
-  <img src="path/to/img.png" alt="Alternative description text"/>
-</p>
+<div align="center">
+<img src="path/to/img.png" alt="Alternative description text"/>
+</div>
 \end{verbatim}
-      \end{itemize}
+        Sometimes using \verb|<p align="center"> ... </p>| works as well
+    \end{itemize}
+  \item Render code: main idea use backticks, ``\texttt{`}''
+    \begin{itemize}
+      \item \href{https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#quoting-code}{GitHub docs}
+        (for more \href{https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks}{advanced settings})
+      \item Display: three backticks with, optionally, the language of the code to highlight syntax as well. E.g.,
+\begin{verbatim}
+```python
+for i in range(5):
+    if i % 2 == 0:
+        print("Even")
+    else:
+        pass
+```
+\end{verbatim}
+
+      \item Inline: one backtick \verb|`code goes here`|
+        \begin{itemize}
+          \item Syntax highlighting is not available for inline code with default renderers. However, some extensions can, see this \href{https://stackoverflow.com/questions/23226224/inline-code-syntax-highlighting-in-github-markdown}{SO question}: \verb|`a = None`{:.python}| or \verb|`a = None`{.python}|
+        \end{itemize}
+    \end{itemize}
   \item Citations, references, bibliography: similar to links, see \href{https://stackoverflow.com/questions/26587527/cite-a-paper-using-github-markdown-syntax}{here}.
     \begin{itemize}
       \item Reference sections
@@ -2127,19 +2149,47 @@ Here is a [link](#section-one) to the previous section.
     \end{itemize}
   \item Math\&Equations:
     \begin{itemize}
-      \item \texttt{GitLab} has native support for equations (\LaTeX-like): inline with \verb|$`\alpha`$| (backticks), display with
+      \item \texttt{GitLab}:
+        \begin{itemize}
+          \item Inline: dollar+backticks, e.g., \verb|$`\alpha`$|
+          \item Display: double dollar, e.g., \verb|$$ \alpha $$| or code-block
 \begin{verbatim}
 ```math
 \alpha
 ```
 \end{verbatim}
-      \item \texttt{GitHub} flavored cannot. However, there seems to be some workarounds, see \href{https://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog}{here} (linking to third-party render) or \href{https://gist.github.com/cyhsutw/d5983d166fb70ff651f027b2aa56ee4e}{here} (write \LaTeX{} code inside a \texttt{jupyter} notebook, for tips about \LaTeX{} and \texttt{jupyter} see \texttt{python} section, \ref{sec:python}, and/or \href{https://jupyterbook.org/content/math.html}{here})
+        \end{itemize}
+      \item \texttt{GitHub}
+        \begin{itemize}
+          \item \href{https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions}{Official docs}
+          \item Inline: dollar, e.g., \verb|$\alpha$|
+          \item Display: double dollar, e.g., \verb|$$ \alpha $$| or code-block
+\begin{verbatim}
+```math
+\alpha
+```
+\end{verbatim}
+          \item {[Deprecated workaround]} However, there seems to be some workarounds, see \href{https://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog}{here} (linking to third-party render) or \href{https://gist.github.com/cyhsutw/d5983d166fb70ff651f027b2aa56ee4e}{here} (write \LaTeX{} code inside a \texttt{jupyter} notebook, for tips about \LaTeX{} and \texttt{jupyter} see \texttt{python} section, \ref{sec:python}, and/or \href{https://jupyterbook.org/content/math.html}{here})
+        \end{itemize}
     \end{itemize}
   \item \texttt{grip}: \texttt{python}-based script which allows you to have a \texttt{GitHub} rendering of your documents (needs internet to send request for translation to \texttt{GitHub}).
   \item Draw graphs and charts with \href{https://mermaid-js.github.io/mermaid/#/}{\texttt{mermaid}}: all the info about syntax and configuration are in the link
     \begin{itemize}
       \item A \href{https://mermaid-js.github.io/mermaid-live-editor}{live editor}
     \end{itemize}
+  \item Collapsed section: use html tags \texttt{<details>} and \texttt{<summary>}. Tested on \href{https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-collapsed-sections}{GitHub}
+\begin{verbatim}
+<details>
+
+<summary>Tips for collapsed sections</summary>
+
+### You can add a header
+
+You can add text within a collapsed section.
+You can add an image or a code block, too.
+
+</details>
+\end{verbatim}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
