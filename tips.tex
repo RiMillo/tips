@@ -1068,10 +1068,10 @@ For inexperienced users who want to perform simple tasks, such as looking at the
         \begin{itemize}
           \item Raw format: just save the output of \verb|git diff|, for instance with a simple redirection: e.g., \verb|git diff > test.patch|
           \item \href{https://git-scm.com/docs/git-format-patch}{Mailbox format}: \verb|git format-patch [options] <SHA1>|. Create patches from \texttt{SHA1} to most recent commit
-    \begin{itemize}
-      \item \texttt{-<n>}: create only \texttt{n} patches (always starting from \texttt{SHA1});
-      \item \verb|--start-number <n>|: the patches are numbered starting from \texttt{n};
-      \item \texttt{-N}: commits are unnumbered.
+            \begin{itemize}
+              \item \texttt{-<n>}: create only \texttt{n} patches (always starting from \texttt{SHA1});
+              \item \verb|--start-number <n>|: the patches are numbered starting from \texttt{n};
+              \item \texttt{-N}: commits are unnumbered.
               \item \verb|-o <out_dir>|: output directory
             \end{itemize}
         \end{itemize}
@@ -1541,8 +1541,9 @@ sys.path.append('/path/to')
 # or...
 sys.path.insert(0, '/path/to')
 # Now one can import
-import myMod
+import myMod  # noqa: E402
 \end{lstlisting}
+    The comment to the import allows to avoid warnings / errors from linters if you use them
   \item Format strings: several ways are available, have a look \href{https://realpython.com/python-string-formatting/}{here}, but also \href{https://pyformat.info/}{here} and to the \href{https://docs.python.org/3.10/library/string.html#format-string-syntax}{doc}
     \begin{itemize}
       \item Old-style, ``\verb|%|'': \verb|'Hi, %s!' % 'Bob'|
@@ -1554,6 +1555,7 @@ import myMod
         \begin{itemize}
           \item \verb|"Hi, {0}! It's {1}".format('Bob','Alice')| (or \verb|{<n>:s}| for instance))
           \item \verb|"Hi, {v1}! It's {v2}".format(v1='Bob',v2='Alice')| (or \verb|{<var>:s}| for instance)
+          \item \verb|d={'v1':'Bob','v2':'Alice'}; "Hi, {v1}! It's {v2}".format_map(d)| equivalent to above item
         \end{itemize}
       \item \texttt{f}-strings, \verb|f'[.]'|: \verb|who='Bob'; greet=f'Hi, {who}!'| (or \verb|greet = f'Hi, {who:s}!'|)
         \begin{itemize}
@@ -1616,6 +1618,12 @@ except Exception:
 \end{lstlisting}
       \item Print traceback with \verb|traceback.format_exc()| from module \texttt{traceback}
     \end{itemize}
+  \item Variables and members, taken from \href{https://stackoverflow.com/questions/7969949/whats-the-difference-between-globals-locals-and-vars}{here}
+    \begin{itemize}
+      \item \verb|globals()| always returns the dictionary of the module namespace. The dictionary typically contains all the variables defined in the \emph{global} scope.
+      \item \verb|locals()| always returns a dictionary of the current namespace. Basically, as above but with \emph{local} scope.
+      \item \verb|vars()| returns either a dictionary of the current namespace (if called with no argument, equivalent to \verb|locals()|) or the dictionary of the argument (that is, let \verb|a| be an instance of a class, then \verb|vars(a)| would provide all the attributes, members and/or method, of \verb|a|).
+    \end{itemize}
   \item The underscore: see \href{https://dbader.org/blog/meaning-of-underscores-in-python}{here}
   \item Unpacking operators: \verb|*| iterable unpacking, and \verb|**| dictionary unpacking, see \href{https://geekflare.com/python-unpacking-operators/}{here}
   \item ``\verb|_|'': placeholder for unused arguments / returns
@@ -1657,27 +1665,37 @@ def foo(l = [], a = 5):
 foo() # Prints: 6 [0]
 foo() # Prints: 6 [0,0]
 \end{lstlisting}
-  \item Classes: random stuff about classes (hidden) methods
+  \item Classes:
     \begin{itemize}
-      \item \verb|@staticmethod| vs \verb|@classmethod|: some info \href{https://www.geeksforgeeks.org/class-method-vs-static-method-python/}{here}
-      \item \verb|__init__(self[,args])|: creator
-      \item \verb|__call__(self[,args])|: overload operator \verb|( )|
-      \item \verb|__getitem__(self, key)|: overload evaluation with operator \verb|[ ]|, e.g.\ \verb|a = obj[n]|
-      \item \verb|__setitem__(self, key)|: overload assignment with operator \verb|[ ]|, e.g.\ \verb|obj[n] = a|
-      \item \verb|__add__(self, other)|: overload operator \verb|+|, see \href{https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types}{here}.
+      \item The hidden members \verb|__dict__| holds a dictionary with all the members of the class/instance. It's basically equivalent to \verb|vars| (see above)
+      \item Operations with members:
         \begin{itemize}
-          \item You may overload also \verb|-| with \verb|__sub__|, \texttt{*} with \verb|__mult__|, etc\ldots
-          \item \verb|a + b| is interpreted as \verb|a.__add__(b)|. However, lets say that \texttt{a} is not an instance of your class, but \verb|b| is. In this case, only be \verb|b + a| work. In order to take into account also the Reverse case, define also \verb|__radd__| (\verb|__rsub__|,\ldots). Most of the time, if the operation is symmetric, one can simply put \verb|__radd__ = __add__|.
-          \item The in-place versions of the above mentioned operators are: \verb|__iadd__| for \verb|+=|, \verb|__isub__| for \verb|-=|,\ldots
+          \item Get / Set: \verb|getattr(<obj>, <mmbr>[, <dflt>])| / \verb|setattr(<obj>, <mmbr>, <val>)|
+          \item Delete: \verb|delattr(<obj>, <mmbr>)|
+          \item Interrogate for existence (works with methods too): \verb|hasattr(<obj>, <mmbr>)|
         \end{itemize}
-      \item \verb|__int__(self)|: overload cast \verb|int(<n>)|. Same applies for \verb|str|, \verb|float|
+      \item Random stuff about classes (hidden) methods
         \begin{itemize}
-          \item The cast to \verb|str| allows one to use function \verb|print()| directly
-        \end{itemize}
-      \item \verb|__eq__(self,other)|: overload \verb|==|. Similarly, \verb!__ne|lt|le|gt|ge__!
-        \begin{itemize}
-          \item If \texttt{eq} not present, \texttt{==} is ensured by \texttt{is} (checks the ID)
-          \item As long as there is a \texttt{==}, you can use the \verb|[not] in| keyword
+          \item \verb|@staticmethod| vs \verb|@classmethod|: some info \href{https://www.geeksforgeeks.org/class-method-vs-static-method-python/}{here}
+          \item \verb|__init__(self[,args])|: creator
+          \item \verb|__call__(self[,args])|: overload operator \verb|( )|
+          \item \verb|__getitem__(self, key)|: overload evaluation with operator \verb|[ ]|, e.g.\ \verb|a = obj[n]|
+          \item \verb|__setitem__(self, key, val)|: overload assignment with operator \verb|[ ]|, e.g.\ \verb|obj[n] = a|
+          \item \verb|__add__(self, other)|: overload operator \verb|+|, see \href{https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types}{here}.
+            \begin{itemize}
+              \item You may overload also \verb|-| with \verb|__sub__|, \texttt{*} with \verb|__mult__|, etc\ldots
+              \item \verb|a + b| is interpreted as \verb|a.__add__(b)|. However, lets say that \texttt{a} is not an instance of your class, but \verb|b| is. In this case, only be \verb|b + a| work. In order to take into account also the Reverse case, define also \verb|__radd__| (\verb|__rsub__|,\ldots). Most of the time, if the operation is symmetric, one can simply put \verb|__radd__ = __add__|.
+              \item The in-place versions of the above mentioned operators are: \verb|__iadd__| for \verb|+=|, \verb|__isub__| for \verb|-=|,\ldots
+            \end{itemize}
+          \item \verb|__int__(self)|: overload cast \verb|int(<n>)|. Same applies for \verb|str|, \verb|float|
+            \begin{itemize}
+              \item The cast to \verb|str| allows one to use function \verb|print()| directly
+            \end{itemize}
+          \item \verb|__eq__(self,other)|: overload \verb|==|. Similarly, \verb!__ne|lt|le|gt|ge__!
+            \begin{itemize}
+              \item If \texttt{eq} not present, \texttt{==} is ensured by \texttt{is} (checks the ID)
+              \item As long as there is a \texttt{==}, you can use the \verb|[not] in| keyword
+            \end{itemize}
         \end{itemize}
     \end{itemize}
   \item Printing colors: e.g.
@@ -1711,6 +1729,27 @@ python -m cProfile script.py
       \item \emph{by-value} or \emph{by-reference}? Basically if immutable \emph{by-value}, otherwise \emph{by-reference}. In fact, the real mode is \emph{by object reference}!
       \item Using \texttt{*} (star) and \texttt{**} double-star
       \item \ldots{}similarly for \texttt{args} and \texttt{kwargs}: have a look \href{https://realpython.com/python-kwargs-and-args/}{here}
+      \item Consider these examples
+\begin{lstlisting}[language=python]
+def foo(a, *args, b=4, **kwargs):
+    print(f"{a=}, {args=}, {b=}, {kwargs=}")
+foo(3           ) # a=3, args=(),    b=4, kwargs={}
+foo(3,5         ) # a=3, args=(5,),  b=4, kwargs={}
+foo(3,5,  6     ) # a=3, args=(5,6), b=4, kwargs={}
+foo(3,5,b=6     ) # a=3, args=(5,),  b=6, kwargs={}
+foo(3,5,b=6,c=10) # a=3, args=(5,),  b=6, kwargs={'c': 10}
+
+def bar(a, b, *args, **kwargs):
+    print(f"{a=}, {args=}, {b=}, {kwargs=}")
+bar(3           ) # Error: b required
+bar(3,5         ) # a=3, args=(),    b=5, kwargs={}
+bar(3,5,  6     ) # a=3, args=(6,),  b=5, kwargs={}
+bar(3,5,b=6     ) # Error: multiple b
+bar(3,b=6,5     ) # Error: positional after keyword
+bar(3,  6,5     ) # a=3, args=(5,),  b=6, kwargs={}
+bar(3,  6,5,c=10) # a=3, args=(5,),  b=6, kwargs={'c': 10}
+bar(3,  6,  c=10) # a=3, args=(),    b=6, kwargs={'c': 10}
+\end{lstlisting}
     \end{itemize}
   \item Type hints: one can provide types to variable, arguments and return values of a function. These hints \textbf{won't} be used by \texttt{python} (e.g.\ it isn't \texttt{C}). Type hints are for developers and for IDEs: basically they make the code simpler to read (very useful when developing code to which other user will interface) and help IDEs to infer types of objects in order to offer better prediction.
     \begin{itemize}
