@@ -1057,22 +1057,40 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item If on the branch to rename: \verb|git branch -m <new_name>|
       \item If on another branch: \verb|git branch -m <old_name> <new_name>|
     \end{itemize}
-  \item \href{https://git-scm.com/docs/git-format-patch}{Create patches} from \texttt{SHA1} to most recent commit: \verb|git format-patch [options] <SHA1>|
+  \item Patching: Patches are objects that stores the differences between two \texttt{git} states.
+    \begin{itemize}
+      \item There are two kinds of patches:
+        \begin{itemize}
+          \item Raw (I don't know if that's the official definition, but I think that gives the idea): they are simply the output of \verb|git diff|. 
+          \item Mailbox format: patches of this kind, in addition to the raw difference, also contain information additional information, e.g., the author. This type is typically used when sharing patches.
+        \end{itemize}
+      \item Create patches:
+        \begin{itemize}
+          \item Raw format: just save the output of \verb|git diff|, for instance with a simple redirection: e.g., \verb|git diff > test.patch|
+          \item \href{https://git-scm.com/docs/git-format-patch}{Mailbox format}: \verb|git format-patch [options] <SHA1>|. Create patches from \texttt{SHA1} to most recent commit
     \begin{itemize}
       \item \texttt{-<n>}: create only \texttt{n} patches (always starting from \texttt{SHA1});
       \item \verb|--start-number <n>|: the patches are numbered starting from \texttt{n};
       \item \texttt{-N}: commits are unnumbered.
+              \item \verb|-o <out_dir>|: output directory
+            \end{itemize}
+        \end{itemize}
+      \item Apply patches
+        \begin{itemize}
+          \item \href{https://git-scm.com/docs/git-apply}{\texttt{git apply}}: works both on raw and mailbox formats.
+          \item \href{https://git-scm.com/docs/git-am}{\texttt{git am [options] path/to/patch}}: apply a mailbox patch.
+            \begin{itemize}
+              \item Differently, form the simple \texttt{apply}, \textbf{it also adds a related commit to the tree}.
+              \item \texttt{-3}: if the patch does not apply cleanly for a certain file, falls back to the version of the most recent common commit between the current tree and the one coming with the patch, and propose a 3-way merge (current, patch, and ancestor),
+              \item \verb|--reject|: when the application fails, tells \texttt{git} to apply as many modifications as possible and to temporarily skip the impossible ones. The rejected modification will be stored in \texttt{*.rej} files. The application has to be completed manually (you will have to personally modify the files)
+            \end{itemize}
+        \end{itemize}
     \end{itemize}
   \item Get current branch: \verb|git branch --show-current|
   \item \href{https://git-scm.com/docs/git-merge}{Merge} a branch: \verb|git merge [options] <to_merge>| incorporate all the commits of \verb|o_merge| onto the current branch. Some info also on \href{https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-request-merges}{\texttt{GitHub}}.
     \begin{itemize}
       \item If the history of the current and to-be-merged branch split, then an additional, automatically-generated commit is added (it is usually called ``Merge branch [\ldots]''). To avoid that, you can try to rebase \verb|branch_to_merge| over the final brunch, and possibly use the option \verb|--ff-only|.
       \item It \verb|branch_to_merge| has more than one commits, use \verb|--squash| to merge all its commits without, however, committing the changes into the current branch.
-    \end{itemize}
-  \item \href{https://git-scm.com/docs/git-am}{Apply a patch}: \verb|git am [options] path/to/patch|
-    \begin{itemize}
-      \item \texttt{-3}: if the patch does not apply cleanly for a certain file, falls back to the version of the most recent common commit between the current tree and the one coming with the patch, and propose a 3-way merge (current, patch, and ancestor),
-      \item \verb|--reject|: when the application fails, tells \texttt{git} to apply as many modifications as possible and to temporarily skip the impossible ones. The rejected modification will be stored in \texttt{*.rej} files. The application has to be completed manually (you will have to personally modify the files)
     \end{itemize}
   \item Stashing: sometimes modifications are not yet ready for a commit but you have to go checkout another branch and \texttt{git} won't let you because of the modifications. That's where stashing comes in: it's a heap, a space where one can put modifications without them being in the official history. The state will be restored to \texttt{HEAD} (possibly the staged changes remain). Of course, one can recover them afterwards.
     \begin{itemize}
@@ -1171,6 +1189,9 @@ $ git show --pretty="" --name-only <sha>
       \item \verb|--and|, \verb|--or|, \verb|--not|. Option \verb|-e| should be used.
     \end{itemize}
   \item Submodules: \href{https://git-scm.com/book/en/v2/Git-Tools-Submodules}{here}.
+    \begin{itemize}
+      \item Typically, an useful command in \verb|git submodules update [--init]|
+    \end{itemize}
   \item Sometimes the \texttt{.git} directory (where all the \texttt{git} magic happens) is larger than the projects itself: imaging having to store all the commits, changes,\ldots{} \href{https://stackoverflow.com/questions/5277467/how-can-i-clean-my-git-folder-cleaned-up-my-project-directory-but-git-is-sti}{Here} you find how to do a little house-keeping. \verb|git gc| might be an option, as well.
   \item \href{https://git-scm.com/docs/git-filter-branch}{\texttt{git filter-branch}}: modify the tree according to filters.
 
