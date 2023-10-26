@@ -177,7 +177,28 @@ EOF
     \end{itemize}
   \item In a script, adding at the beginning \verb|set -e| will make the script exit immediately as soon as one of its commands finishes with a non-zero status (when it fails).
   \item For option management \verb|getopts| is recommended, see \autoref{ssec:shell_tools}.
-  \item Arrays: have a look \href{https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays}{here}. Access with \verb|${list[$i]}|
+  \item Arrays: have a look \href{https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays}{here}.
+    \begin{itemize}
+      \item Definition: Use parentheses and whitespace as delimiter:
+\begin{verbatim}
+arr=(one two three)
+\end{verbatim}
+      \item Split string into array
+        \begin{itemize}
+          \item If delimiter is whitespace, simply use parentheses
+\begin{verbatim}
+str="one two three"
+arr=($str)
+\end{verbatim}
+          \item Use \verb|read -a|, and \verb|IFS| to set the delimiter (default is whitespace). In recent version of bash, one can use \verb|readarray|
+\begin{verbatim}
+str="one,two,three"
+IFS="," read -a arr <<< $str
+\end{verbatim}
+        \end{itemize}
+      \item Access with \verb|${arr[$i]}|
+      \item Get length: \verb|${#arr[@]}|
+    \end{itemize}
   \item Loops:
     \begin{itemize}
       \item For loops: have a look \href{https://www.cyberciti.biz/faq/bash-for-loop/}{here}. Quick examples:
@@ -198,6 +219,7 @@ for n in (one two three); do [...] done
 list=(one two three)
 for n in ${list[@]}; do [...] done # Items only
 for i in ${!list[@]}; do [...] done # Indeces only
+for n in ${list[@]:1}; do [...] done # Items only, skip the first one
 \end{verbatim}
     \end{itemize}
   \item Notifications and dialogue windows: we really like the old-school terminal, but sometimes nice GUI stuffs and visual aides make life easier. Consider this: you launch a script which takes a really long time, so from the terminal you switch to do other stuff. It would be nice to be alerted when the said script finishes. I am still working on an audio signal, but consider these two options:
@@ -716,11 +738,24 @@ rsync --include='*.pdf' --include='*/' --exclude='*' src dest
     \end{itemize}
   \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
 \begin{verbatim}
-  echo "Message Body Here" | \
-      mailx -s "Subject Here" -a attachment.txt user@example.com
-  echo "Message Body Here" | \
-      mail -s "Subject Here" -A attachment.txt user@example.com
+echo "Message Body Here" | \
+    mailx -s "Subject Here" -a attachment.txt user@example.com
+echo "Message Body Here" | \
+    mail -s "Subject Here" -A attachment.txt user@example.com
 \end{verbatim}
+    \begin{itemize}
+      \item Other useful options:
+        \begin{itemize}
+          \item \verb|-c me@me.me|: CC-address
+          \item \verb|-b me@me.me|: BCC-address
+          \item \verb|-r me@me.me|: sender address
+        \end{itemize}
+      \item Use file as body of the message: option \verb|-q file.txt|. \textbf{However}, this might not work as expected: if the command finds non-standard charcters, even new-lines (!) instead of using the text it will attach it as a binary file. The following might work (see this \href{https://unix.stackexchange.com/a/522868/502731}{SO discussion}):
+\begin{verbatim}
+tr -cd "[:print:]\n" < file.txt | \
+    mailx -s "Subject Here" user@example.com
+\end{verbatim}
+    \end{itemize}
   \item \texttt{wc}: \texttt{shell} command to perform some basic counting operations on a file (mnemonic: \emph{w}ord \emph{c}ount):
 \begin{verbatim}
 wc [options] <file>
@@ -784,7 +819,13 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] \
                    [file_2.pdf ['<page_range>'] ...]
 \end{verbatim}
       \item Rotate: Commands specified for certain angles are available: \verb!pdf90|180|270 <in.pdf>!
+      \item Landscape mode: \verb|--landscape|
+      \item Keep size: \verb|--fitpaper true|
+      \item Autorotate oversized pages: \verb|--totateoversize true|
       \item A similar utility with a wider range of capabilities is \href{https://www.ghostscript.com/doc/current/Use.htm}{\texttt{ghostscript}}
+        \begin{itemize}
+          \item \texttt{ghostscript} can output in many forms, called \emph{devices} (even OCR!), \href{https://ghostscript.com/docs/9.54.0/Devices.htm}{here's how}
+        \end{itemize}
       \item In fact, under the hood \texttt{pdfjam} calls \LaTeX{} and loads the pdf into a page. This is enough most of the time, however, if the pdf has non-standard dimensions, let say smaller than A4, this will result in a blank A4 page with the pdf at the center. To fit to the size, use \texttt{ghostscript} (for the pages, the option \texttt{-sPageList} is also available and accepts ranges)
     \end{itemize}
 \begin{verbatim}
@@ -1061,7 +1102,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
     \begin{itemize}
       \item There are two kinds of patches:
         \begin{itemize}
-          \item Raw (I don't know if that's the official definition, but I think that gives the idea): they are simply the output of \verb|git diff|. 
+          \item Raw (I don't know if that's the official definition, but I think that gives the idea): they are simply the output of \verb|git diff|.
           \item Mailbox format: patches of this kind, in addition to the raw difference, also contain information additional information, e.g., the author. This type is typically used when sharing patches.
         \end{itemize}
       \item Create patches:
@@ -1170,6 +1211,7 @@ $ git diff-tree --no-commit-id --name-only -r <sha> # For scripts
 # or...
 $ git show --pretty="" --name-only <sha>
 \end{verbatim}
+  \item List all authors / developers in a project: see \href{https://stackoverflow.com/questions/9597410/list-all-developers-on-a-project-in-git}{here} \verb|git shortlog -sne|
   \item Ignore files from the syncing:
     \begin{itemize}
       \item Add them to \texttt{.gitignore}. Since \texttt{.gitignore} itself is synchronized, the exclusion is global and will stay in the tree, meaning that any new clone of the repository will see it; one can also add \texttt{.gitignore} to itself;
@@ -1187,6 +1229,10 @@ $ git show --pretty="" --name-only <sha>
     \begin{itemize}
       \item Notice that \verb|--| marks the end of the options.
       \item \verb|--and|, \verb|--or|, \verb|--not|. Option \verb|-e| should be used.
+    \end{itemize}
+  \item \verb|git blame| (\href{https://git-scm.com/docs/git-blame}{Manual}): Show what revision and author last modified each line of a file. \textbf{ATTENTION:} \texttt{blame} returns info line by line; if you are just interested to know the last commit to date which modified a certain file, then use \verb|git log -- file.txt|
+    \begin{itemize}
+      \item ``\verb|-L <start>,<end>|'' or ``\verb|-L :<foo>|'': Annotate only the line range given by \verb|start| and \verb|end| or by the function name regex \verb|foo|
     \end{itemize}
   \item Submodules: \href{https://git-scm.com/book/en/v2/Git-Tools-Submodules}{here}.
     \begin{itemize}
@@ -1919,6 +1965,7 @@ plt.loglog(...)
         \begin{itemize}
           \item Pay attention to whether the function returns a view or a copy, see \href{https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#indexing-view-versus-copy}{here}
         \end{itemize}
+      \item Build dataframe from dict of dict: just pass it to default constructor, or use \verb|from_dictionary|, see \href{https://stackoverflow.com/questions/33157522/create-pandas-dataframe-from-dictionary-of-dictionaries}{here}
     \end{itemize}
   \item Progress bar: \href{https://github.com/tqdm/tqdm#manual}{\texttt{tqdm}}
     \begin{itemize}
