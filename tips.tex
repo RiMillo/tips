@@ -1933,17 +1933,6 @@ plt.loglog(...)
       \item \texttt{statsmodels}: regressions.
       \item \href{https://seaborn.pydata.org/introduction.html}{\texttt{seaborn}}: powerful data visualization tool.
     \end{itemize}
-  \item \texttt{jupyter} notebooks
-    \begin{itemize}
-      \item Plots and semi-prints (I mean what you get when in a \texttt{python} interface you run "\texttt{a}", \texttt{a} being a variable, and not "\texttt{print(a)}") overwrite. To make them stay, use \verb|plt.show()| for plots or simply \verb|print()| for other stuff
-      \item Download images:
-        \begin{itemize}
-          \item "(Shift + ) Right click > Save image as..." easy-peasy.
-          \item Download images in batch: \href{https://github.com/damienmarlier51/JupyterNotebookImageExporter}{\texttt{junix}}
-          \item Here the gist (used by the \texttt{junix} above): images are stored as ASCII strings in base64. Recover the data-string associated with an image: open the \texttt{ipynb} with a simple editor, there you will find a structure composed of dictionaries and lists, find the items associated to the image, they are inside a \texttt{data} cell and their key is \texttt{image/<type>} with \texttt{type} being \texttt{png}, for instance. Mind to remove \verb|\n| at the end if present. Use base64 utilities to convert the string into image: you can use \texttt{base64} \texttt{bash} command with option \verb|-d| (see \href{https://askubuntu.com/questions/907540/how-to-decode-an-image-string-using-base64-in-command-line}{here}) or \texttt{python} \verb|base64.b64decode|
-        \end{itemize}
-      \item Use \LaTeX{} commands, see \href{https://stackoverflow.com/questions/13208286/how-to-write-latex-in-ipython-notebook}{here} or, even better, \href{https://jupyterbook.org/content/math.html}{here}
-      \end{itemize}
 \end{itemize}
 
 \subsection{Data structures}
@@ -2102,6 +2091,53 @@ Writing
   \item Write a list of strings: \verb|f.writlines(l)|
     \begin{itemize}
       \item It does NOT automatically add the newline after each string
+    \end{itemize}
+\end{itemize}
+
+\subsection{Working with \texttt{jupyter} notebooks}
+\begin{itemize}
+  \item \texttt{jupyter-lab}: advanced browser-based (it uses a browser, but no need to be online) environment for editing and running notebooks
+  \item Plots and semi-prints (I mean what you get when in a \texttt{python} interface you run "\texttt{a}", \texttt{a} being a variable, and not "\texttt{print(a)}") overwrite. To make them stay, use \verb|plt.show()| for plots or simply \verb|print()| for other stuff
+  \item \texttt{jupyter} magic:
+    \begin{itemize}
+      \item \href{https://ipython.readthedocs.io/en/stable/interactive/reference.html#magic}{Some info}
+      \item Complete built-in \href{https://ipython.readthedocs.io/en/stable/interactive/magics.html}{list}
+      \item \href{https://nbviewer.org/github/ipython/ipython/blob/1.x/examples/notebooks/Cell%20Magics.ipynb}{Online example}
+      \item \verb|[%]%timeit|: compute performances
+        \begin{itemize}
+          \item Starts the cell with \verb|%%timeit| to run the performance analysis on the whole cell
+          \item \verb|%timeit|: same as above, but inline, hence only for the current line
+          \item Option \verb|-r <N>|: repeat \verb|N| times
+          \item Option \verb|-o|: capture output. E.g., \verb|res = %timeit -o -r 5 foo()|
+            \begin{itemize}
+              \item Access data: \verb|res.average|, \verb|res.stdev|, \ldots
+              \item If in whole-cell mode (i.e., \verb|%%timeit|), results are stored in underscore operator, ``\verb|_|''
+            \end{itemize}
+        \end{itemize}
+      \item \verb|%%matplotlib|: Interactive support with \texttt{matplotlib}
+        \begin{itemize}
+          \item Intro \href{https://matplotlib.org/stable/users/explain/figure/interactive.html#ipython-integration}{here}
+          \item Add \verb|%%matplotlib widget| at the beginning of the selected code-cell
+          \item Needs dependency \texttt{ipympl}
+        \end{itemize}
+    \end{itemize}
+  \item Download images:
+    \begin{itemize}
+      \item "(Shift + ) Right click > Save image as..." easy-peasy.
+      \item Download images in batch: \href{https://github.com/damienmarlier51/JupyterNotebookImageExporter}{\texttt{junix}}
+      \item Here the gist (used by the \texttt{junix} above): images are stored as ASCII strings in base64. Recover the data-string associated with an image: open the \texttt{ipynb} with a simple editor, there you will find a structure composed of dictionaries and lists, find the items associated to the image, they are inside a \texttt{data} cell and their key is \texttt{image/<type>} with \texttt{type} being \texttt{png}, for instance. Mind to remove \verb|\n| at the end if present. Use base64 utilities to convert the string into image: you can use \texttt{base64} \texttt{bash} command with option \verb|-d| (see \href{https://askubuntu.com/questions/907540/how-to-decode-an-image-string-using-base64-in-command-line}{here}) or \texttt{python} \verb|base64.b64decode|
+    \end{itemize}
+  \item Use \LaTeX{} commands, see \href{https://stackoverflow.com/questions/13208286/how-to-write-latex-in-ipython-notebook}{here} or, even better, \href{https://jupyterbook.org/content/math.html}{here}
+  \item Sub-command \href{https://nbconvert.readthedocs.io/en/latest/usage.html}{\texttt{jupyter nbconvert}}: it enables one to convert notebooks in several format directly from command line. Options:
+    \begin{itemize}
+      \item \verb|--to <fmt>|: choose the output format. Available: pdf, latex, markdown, python, asciidoc, html, notebook (see executing below),\ldots
+      \item \verb|--output <ouname>|: basename for output
+      \item \verb|--no-input|: do not render code-cells (but do render their output)
+      \item \verb|--execute|: execute the notebook before converting it
+        \begin{itemize}
+          \item It format notebook is chosen, then a new one is generated with the results with the following name \texttt{basename.nbconvert.ipynb}
+          \item \verb|--inplace|: Save in-place instead of into a new file
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 
