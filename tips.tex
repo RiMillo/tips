@@ -1675,11 +1675,11 @@ except Exception:
   \item ``\verb|_|'': placeholder for unused arguments / returns
     \begin{itemize}
       \item It can be unpacked with \verb|*| (see above)
-\begin{verbatim}
+\begin{lstlisting}[language=python]
 a = [1, 2, 3, 4, 5]
 first, *_, last = a
 print(first, last) # 1 5
-\end{verbatim}
+\end{lstlisting}
     \end{itemize}
   \item \href{https://wiki.python.org/moin/Generators}{Generators}: Generator functions allow you to declare a function that behaves like an iterator, i.e.\ it can be used in a for loop. This is faster than creating lists on purpose. Brief \href{https://www.programiz.com/python-programming/generator}{intro}. Generators do not \emph{return}, they \emph{yield}. An example
 \begin{lstlisting}[language=python]
@@ -1890,17 +1890,72 @@ x.sum(axis=1) # Gives [4, 4, 4]
   \item \href{https://docs.python.org/3/library/functools.html}{\texttt{functools}}: functions for callable objects (e.g.\ functions)
     \begin{itemize}
       \item \verb|partial(foo, *args, **kwargs)|: Return a new partial object which when called will behave like \texttt{foo} called with the positional arguments \texttt{args} and keyword arguments \texttt{kwargs}.
-\begin{verbatim}
+\begin{lstlisting}[language=python]
 def foo(a,b): print(f'a:{a}, b:{b}')
 ptf_a = partial(foo, 3) # argument a is 3
 ptf_a(4) # print a:3, b:4
 ptf_b = partial(foo, b=3) # argument b is 3
 ptf_b(4) # print a:4, b:3
-\end{verbatim}
+\end{lstlisting}
         \begin{itemize}
           \item For class methods use \texttt{partialmethod}
         \end{itemize}
       \item \verb|reduce(foo, iter)|: reduce iterable \texttt{iter} by function \texttt{foo}. For instance if \texttt{foo} is addition, then reducing will be equivalent to accumulate
+    \end{itemize}
+  \item \href{https://docs.python.org/3/library/timeit.html}{\texttt{timeit}}: useful built-in module to measure performances
+    \begin{itemize}
+      \item \lstinline[language=python]{timeit.timeit(stmt='pass', setup='pass', number=1000000, globals=None)}: run \texttt{stmt} \texttt{number} times after having run \texttt{setup} as a pre-process step and return the elapsed time
+        \begin{itemize}
+          \item Time in seconds
+          \item Time include all the \texttt{number} iterations
+          \item Suppose that you want to measure function \lstinline[language=python]{foo.bar(baz))} from module \texttt{foo} and which needs a parameter \texttt{baz}. Then, should import the module and create the parameter in the setup:
+\begin{lstlisting}[language=python]
+setup = """
+import foo
+baz = foo.Baz()
+"""
+timeit.timeit("foo.bar(baz)", setup=setup)
+\end{lstlisting}
+          \item If you want to use objects inside the same scope, pass the current globals
+\begin{lstlisting}[language=python]
+def foo(n): return list(range(n))
+N = 200
+timeit.timeit("foo(N)", globals=globals())
+\end{lstlisting}
+        \end{itemize}
+      \item \lstinline[language=python]{timeit.repeat(<as above>, repeat=5)}: call \texttt{timeit} \texttt{repeat} times
+        \begin{itemize}
+          \item Return a list of length \texttt{repeat} with the result of each \texttt{timeit} call
+          \item See this note from the developers: ``It’s tempting to calculate mean and standard deviation from the result vector and report these. However, this is not very useful. In a typical case, the lowest value gives a lower bound for how fast your machine can run the given code snippet; higher values in the result vector are typically not caused by variability in Python’s speed, but by other processes interfering with your timing accuracy. So the min of the result is probably the only number you should be interested in. After that, you should look at the entire vector and apply common sense rather than statistics.''
+        \end{itemize}
+      \item It can be used as command-line tool: \lstinline[language=bash]{python3 -m timeit [OPT] [stmt]}
+        \begin{itemize}
+          \item \verb|-s|: setup
+          \item \verb|-n|: number
+          \item \verb|-r|: repeat
+          \item \verb|-u|: unit
+        \end{itemize}
+      \item An idea (notice: it evaluates the statement and return what it gets):
+\begin{lstlisting}[language=python]
+REPEAT = 20
+N_LOOPS = 10_000
+
+def run_perf_analysis_eval(
+    statement, label, repeat=REPEAT, n_loops=N_LOOPS
+):
+    measures = timeit.repeat(
+        statement, repeat=repeat,
+        number=n_loops, globals=globals(),
+    )
+    measures = np.array(measures) / n_loops
+    print(
+        f"* {label:15}: {np.mean(measures):>5.1f} mus"
+        f" +- {np.std(measures):>6.2f} mus,"
+        f" in [{np.min(measures):>5.1f},"
+        f" {np.max(measures):>5.1f}]"
+    )
+    return eval(statement), measures
+\end{lstlisting}
     \end{itemize}
   \item \href{https://docs.python.org/3/library/itertools.html}{\texttt{itertools}}: functions for creating iterators for efficient looping
     \begin{itemize}
