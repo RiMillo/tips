@@ -1770,8 +1770,54 @@ msg = "True" if condition else "False"
 \end{lstlisting}
     or suppose that you have an argument which can be passed or not (hence in this case equal to \verb|None|)
 \begin{lstlisting}[language=python]
-\tikzexternaldisable
 msg = arg_msg or "Your message here"
+\end{lstlisting}
+  \item \href{https://docs.python.org/3/library/pathlib.html}{\texttt{pathlib}} and \texttt{Path}: filesystem paths. Similarities and differences w.r.t.\ \texttt{os} module \href{https://docs.python.org/3/library/pathlib.html#correspondence-to-tools-in-the-os-module}{here}. Examples below
+\begin{lstlisting}[language=python]
+from pathlib import Path
+Path()  # .
+p = Path("path")
+# Operator / overloaded
+foo = p / "to" / "foo.py"  # path/to/foo.py
+# Some functions
+Path.cwd(), Path.home()
+foo.exists(), foo.is_dir(), foo.is_file(), foo.is_symlink()
+# Properties
+foo.parts  # ("path", "to", "foo.py")
+foo.name  # foo.py
+foo.suffix  # .py
+tgz = Path("t.tar.gz")
+tgz.suffix  # ".gz"
+tgz.suffixes  # [".tar", ".gz"]
+foo.stem  # foo final component without suffix
+foo.match("*.py")
+foo.relative_to(other)
+foo.with_suffix(".txt")  # path/to/foo.txt
+foo.open()
+foo.rename("new.py"), foo.replace("new.py")
+# Similarly with_stem(), with_name()
+drc = Path("a/directory")
+drc.glob("*.py")
+for child in drc.iterdir(): pass
+# Path as string
+str(foo), f"{foo}"
+# Consider this file tree
+# dir
+#   |_ foo
+#   |    |_ toto
+#   |    |_ bar.py
+#   |_ __pycache__
+#   |    |_ ...
+#   |_ baz.txt
+for root, dirs, files in Path("dir").walk():
+    print(f"Dir {root} contains",
+          f"sub-dirs {dirs},",
+          f"files {files}")
+    if "__pycache__" in dirs:
+        dirs.remove("__pycache__")
+# Dir "dir" contains sub-dirs ["foo"] and files ["baz.txt"]
+# Dir "dir/foo" contains sub-dirs ["toto"] and files ["bar.py"]
+# Dir "dir/foo/toto" contains sub-dirs [] and files []
 \end{lstlisting}
   \item Default function arguments: if containers or complex types, prefer using \verb|None| as default parameter then defining it inside the function. See \href{https://www.geeksforgeeks.org/default-arguments-in-python/}{here}. This allows to avoid the following (often unwanted) behaviour (it happens also with mutable containers such as dictionaries):
 \begin{lstlisting}[language=python]
@@ -1871,7 +1917,11 @@ bar(3,  6,  c=10) # a=3, args=(),    b=6, kwargs={'c': 10}
   \item Type hints: one can provide types to variable, arguments and return values of a function. These hints \textbf{won't} be used by \texttt{python} (e.g.\ it isn't \texttt{C}). Type hints are for developers and for IDEs: basically they make the code simpler to read (very useful when developing code to which other user will interface) and help IDEs to infer types of objects in order to offer better prediction.
     \begin{itemize}
       \item To go further: \href{https://stackoverflow.com/a/32558710}{here}, \href{https://www.infoworld.com/article/3630372/get-started-with-python-type-hints.html}{here}
-      \item Use module \href{https://docs.python.org/3/library/typing.html}{\texttt{typing}} which provide types for built-in structures such as \texttt{Dict}, \texttt{Tuple}, \texttt{List},\ldots
+      \item Use module \href{https://docs.python.org/3/library/typing.html}{\texttt{typing}}
+      \item For built-in structures, in older versions use, e.g., \texttt{Dict}, \texttt{Tuple}, \texttt{List}; otherwise in newer version just standard is accepted, e.g., \verb|dict[str, str]|
+      \item For more than one possible types, use \verb|Union|. In recent versions, ``\verb!|!'' (pipe, like in \emph{or}) is accepted as well
+      \item For optional arguments that can assume \verb|None| or another type, use \verb|Optional|
+      \item Skip line: add comment \verb|# type: ignore|
       \item An example below
 \begin{lstlisting}[language=python]
 from typing import List, Dict
@@ -2078,6 +2128,7 @@ plt.loglog(...)
       \item Remove axis (no axis, no ticks, no labels, etc): \verb|ax.axis('off')|
       \item Every names color \href{https://matplotlib.org/stable/gallery/color/named_colors.html}{here}
       \item 3D plots. A nice introduction can be found \href{https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html}{here}. To activate 3D-plotting (scatter, surface, mesh plot or any other) the axis should be called with \lstinline[language=python]{projection='3d'} which should be imported as follows: \lstinline[language=python]{from mpl_toolkits import mplot3d}
+      \item Interactive plots: \href{https://matplotlib.org/stable/gallery/event_handling/legend_picking.html}{legend picking}, \href{https://matplotlib.org/stable/gallery/event_handling/cursor_demo.html}{grids moving with the mouse}, in general, checkout the whole \href{https://matplotlib.org/stable/gallery/event_handling/index.html}{event handling} session
     \end{itemize}
   \item Argument parsing: \href{https://docs.python.org/3/library/argparse.html#module-argparse}{\texttt{argparse}}
   \item Working with datasets:
