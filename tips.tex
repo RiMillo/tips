@@ -1107,7 +1107,14 @@ For inexperienced users who want to perform simple tasks, such as looking at the
         \end{itemize}
       \item Link a commit to an issues: it suffices to quote the issue number anywhere in the commit message as such \verb|#xxx| where \texttt{xxx} is the issue number. Moreover, one can directly close an issue with a similar strategy, more details \href{https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue}{here}: for instance put \verb|close #xxx| in the commit message
     \end{itemize}
-  \item Tagging: e.g.\ adding things like \texttt{v1.0}, have a look \href{https://git-scm.com/book/en/v2/Git-Basics-Tagging}{here}
+  \item Choosing good branch names:
+    \begin{itemize}
+      \item More generally, \href{https://nvie.com/posts/a-successful-git-branching-model/}{here} is an article about a good branching convenstions / strategies.
+      \item It is suggested to prepend categories to branch names, e.g., \verb|features/new_cool_dev|. One could choose the category according the same principles of conventional commits described above. An interesting \href{https://dev.to/varbsan/a-simplified-convention-for-naming-branches-and-commits-in-git-il4}{article}.
+      \item Sometimes, using category in branch names is recognized by git platforms which can improve the displaying for instance of the PR associated to the branch.
+      \item In every modern git platform one can open branches directly associated with an issue.
+    \end{itemize}
+  \item Tagging: e.g., adding things like \texttt{v1.0}, have a look \href{https://git-scm.com/book/en/v2/Git-Basics-Tagging}{here}
     \begin{itemize}
       \item Add: \verb|git tag -a <tagname> -m"<message>"|
       \item Publish: by default, the git push command doesn't transfer tags to remote servers. You will have to explicitly push tags to a shared server: \verb|git push origin <tagname>|, or for all tags at once \verb|git push origin --tags|
@@ -1189,6 +1196,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item If the history of the current and to-be-merged branch split, then an additional, automatically-generated commit is added (it is usually called ``Merge branch [\ldots]''). To avoid that, you can try to rebase \verb|branch_to_merge| over the final brunch, and possibly use the option \verb|--ff-only|.
       \item It \verb|branch_to_merge| has more than one commits, use \verb|--squash| to merge all its commits without, however, committing the changes into the current branch.
     \end{itemize}
+  \item Rebasing: see \href{https://git-scm.com/book/en/v2/Git-Branching-Rebasing}{here}
   \item Stashing: sometimes modifications are not yet ready for a commit but you have to go checkout another branch and \texttt{git} won't let you because of the modifications. That's where stashing comes in: it's a heap, a space where one can put modifications without them being in the official history. The state will be restored to \texttt{HEAD} (possibly the staged changes remain). Of course, one can recover them afterwards.
     \begin{itemize}
       \item Stash modifications: \texttt{git stash}
@@ -1206,7 +1214,7 @@ For inexperienced users who want to perform simple tasks, such as looking at the
           \item See above to choose a specific stash
         \end{itemize}
     \end{itemize}
-  \item List files followed bu \texttt{git}: \verb|git ls-tree <SHA1>|. Advised options:
+  \item List files followed by \texttt{git}: \verb|git ls-tree <SHA1>|. Advised options:
     \begin{itemize}
       \item \verb|--full-tree|: start from the root of the repository
       \item \verb|-r|: recursive
@@ -1231,6 +1239,11 @@ git update-index --no-assume-unchanged <file>
       \item \verb!--<path>|<path/to/filename>!: show commits which modified the files in \texttt{path} (resp.\ the file \verb|path/to/filename|). To be put after all other options;
       \item \verb|--pretty[=<format>]|, \verb|--format=<format>|: customize the format of your output. You may want to choose predefined styles, then \texttt{format} can be chosen in \texttt{oneline}, \texttt{short}, \texttt{medium}, \texttt{full}, \texttt{fuller}, ...
     \end{itemize}
+  \item \href{https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks}{\texttt{git} hooks}: hooks are scripts that are automatically triggered before/after certain events (e.g., commit, checkout, push)
+      \begin{itemize}
+        \item Some examples are already available in each repository. Have a look at directory \texttt{.git/hooks}, you will find a bunch of script with extension \texttt{.sample}. One can write their own script in bash, python, everything one wants. To enable one hook, just remove the \texttt{.sample} extension (e.g., \texttt{pre-commit}) and make it executable.
+        \item \href{https://verdantfox.com/blog/how-to-use-git-pre-commit-hooks-the-hard-way-and-the-easy-way}{An example} for pre-commit hooks. Also, check out the \href{https://github.com/pre-commit/pre-commit-hooks}{\texttt{pre-commit} framework}.
+      \end{itemize}
   \item Commit cherry-picking (\href{https://git-scm.com/docs/git-cherry-pick}{manual}): apply a specific commit from another branch
 \begin{verbatim}
   git cherry-picking <commit>
@@ -1293,9 +1306,11 @@ $ git show --pretty="" --name-only <sha>
   \item Submodules: \href{https://git-scm.com/book/en/v2/Git-Tools-Submodules}{here}.
     \begin{itemize}
       \item Typically, an useful command in \verb|git submodules update [--init]|
+      \item The status of the submodules is shown when running \verb|git status|, to avoid that use option \verb|--ignore-submodules=all|
     \end{itemize}
   \item Sometimes the \texttt{.git} directory (where all the \texttt{git} magic happens) is larger than the projects itself: imaging having to store all the commits, changes,\ldots{} \href{https://stackoverflow.com/questions/5277467/how-can-i-clean-my-git-folder-cleaned-up-my-project-directory-but-git-is-sti}{Here} you find how to do a little house-keeping. \verb|git gc| might be an option, as well.
-  \item \href{https://git-scm.com/docs/git-filter-branch}{\texttt{git filter-branch}}: modify the tree according to filters.
+  \item \href{https://git-scm.com/docs/git-filter-branch}{\texttt{git filter-branch}}: modify the tree according to filters. This command is very powerful but it rewrites the history, so, before doing it, be sure to read the link in the dedicated item below.
+  \item About \href{https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History}{rewriting \texttt{git} history}. See GitHub help about \href{https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository}{removing sensitive data}. WARNING: it is highly advised not to rewrite the history of a published repository, since collaborators that already had the sources, will certainly have issues since their history does not correspond anymore. Hence, do not use it lightly and only on not-yet published repositories / branches.
 
 \end{itemize}
 
