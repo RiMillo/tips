@@ -698,6 +698,11 @@ eval $cmd dir
       \item \texttt{ssh}
         \begin{itemize}
           \item Connect to server: \verb|ssh [opt] [user@]server|. A new session open (a password may be requested). Use option \verb|-X| (or \verb|-Y|) to enable forwarding of the GUI, that is enabling GUI programs on the server
+          \item For connections that requires an identification, one may skip the typical ``insert the password'' method by adding a \texttt{ssh} key to the authorized one. See \href{https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server}{here} how:
+\begin{verbatim}
+ssh-copy-id username@remote_host
+\end{verbatim}
+            or simply add your public key to \verb|$HOME/.ssh/authorized_keys| of the server
           \item Run command on a server: \verb|ssh [opt] [user@]server cmd| (or \verb|'cmd'|)
         \end{itemize}
       \item Transfer data, \texttt{rsync} or \texttt{scp}: \verb|rsync file.txt server:/home/user/path/to|. Notice the colon.
@@ -721,6 +726,35 @@ rsync --include='*.pdf' --include='*/' --exclude='*' src dest
 \end{verbatim}
             \end{itemize}
           \item ATTENTION: \texttt{scp} and \texttt{rsync} load the \texttt{.bashrc} and fail if it produces an output to \texttt{stdout} (for instance, if they contain commands such as \texttt{echo}). The workaround is to move those commands into \texttt{.bash\_profile} (or just send the output to \verb|/dev/null| if it is not important)
+        \end{itemize}
+    \end{itemize}
+  \item \texttt{chmod}: change file permissions. See this \href{https://www.pluralsight.com/blog/it-ops/linux-file-permissions}{article}
+    \begin{itemize}
+      \item Typically, when looking at the permission of a file / repository via \texttt{ls -l}, the results is given by a 10-character chain divided
+        \begin{itemize}
+          \item The first character indicates the type of file: \verb|-| regular file, \verb|d| directory or \verb|l| link
+          \item The remaining characters are subdivided in 3 groups: the first refers to the permissions of the owner of the files, the second to the permission of the group, the third to the permissions of other users
+          \item The first element of each group refers to reading permission, \verb|r| if granted, \verb|-| otherwise; the second element to the writing one, \verb|w| or \verb|-|, the third to the execution permission, \verb|x| or \verb|-|
+          \item E.g., \verb|drwxr-xr--| signifies a directory on which the owner has reading, writing and execution permissions; the group reading and execution; other users reading only
+        \end{itemize}
+      \item Typical commands:
+        \begin{itemize}
+          \item Extended format: \verb|chmod [options] <target><operator><permission> filename|
+            \begin{itemize}
+              \item \verb|target| can be one of or a combination of the following characters: \verb|u| to change user permissions, \verb|g| group, \verb|o| other permissions. \verb|a| is valid and is equivalent to \verb|ugo|
+              \item \verb|operator| is one of the followings: \verb|+| to add permissions, \verb|-| to remove, \verb|=| to force permission to be exactly what provided
+              \item \verb|permission| is one of or a combination of the following characters: \verb|r| to express reading permission, \verb|w| writing one, \verb|x| execution one.
+              \item \verb|-R| option to recursively apply in the case of a directory
+              \item E.g., \verb|chmod ug+x foo|: add to file \texttt{fool} execution permission for user and group
+            \end{itemize}
+          \item Numerical format: \verb|chmod <X><Y><Z> filename|
+            \begin{itemize}
+              \item \verb|X| is a digit that refers to user permissions, \verb|Y| to group ones, \verb|Z| to other users one
+              \item In numerical format, no permission (e.g., \verb|-|) corresponds to 0, execution permission to 1, writing to 2, and reading to 4
+              \item Sums are allowed, hence 5=1+4 means execution and reading permissions
+              \item This command sets the permissions, hence is equivalent to the usage of \verb|=| from the previous format
+              \item To obtain \verb|-rwxr-xr--| one should use 754
+            \end{itemize}
         \end{itemize}
     \end{itemize}
   \item Download with command line: \texttt{wget} and \texttt{curl}
@@ -811,6 +845,13 @@ wc [options] <file>
       \item Extract images from an animated \texttt{gif}: \verb|convert in.gif out.png| and it will save images like \texttt{out-0.png}, \texttt{out-1.png}, \texttt{out-2.png}\ldots
       \item Write text on image: see \href{https://stackoverflow.com/questions/23236898/add-text-on-image-at-specific-point-using-imagemagick}{here}
     \end{itemize}
+  \item See node architecture: \href{https://linux.die.net/man/1/lstopo}{\texttt{lstopo}}
+\begin{lstlisting}[language=bash]
+# Try also png for instance
+lstopo --output-format svg > topology.svg
+# Without graphic support
+lstopo-no-graphics --output-format txt > topology.txt
+\end{lstlisting}
   \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: nice and easy utility to modify \texttt{pdf} files
     \begin{itemize}
       \item Extract and/or merge: Examples of accepted ranges: \texttt{'1,6-9'}, \texttt{'-2,4,6'}
@@ -822,11 +863,12 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] \
       \item Landscape mode: \verb|--landscape|
       \item Keep size: \verb|--fitpaper true|
       \item Autorotate oversized pages: \verb|--totateoversize true|
+      \item More than one page per page: \verb|--nup <cols>x<rows>|, e.g., \verb|--nup 2x1|
+      \item In fact, under the hood \texttt{pdfjam} calls \LaTeX{} and loads the pdf into a page. This is enough most of the time, however, if the pdf has non-standard dimensions, let say smaller than A4, this will result in a blank A4 page with the pdf at the center. To fit to the size, use \texttt{ghostscript} (for the pages, the option \texttt{-sPageList} is also available and accepts ranges)
       \item A similar utility with a wider range of capabilities is \href{https://www.ghostscript.com/doc/current/Use.htm}{\texttt{ghostscript}}
         \begin{itemize}
           \item \texttt{ghostscript} can output in many forms, called \emph{devices} (even OCR!), \href{https://ghostscript.com/docs/9.54.0/Devices.htm}{here's how}
         \end{itemize}
-      \item In fact, under the hood \texttt{pdfjam} calls \LaTeX{} and loads the pdf into a page. This is enough most of the time, however, if the pdf has non-standard dimensions, let say smaller than A4, this will result in a blank A4 page with the pdf at the center. To fit to the size, use \texttt{ghostscript} (for the pages, the option \texttt{-sPageList} is also available and accepts ranges)
     \end{itemize}
 \begin{verbatim}
 gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -dPSFitPage \
@@ -870,6 +912,20 @@ udisksctl power-off -b /dev/sdX
     \begin{itemize}
       \item \verb|cat [<opt>] file [file2 [...]]|
       \item \verb|tac [<opt>] file [file2 [...]]| as above but reverse order of the lines
+    \end{itemize}
+  \item Print a small part of a file
+    \begin{itemize}
+      \item \texttt{head}: print the first part of a file
+        \begin{itemize}
+          \item \verb|-n [-]N|: first \texttt{N} lines; if \verb|-| given, all but the last \texttt{N}
+          \item \verb|-c [-]N|: as above but bytes instead of lines
+        \end{itemize}
+      \item \texttt{tail}: print the last part of a file
+        \begin{itemize}
+          \item \verb|-n [+]N|: last \texttt{N} lines; if \verb|+| given, all but the first \texttt{N}
+          \item \verb|-c [+]N|: as above but bytes instead of lines
+          \item \verb|-f|: output appended as file grows (kinda of syncing)
+        \end{itemize}
     \end{itemize}
   \item \verb|cp [options] <source> [dest]|: copy \texttt{source} into \texttt{dest} (if omitted, "\texttt{.}")
     \begin{itemize}
@@ -2678,6 +2734,7 @@ mask = cv.inRange(hsv.copy(), lower, upper)
 \section{Miscellaneous}
 \label{sec:misc}
 \begin{itemize}
+  \item{} [Linux] Add personal apps to regular menu: It comes down to create \texttt{your\_app.desktop} file in \url{~/.local/share/applications}. You can get inspiration from other similar files that are already there or in \url{/usr/share/applications}. Another idea is to use the user-interface \texttt{alacarte}, see \href{https://askubuntu.com/questions/79583/adding-custom-applications-to-gnome-3-launcher}{here}: this produces a \texttt{.desktop} file, usually the name is little something like \texttt{alacarte-n.desktop}, so it might be hard to see which file corresponds to which app.
   \item \texttt{PETSc} \href{https://www.mcs.anl.gov/petsc/petsc-current/docs/manual.pdf}{manual}
     \begin{itemize}
       \item Use \verb|MatView(Mat a, PETSC_VIEWER_DRAW_WORLD)| or with any another \texttt{PetscViewer} to draw the nonzero structure of a matrix.
