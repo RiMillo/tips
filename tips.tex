@@ -2440,7 +2440,7 @@ Here is a [link](#section-one) to the previous section.
     \begin{itemize}
       \item \href{https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#quoting-code}{GitHub docs}
         (for more \href{https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks}{advanced settings})
-      \item Display: three backticks with, optionally, the language of the code to highlight syntax as well. E.g.,
+      \item Display: three backticks with, optionally, the language of the code to highlight syntax as well. E.g., python and terminal (see \href{https://stackoverflow.com/a/49004070/12152457}{here}) examples:
 \begin{verbatim}
 ```python
 for i in range(5):
@@ -2449,8 +2449,15 @@ for i in range(5):
     else:
         pass
 ```
-\end{verbatim}
 
+```console
+foo@bar:~$ whoami
+foo
+```
+\end{verbatim}
+        \begin{itemize}
+          \item \href{https://github.com/github-linguist/linguist/blob/3c3b037910006fc2f1a9bb34b2c4e9cde062206c/lib/linguist/languages.yml}{Official list} of languages supported by GitHub and their definitions. For a non-official but user-friendly (and possible incomplete) list, see \href{https://github.com/jincheng9/markdown_supported_languages?tab=readme-ov-file#heres-a-full-list-of-supported-languages}{here}
+        \end{itemize}
       \item Inline: one backtick \verb|`code goes here`|
         \begin{itemize}
           \item Syntax highlighting is not available for inline code with default renderers. However, some extensions can, see this \href{https://stackoverflow.com/questions/23226224/inline-code-syntax-highlighting-in-github-markdown}{SO question}: \verb|`a = None`{:.python}| or \verb|`a = None`{.python}|
