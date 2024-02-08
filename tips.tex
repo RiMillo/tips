@@ -123,7 +123,6 @@ fi
     \end{itemize}
   \item Operator \texttt{*} expands to all the files whose name does not start with "\texttt{.}". Hence, hidden files (as well as current directory "\texttt{.}", and parent directory "\texttt{..}" are not included).
   \item Arithmetic operations: \verb|$((4*n+3))|, notice that once inside the variables do not need the \$ sign. As it is the case for operator \verb|[| (cf. \autoref{ssec:shell_tools}), \verb|((| is a shortcut for a command, precisely \href{https://www.computerhope.com/unix/bash/let.htm}{\texttt{let}}. On shell such as \texttt{bash} only integers arithmetics are allowed. Many alternatives are available, for instance using \texttt{awk} (\autoref{ssec:awk}) or \texttt{python} (\autoref{sec:python}) or \texttt{bc} (\autoref{ssec:shell_tools}). Others may be found \href{https://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks}{here}.
-  \item Conditional statements: \href{https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs}{here}
   \item Pipes: \verb!|! connects standard output of one command to standard input of another.
   \item File descriptors:
     \begin{enumerate}[start=0,label={\texttt{\arabic*} :}]
@@ -198,6 +197,55 @@ IFS="," read -a arr <<< $str
         \end{itemize}
       \item Access with \verb|${arr[$i]}|
       \item Get length: \verb|${#arr[@]}|
+    \end{itemize}
+  \item Conditional statements:
+    \begin{itemize}
+      \item Typical structure
+\begin{verbatim}
+if <cond>
+then
+# These first two lines might be written in only one, join with semi-colon:
+# if <cond>; then
+  <cmd>
+else
+  <cmd>
+fi
+\end{verbatim}
+      \item The above \verb|<cond>| can be written in several ways, see \href{https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs}{here}. Some examples:
+\begin{verbatim}
+if [ <cond> ]
+if test <cond> # Same as above
+if [[ <cond> ]]
+if ((<cond>)) # Arithmetic evaluation
+if (cmd) # Command run in a subshell
+if cmd # Command run
+\end{verbatim}
+      \item Remember: 0 is true, other is false
+      \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one. A little syntax:
+        \begin{itemize}
+          \item Conditional \verb|!| negate, \verb!-a|-o! and/or
+          \item Strings: \verb!-z|-n! true if zero | nonzero, compare with \verb|=| and \verb|!=|
+          \item Integers: \verb|-eq| equal, \verb|-ne| not-equal, \verb!-gt|-ge! (resp.\ \verb!-lt|-le!) greater than | greater or equal (resp.\ less)
+          \item Files: \verb!-ot|-nt! older|newer than, \verb|-e| exists, \verb|-f| regular file, \verb|-d| directory
+          \item Combine: \verb|[ a = a ] && [ b = b ]|, for or use \verb!||!. To construct multilevel conditions, one should escape parentheses
+          \item Mind: variable are split, hence, you might want to put them in quotes. Consider \verb|foo bar| vs.\ \verb|"foo bar"|
+        \end{itemize}
+      \item Operator \verb|[[| (double square brackets) is a \texttt{bash} improvement of \texttt{test}, and allows more stuff (see this \href{https://stackoverflow.com/a/47576482}{comparison}), such as:
+        \begin{itemize}
+          \item An important difference is that variable are NOT split
+          \item Combine: \verb|[[ a = a && b = b ]]|
+          \item \verb|$lhs =~ <regex>|: check if \verb|$lhs| match the given pattern
+        \end{itemize}
+      \item Empty and unset variables:
+        \begin{itemize}
+          \item Check for an UNSET variable: \verb|[ -z "${var+x}" ]| (from \href{https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash}{here})
+          \item Check for an EMPTY variable: \verb|[[ -z $var ]]| or \verb|[[ ! $var ]]| (from \href{https://serverfault.com/questions/7503/how-to-determine-if-a-bash-variable-is-empty}{here})
+          \item Check out this \href{https://stackoverflow.com/questions/3869072/test-for-non-zero-length-string-in-bash-n-var-or-var}{comparison}
+\begin{verbatim}
+if [[ $var ]]; then   # var is set and it is not empty
+if [[ ! $var ]]; then # var is not set or it is set to an empty string
+\end{verbatim}
+        \end{itemize}
     \end{itemize}
   \item Loops:
     \begin{itemize}
@@ -364,9 +412,14 @@ Options and tricks:
       \item \verb|-i.bak| creates a backup file,
       \item The option \verb|--follow-symlinks|, available only with \verb|-i| activated, enables to modify the original file;
     \end{itemize}
+  \item Option \verb|-n| avoid printing. This might be used in combination with the command \texttt{p} (print) to have a \texttt{grep}-like results where one can also replace. \href{https://unix.stackexchange.com/a/278377}{E.g.}:
+\begin{verbatim}
+# Replace foo by FOO (using groups)
+sed -n "s/^.*foo\([0-9]\+\).*$/FOO\1/p" file
+\end{verbatim}
   \item If in one line there are more occurrences, only the first one is matched. Appending \texttt{g} will make \texttt{sed} match all the occurrences.
 \begin{verbatim}
-  sed -i "s/<pattern>/<replaced>/g" file
+sed -i "s/<pattern>/<replaced>/g" file
 \end{verbatim}
   \item Character \verb|&| expands to matched string.
   \item Match exactly the word: from regex, \verb|\b| delimits boundaries of the word. Hence, (although \verb|\<word\>| seems to work, as well (\texttt{vim}, anyone?)):
@@ -816,18 +869,6 @@ wc [options] <file>
       \item \verb|-c|: prefix line with number of occurrences
       \item \verb|-d|: print repeated lines only
       \item \verb|-u|: print unique lines only
-    \end{itemize}
-  \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one. A little syntax:
-    \begin{itemize}
-      \item Conditional \verb|!| negate, \verb!-a|-o! and/or
-      \item Strings: \verb!-z|-n! true if zero | nonzero, compare with \verb|=| and \verb|!=|
-      \item Integers: \verb|-eq| equal, \verb|-ne| not-equal, \verb!-gt|-ge! (resp.\ \verb!-lt|-le!) greater than | greater or equal (resp.\ less)
-      \item Files: \verb!-ot|-nt! older|newer than, \verb|-e| exists, \verb|-f| regular file, \verb|-d| directory
-      \item Combine: \verb|[ a = a ] && [ b = b ]|, for or use \verb!||!. To construct multilevel conditions, one should escape parentheses
-      \item ATTENTION: operator \verb|[[| (double square brackets) is a \texttt{bash} improvement of \texttt{test}, and allows more stuff (see this \href{https://stackoverflow.com/a/47576482}{comparison}), such as:
-        \begin{itemize}
-          \item \verb|$lhs =~ <regex>|: check if \verb|$lhs| match the given pattern
-        \end{itemize}
     \end{itemize}
   \item \verb|touch <file>|: modify the file access and/or modification date. If the file doesn't exist, an empty one will be created (unless specific options are given). For more details and all the options, have a look at its \texttt{man} page.\\
   Why should one use it?
