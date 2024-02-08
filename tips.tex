@@ -1813,53 +1813,6 @@ msg = "True" if condition else "False"
 \begin{lstlisting}[language=python]
 msg = arg_msg or "Your message here"
 \end{lstlisting}
-  \item \href{https://docs.python.org/3/library/pathlib.html}{\texttt{pathlib}} and \texttt{Path}: filesystem paths. Similarities and differences w.r.t.\ \texttt{os} module \href{https://docs.python.org/3/library/pathlib.html#correspondence-to-tools-in-the-os-module}{here}. Examples below
-\begin{lstlisting}[language=python]
-from pathlib import Path
-Path()  # .
-p = Path("path")
-# Operator / overloaded
-foo = p / "to" / "foo.py"  # path/to/foo.py
-# Some functions
-Path.cwd(), Path.home()
-foo.exists(), foo.is_dir(), foo.is_file(), foo.is_symlink()
-# Properties
-foo.parts  # ("path", "to", "foo.py")
-foo.name  # foo.py
-foo.suffix  # .py
-tgz = Path("t.tar.gz")
-tgz.suffix  # ".gz"
-tgz.suffixes  # [".tar", ".gz"]
-foo.stem  # foo final component without suffix
-foo.match("*.py")
-foo.relative_to(other)
-foo.with_suffix(".txt")  # path/to/foo.txt
-foo.open()
-foo.rename("new.py"), foo.replace("new.py")
-# Similarly with_stem(), with_name()
-drc = Path("a/directory")
-drc.glob("*.py")
-for child in drc.iterdir(): pass
-# Path as string
-str(foo), f"{foo}"
-# Consider this file tree
-# dir
-#   |_ foo
-#   |    |_ toto
-#   |    |_ bar.py
-#   |_ __pycache__
-#   |    |_ ...
-#   |_ baz.txt
-for root, dirs, files in Path("dir").walk():
-    print(f"Dir {root} contains",
-          f"sub-dirs {dirs},",
-          f"files {files}")
-    if "__pycache__" in dirs:
-        dirs.remove("__pycache__")
-# Dir "dir" contains sub-dirs ["foo"] and files ["baz.txt"]
-# Dir "dir/foo" contains sub-dirs ["toto"] and files ["bar.py"]
-# Dir "dir/foo/toto" contains sub-dirs [] and files []
-\end{lstlisting}
   \item Default function arguments: if containers or complex types, prefer using \verb|None| as default parameter then defining it inside the function. See \href{https://www.geeksforgeeks.org/default-arguments-in-python/}{here}. This allows to avoid the following (often unwanted) behaviour (it happens also with mutable containers such as dictionaries):
 \begin{lstlisting}[language=python]
 def foo(l = [], a = 5):
@@ -2198,6 +2151,64 @@ plt.loglog(...)
       \item \texttt{statsmodels}: regressions.
       \item \href{https://seaborn.pydata.org/introduction.html}{\texttt{seaborn}}: powerful data visualization tool.
     \end{itemize}
+  \item \texttt{re}: \href{https://docs.python.org/3/library/re.html}{regex'ing}
+    \begin{itemize}
+      \item Main functions:
+        \begin{itemize}
+          \item \verb|re.search(pattern, string)|: Search \emph{anywhere} in the string.
+          \item \verb|re.match(pattern, string)|: Search at the \emph{beginning} of the string.
+          \item \verb|re.fullmatch(pattern, string)|: The \emph{whole} string should math the pattern.
+          \item \verb|re.sub(pattern, repl, string)|: Replace the pattern with the alternative text.
+          \item The functions take a key argument for flags. E.g.:
+\begin{lstlisting}[language=python]
+# Case-insensitive
+re.search(ptrn, string, flag=re.I)
+# Multi-line
+re.search(ptrn, string, flag=re.M)
+\end{lstlisting}
+        \end{itemize}
+      \item One can compile a regex in advance, then use the usual functions:
+\begin{lstlisting}[language=python]
+foo_re = re.compile("foo")
+foo_re.search("Foo foo bar")
+\end{lstlisting}
+      \item \verb|re.escape(pattern)|: escape all the ambiguous characters
+\begin{lstlisting}[language=python]
+foo_re = re.compile(re.escape("/foo.bar"))
+\end{lstlisting}
+      \item Matches\&Groups: The above-mentioned function return a \emph{match} object
+        \begin{itemize}
+          \item Access full match and groups with brackets
+\begin{lstlisting}[language=python]
+m = re.match(r"(\w+) (\w+)", "Isaac Newton, physicist")
+m[0]  # The entire match
+# 'Isaac Newton'
+m[1]  # The first parenthesized subgroup.
+\end{lstlisting}
+          \item Access groups with group ad-hoc function:
+\begin{lstlisting}[language=python]
+m.group(0)  # The entire match
+# 'Isaac Newton'
+m.group(1)  # The first parenthesized subgroup.
+# 'Isaac'
+m.group(1, 2)  # Multiple arguments give us a tuple.
+# ('Isaac', 'Newton')
+\end{lstlisting}
+          \item Access groups with names: one should use a special constructor \texttt{(?P<foo>pattern)}.
+\begin{lstlisting}[language=python]
+m = re.match(
+  r"(?P<name>\w+) (?P<surname>\w+)",
+  "Isaac Newton, physicist",
+)
+m.group("name")
+# 'Isaac'
+m.group("surname")
+# 'Newton'
+\end{lstlisting}
+          \item All the groups as tuple: \verb|m.groups(default=None)| (default value is for groups that did not participate to the match).
+          \item All the groups as dict: \verb|m.groupdict(default=None)|, to use in case where one gave name to a group (see \texttt{name} and \texttt{surname} above).
+        \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 \subsection{Data structures}
@@ -2323,6 +2334,248 @@ def tuple_gt(t1, t2):
     return t1[1] > t2[1]
 \end{verbatim}
 \end{itemize}
+
+\subsection{\texttt{argparse}}
+Have a look at the official \href{https://docs.python.org/3/library/argparse.html}{documentation} and \href{https://docs.python.org/3/howto/argparse.html}{tutorial}. Otherwise, below a very basic example:
+\begin{lstlisting}[language=python]
+import argparse
+
+# CREATING A PARSER
+parser = argparse.ArgumentParser(
+  # Optional
+  prog="ProgName",
+  usage="Describe the usage",
+  desciption="Description of the program",
+  epilog="Test displayed after argument help",
+)
+
+# ADD ARGUMENTS
+# Help option added by default
+# Positional argument
+parser.add_argument(
+  "FOO",  # Name
+  help="A nice little foo",  # Description of option
+)
+# Flag argument (mind the name starts with -)
+# Commonly used for optional argument
+parser.add_argument(
+  "-t", "-T",  # short name
+  "--test", "--Test",  # Full name
+  dest="myTest",  # Name of the member in which the value will be stored
+  help="Activate test mode",  # Description of option
+)
+
+# PARSING ARGUMENTS
+args = parser.parse_args()
+# or
+import sys
+args = parser.parse_args(sys.argv[1:])
+# Actually, any sequence of strings
+args = parser.parse_args(["--test"])
+
+# USING STORED ARGUMENTS
+print(args.myTest)
+\end{lstlisting}
+
+\medskip
+\href{https://docs.python.org/3/library/argparse.html#quick-links-for-add-argument}{Options for \texttt{add\_argument}} (they are all optional):
+\begin{itemize}
+  \item \texttt{dest}: Specify the attribute name used in the result namespace. It can be the same for more than one argument.
+  \item \texttt{help}: Help message for an argument.
+  \item \texttt{required}: Indicate whether an argument is required or optional.
+  \item \texttt{nargs}: Number of times the argument can be used. Valid options:
+    \begin{itemize}
+      \item \texttt{N} (an integer): \texttt{N} options will be consumed and gathered into a list.
+      \item \texttt{"?"}: One argument will be consumed from the command line if possible, and produced as a single item. If no command-line argument is present, the value from default will be produced.
+      \item \texttt{"*"}: All command-line arguments present are gathered into a list.
+      \item \texttt{"+"}: As \texttt{"*"}, but raises an error if no argument is found.
+    \end{itemize}
+  \item \texttt{default}: Default value used when an argument is not provided (default is \texttt{None}).
+  \item \texttt{const}: Store a constant value.
+    \begin{itemize}
+      \item It is required by some \texttt{nargs} and \texttt{action}.
+      \item When \texttt{nargs="?"}, it's the value that will taken when the argument is passed but without a value.
+    \end{itemize}
+  \item \texttt{choices}: Limit values to a specific set of choices. E.g.: \verb|["one", "un", "uno"]|.
+  \item \texttt{type}: Automatically convert an argument to the given type. Valid options:
+    \begin{itemize}
+      \item Standard types, e.g., \texttt{int}, \texttt{float},\ldots
+      \item A callable function that returns a value or raises \verb|argparse.ArgumentTypeError| if argument is not valid.
+      \item A \verb|argparse.FileType| object (for file IO).
+    \end{itemize}
+  \item \texttt{action}: Specify how an argument should be handled: Valid options:
+    \begin{itemize}
+      \item \verb|"store"|: Store the argument's value (the default).
+      \item \verb|"store_const"|: Store the argument specified by \texttt{const} keyword; commonly used with optional arguments that specify some sort of flag.
+      \item \verb|"store_true"| and \verb|"store_false"|: These are special cases of \verb|store_const| used for storing the values \texttt{True} and \texttt{False} respectively
+      \item \verb|"append"|: This stores a list, and appends each argument value to the list. It is useful to allow an option to be specified multiple times.
+      \item \verb|"append_const"|: This stores a list, and appends the value specified by the \texttt{const} keyword argument to the list.
+      \item \verb|"count"|: This counts the number of times a keyword argument occurs.
+      \item \verb|"help"|: This prints a complete help message for all the options in the current parser and then exits.
+      \item \verb|"version"|: This expects a \verb|version=| keyword argument in the \verb|add_argument| call, and prints version information and exits when invoked.
+      \item \verb|"extend"|: This stores a list, and extends each argument value to the list.
+    \end{itemize}
+  \item \texttt{metavar}: Alternate display name for the argument as shown in help
+\end{itemize}
+
+Tircks\&Tips:
+\begin{itemize}
+  \item Mutually exclusive arguments: create a related group
+\begin{lstlisting}[language=python]
+parser = argparse.ArgumentParser()
+mutEx = parser.add_mutually_exclusive_group()
+mutEx.add_argument("--foo")
+mutEx.add_argument("--bar")
+\end{lstlisting}
+  \item Sub-parsers:
+\begin{lstlisting}[language=python]
+# create the top-level parser
+parser = argparse.ArgumentParser(prog='PROG')
+parser.add_argument('--foo', action='store_true', help='foo help')
+subparsers = parser.add_subparsers(help='sub-command help')
+
+# create the parser for the "a" command
+parser_a = subparsers.add_parser('a', help='a help')
+parser_a.add_argument('bar', type=int, help='bar help')
+
+# create the parser for the "b" command
+parser_b = subparsers.add_parser('b', help='b help')
+parser_b.add_argument('--baz', choices='XYZ', help='baz help')
+\end{lstlisting}
+  \item Parse only known arguments
+\begin{lstlisting}[language=python]
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', action='store_true')
+parser.add_argument('bar')
+parser.parse_known_args(['--foo', '--badger', 'BAR', 'spam'])
+# Gives (Namespace(bar='BAR', foo=True), ['--badger', 'spam'])
+\end{lstlisting}
+  \item \texttt{default} vs.\ \texttt{const}: Consider the following 3 examples (mind the presence or absence of \texttt{default} and \texttt{const} in the parser definition)
+
+    \begin{minipage}[T]{.45\textwidth}
+      \begin{lstlisting}[language=python,frame=single]
+p = argparse.ArgumentParser()
+p.add_argument(
+    "-f",
+    dest="f"
+    nargs="?",
+    default=4,
+)
+# Not passed
+a = p.parse_args([])
+print(a.f) # 4 (default)
+# Passed but no value
+a = p.parse_args(["-f"])
+print(a.f) # None (const)
+a = p.parse_args(["-f", "12"])
+print(a.f) # 12
+      \end{lstlisting}
+    \end{minipage}\hfill%
+    \begin{minipage}[T]{.45\textwidth}
+      \begin{lstlisting}[language=python, frame=single]
+p = argparse.ArgumentParser()
+p.add_argument(
+    "-f",
+    dest="f"
+    nargs="?",
+    const=8,
+)
+# Not passed
+a = p.parse_args([])
+print(a.f) # None (default)
+# Passed but no value
+a = p.parse_args(["-f"]
+print(a.f) # 8 (const)
+a = p.parse_args(["-f", "12"])
+print(a.f) # 12
+      \end{lstlisting}
+    \end{minipage}
+
+    \begin{center}
+    \begin{minipage}[T]{.45\textwidth}
+        \begin{lstlisting}[language=python,frame=single]
+p = argparse.ArgumentParser()
+p.add_argument(
+    "-f",
+    dest="f"
+    nargs="?",
+    default=4,
+    const=8,
+)
+# Not passed
+a = p.parse_args([])
+print(a.f) # 4 (default)
+# Passed but no value
+a = p.parse_args(["-f"])
+print(a.f) # 8 (const)
+a = p.parse_args(["-f", "12"])
+print(a.f) # 12
+        \end{lstlisting}
+      \end{minipage}
+    \end{center}
+
+  \item More than one argument with the same destination:
+\begin{lstlisting}[language=python]
+p = argparse.ArgumentParser()
+p.add_argument("-t", dest="boolean", action="store_true")
+p.add_argument("-f", dest="boolean", action="store_false")
+a = p.parse_args(["-t"])
+print(a.boolean) # True
+a = p.parse_args(["-f"])
+print(a.boolean) # False
+a = p.parse_args(["-f", "-t"])
+print(a.boolean) # True (last one prevails)
+\end{lstlisting}
+\end{itemize}
+
+\subsection{\texttt{pathlib}}
+\href{https://docs.python.org/3/library/pathlib.html}{\texttt{pathlib}} and \texttt{Path}: filesystem paths. Similarities and differences w.r.t.\ \texttt{os} module \href{https://docs.python.org/3/library/pathlib.html#correspondence-to-tools-in-the-os-module}{here}. Examples below
+\begin{lstlisting}[language=python]
+from pathlib import Path
+Path()  # .
+p = Path("path")
+# Operator / overloaded
+foo = p / "to" / "foo.py"  # path/to/foo.py
+# Some functions
+Path.cwd(), Path.home()
+foo.exists(), foo.is_dir(), foo.is_file(), foo.is_symlink()
+# Properties
+foo.parts  # ("path", "to", "foo.py")
+foo.name  # foo.py
+foo.suffix  # .py
+tgz = Path("t.tar.gz")
+tgz.suffix  # ".gz"
+tgz.suffixes  # [".tar", ".gz"]
+foo.stem  # foo final component without suffix
+foo.match("*.py")
+foo.relative_to(other)
+foo.with_suffix(".txt")  # path/to/foo.txt
+foo.open()
+foo.rename("new.py"), foo.replace("new.py")
+# Similarly with_stem(), with_name()
+drc = Path("a/directory")
+drc.glob("*.py")
+for child in drc.iterdir(): pass
+# Path as string
+str(foo), f"{foo}"
+# Consider this file tree
+# dir
+#   |_ foo
+#   |    |_ toto
+#   |    |_ bar.py
+#   |_ __pycache__
+#   |    |_ ...
+#   |_ baz.txt
+for root, dirs, files in Path("dir").walk():
+    print(f"Dir {root} contains",
+          f"sub-dirs {dirs},",
+          f"files {files}")
+    if "__pycache__" in dirs:
+        dirs.remove("__pycache__")
+# Dir "dir" contains sub-dirs ["foo"] and files ["baz.txt"]
+# Dir "dir/foo" contains sub-dirs ["toto"] and files ["bar.py"]
+# Dir "dir/foo/toto" contains sub-dirs [] and files []
+\end{lstlisting}
 
 \subsection{Files\&Co}
 Open'n'Close
