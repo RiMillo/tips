@@ -83,6 +83,87 @@ In this section, we cover basic stuff about the shell. For useful terminal comma
           \item \verb|evince work{1,2,3}.pdf| expands to \verb|evince work1.pdf work2.pdf work3.pdf|
         \end{itemize}
     \end{itemize}
+  \item Variables
+    \begin{itemize}
+      \item To set / declare a variable just use implicit declaration: \verb|foo="BAR"|.
+      \item For strings with whitespaces in them, one should quote them otherwise they will be split and the subsequent parts of the string after a whitespace will be treated as commands. For instance: \verb|string="A string with spaces"|
+      \item To access the value of a variable use the dollar sign, \verb|$|, e.g. \verb|foo=bar; echo $foo| prints \texttt{bar}
+        \begin{itemize}
+          \item It is good practice to put the name of the variable inside braces: \verb|${foo}|. This avoids substitution problems. E.g., suppose we have \verb|foo=bar| and want to write \texttt{baz} just after the value of \texttt{foo}
+            \begin{itemize}
+              \item The following will try to get the value of variable \texttt{foobaz} which does not exist, hence printing nothing
+\begin{lstlisting}[language=bash]
+echo $foobaz
+# Prints nothing
+\end{lstlisting}
+              \item Using braces, one obtains the wished result
+\begin{lstlisting}[language=bash]
+echo ${foo}baz
+# Prints barbaz
+\end{lstlisting}
+            \end{itemize}
+        \end{itemize}
+      \item Scope: the scope of a standard variable is its script. But there are way to change this
+        \begin{itemize}
+          \item Local variables: variable declared in this way inside a function, are only visible inside the same function: \verb|local foo="Bar"|
+          \item Environment variables: use \texttt{export}
+\begin{lstlisting}[language=bash]
+# Typical usage
+export $PATH=/new/path:$PATH
+# For a function, use -f
+function foo() { echo "Ciao"; }
+export -f foo
+# Remove export property
+export -n foo
+\end{lstlisting}
+        \end{itemize}
+      \item Some built-in variables:
+        \begin{itemize}
+          \item \verb|$#|: number of arguments passed to the script
+          \item \verb|$<n>|: argument \texttt{n}. It is 1-based, in fact \verb|$0| expands to shell / script's name
+          \item \verb|$@|: all arguments. You can use it in a list: \verb|for arg in "${@}"|. When quoted, it extends to singularly quoted arguments: \verb|"$@"| expands to \verb|"$1" "$2"|\ldots
+          \item \verb|$*|: all arguments. It is similar to \verb|$@|, however, when quoted, it extends to all arguments quoted inside the same quotes: \verb|"$*"| expands to \verb|"$1 $2 ..."|
+          \item \verb|$!|: expands to the last run process's ID
+          \item \verb|$?|: return value of last command. You can store it \verb|ret_val=$?| or use it directly
+\begin{lstlisting}[language=bash]
+some_command
+if [ $? -eq 0 ]; then
+  echo OK
+else
+  echo FAIL
+fi
+\end{lstlisting}
+        \end{itemize}
+      \item Variables are not usually typed (there is no distinction between integers, string,\ldots). However, sometimes we'd like to have this, one can then use \texttt{declare}. Some options and tricks:
+        \begin{itemize}
+          \item \verb|-r|: declare a \emph{r}eadonly variable
+          \item \verb|-i|: declare an \emph{i}nteger variable (gives 0 if not integer)
+          \item \verb|-a|: declare an \emph{a}rray
+          \item \verb|-f|: declare a \emph{f}unction
+          \item \verb|-e|: declare an ``\emph{e}xport'' (that's actually what \texttt{export var} does)
+        \end{itemize}
+\begin{lstlisting}[language=bash]
+declare -i n_iter
+n_iter=5
+declare -r ro="readonly"
+\end{lstlisting}
+      \item Command \verb|let <expression>| can be used to define arithmetic variables
+\begin{lstlisting}[language=bash]
+let "foo = 1" "bar = foo + 2" "foo++"; echo "$foo, $bar" # 2, 3
+\end{lstlisting}
+    \end{itemize}
+  \item Functions
+\begin{lstlisting}[language=bash]
+function foo() {
+  # Variable
+  foo="Foo"
+  # Local variable, recommended
+  local bar="Bar"
+  # Using arguments
+  first_arg=$1
+  second_arg=$2
+}
+\end{lstlisting}
   \item Default applications: often we don't know the name of the programs that we use, for instance, for opening a pdf. Here some of them
     \begin{itemize}
       \item \texttt{evince} for pdf.
@@ -99,22 +180,6 @@ In this section, we cover basic stuff about the shell. For useful terminal comma
     \begin{itemize}
       \item Add a \verb|&| after a command to run it back ground, meaning that it won't block the terminal while running, so that you can still use the terminal window for other stuff. This is quite useful when opening GUI programs (e.g.\ \texttt{evince}).
       \item Precede your commands with \texttt{nohup} in order to have them running ever after the terminal window / session is closed. More \href{https://linux.101hacks.com/unix/nohup-command/}{here} or \href{https://hexadix.com/use-nohup-execute-commands-background-keep-running-exit-shell-promt/}{here}.
-    \end{itemize}
-  \item Some built-in variables:
-    \begin{itemize}
-      \item \verb|$#|: number of arguments passed to the script
-      \item \verb|$<n>|: argument \texttt{n}. It is 1-based, in fact \verb|$0| expands to shell / script's name
-      \item \verb|$@|: all arguments. You can use it in a list: \verb|for arg in "${@}"|
-      \item \verb|$!|: expands to the last run process's ID
-      \item \verb|$?|: return value of last command. You can store it \verb|ret_val=$?| or use it directly
-\begin{verbatim}
-some_command
-if [ $? -eq 0 ]; then
-  echo OK
-else
-  echo FAIL
-fi
-\end{verbatim}
     \end{itemize}
   \item \texttt{echo}: print to screen
     \begin{itemize}
