@@ -49,13 +49,13 @@ Tips \& stuff
 \vspace*{\baselineskip}
 
 Some tips about terminal commands (\texttt{sed}, \texttt{grep}\ldots) and languages (\texttt{C}, \texttt{python}\ldots) are given here. For terminal commands, mind that you can access the related \emph{man}ual/help page by running
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 man <cmd>
-\end{verbatim}
+\end{lstlisting}
 or sometimes
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 <cmd> --help
-\end{verbatim}
+\end{lstlisting}
 
 \emph{Notations and conventions.} You will find stuff inside angle brackets (like this \verb|<.>|): this is something that you can choose. You will also find other stuff within square brackets (like this \verb|[.]|, and they can be nested): this indicates something that is optional.
 
@@ -139,14 +139,14 @@ fi
     \begin{itemize}
       \item Redirect \texttt{stdout} to \texttt{stderr}: \verb|<cmd> 1>&2|
       \item Redirect \texttt{stdout} and \texttt{stderr} to file: first we redirect \texttt{stdout} to a file then we tell to copy \texttt{stderr} to \texttt{stdout}
-\begin{verbatim}
-  <cmd> > file.log 2>&1
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+<cmd> > file.log 2>&1
+\end{lstlisting}
       \item Discard output: \texttt{<cmd> > /dev/null}.
       \item Pipe \texttt{stderr}. Aim: discard \texttt{stdout} and pipe \texttt{stderr}. \href{https://stackoverflow.com/questions/2342826/how-can-i-pipe-stderr-and-not-stdout}{Actions}: redirect \texttt{stderr} to \texttt{stdout}, discard \texttt{stdout}, pipe.
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 cmd 2>&1 >/dev/null | pipe_receiver
-\end{verbatim}
+\end{lstlisting}
       \item \verb|>| can be used to write to file: \verb|echo "Hello world!" > hello.txt| will write into the provided file. If the file already exists it will be replaced, otherwise it will be created. If you want to \emph{append} to the file just use \verb|>>|.
       \item You may want to check out \texttt{tee} in \ref{ssec:shell_tools}.
     \end{itemize}
@@ -154,12 +154,12 @@ cmd 2>&1 >/dev/null | pipe_receiver
     \begin{itemize}
       \item \emph{Here}-strings: feed the content of a variable to a command with \verb|<<<|: \verb|grep [] <<< $var|
       \item \emph{Here}-documents: feed the content of a file created on-the-run to a command with  \verb|<<|:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 grep [] <<EOF
 First line
 Second line
 EOF
-\end{verbatim}
+\end{lstlisting}
         The keyword \texttt{EOF} is arbitrary (one can choose it freely) and delimits the beginning and the end of the document
     \end{itemize}
   \item Strings manipulation:
@@ -179,21 +179,21 @@ EOF
   \item Arrays: have a look \href{https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays}{here}.
     \begin{itemize}
       \item Definition: Use parentheses and whitespace as delimiter:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 arr=(one two three)
-\end{verbatim}
+\end{lstlisting}
       \item Split string into array
         \begin{itemize}
           \item If delimiter is whitespace, simply use parentheses
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 str="one two three"
 arr=($str)
-\end{verbatim}
+\end{lstlisting}
           \item Use \verb|read -a|, and \verb|IFS| to set the delimiter (default is whitespace). In recent version of bash, one can use \verb|readarray|
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 str="one,two,three"
 IFS="," read -a arr <<< $str
-\end{verbatim}
+\end{lstlisting}
         \end{itemize}
       \item Access with \verb|${arr[$i]}|
       \item Get length: \verb|${#arr[@]}|
@@ -201,25 +201,26 @@ IFS="," read -a arr <<< $str
   \item Conditional statements:
     \begin{itemize}
       \item Typical structure
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 if <cond>
 then
-# These first two lines might be written in only one, join with semi-colon:
+# These first two lines might be written in only one, join
+# with semi-colon as follows:
 # if <cond>; then
   <cmd>
 else
   <cmd>
 fi
-\end{verbatim}
+\end{lstlisting}
       \item The above \verb|<cond>| can be written in several ways, see \href{https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs}{here}. Some examples:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 if [ <cond> ]
 if test <cond> # Same as above
 if [[ <cond> ]]
 if ((<cond>)) # Arithmetic evaluation
 if (cmd) # Command run in a subshell
 if cmd # Command run
-\end{verbatim}
+\end{lstlisting}
       \item Remember: 0 is true, other is false
       \item \texttt{test} or operator \verb|[| (square brackets): test if an expression is true. A quick \href{https://www.computerhope.com/unix/test.htm}{guide}. But the \texttt{man} page is clear and concise, just use this one. A little syntax:
         \begin{itemize}
@@ -241,34 +242,38 @@ if cmd # Command run
           \item Check for an UNSET variable: \verb|[ -z "${var+x}" ]| (from \href{https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash}{here})
           \item Check for an EMPTY variable: \verb|[[ -z $var ]]| or \verb|[[ ! $var ]]| (from \href{https://serverfault.com/questions/7503/how-to-determine-if-a-bash-variable-is-empty}{here})
           \item Check out this \href{https://stackoverflow.com/questions/3869072/test-for-non-zero-length-string-in-bash-n-var-or-var}{comparison}
-\begin{verbatim}
-if [[ $var ]]; then   # var is set and it is not empty
-if [[ ! $var ]]; then # var is not set or it is set to an empty string
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+if [[ $var ]]; then
+  # var is set and it is not empty
+fi
+if [[ ! $var ]]; then
+  # var is not set or set to an empty string
+fi
+\end{lstlisting}
         \end{itemize}
     \end{itemize}
   \item Loops:
     \begin{itemize}
       \item For loops: have a look \href{https://www.cyberciti.biz/faq/bash-for-loop/}{here}. Quick examples:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 for n in one two three; do [...] done
 # {START..END} or {START..END..INCREMENT}
 for n in {1..10}; do [...] done
 for n in {1..10..2}; do [...] done
 # 3-expression form (( INIT; COND; STEP )), C-like
 for (( n=0; n<10; n++ )); do [...] done
-\end{verbatim}
+\end{lstlisting}
       \item While loops: \verb|while []; do [] done|
       \item Emulating do-while: see first two answers \href{https://stackoverflow.com/questions/16489809/emulating-a-do-while-loop-in-bash}{here}
       \item Combine loops and arrays: some examples
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 for n in (one two three); do [...] done
 #
 list=(one two three)
 for n in ${list[@]}; do [...] done # Items only
-for i in ${!list[@]}; do [...] done # Indeces only
-for n in ${list[@]:1}; do [...] done # Items only, skip the first one
-\end{verbatim}
+for i in ${!list[@]}; do [...] done # Indices only
+for n in ${list[@]:1}; do [...] done # Items only, skip the first
+\end{lstlisting}
     \end{itemize}
   \item Notifications and dialogue windows: we really like the old-school terminal, but sometimes nice GUI stuffs and visual aides make life easier. Consider this: you launch a script which takes a really long time, so from the terminal you switch to do other stuff. It would be nice to be alerted when the said script finishes. I am still working on an audio signal, but consider these two options:
     \begin{itemize}
@@ -288,23 +293,24 @@ for n in ${list[@]:1}; do [...] done # Items only, skip the first one
   \item Parallelize loops:
     \begin{itemize}
       \item Use background commands with \verb|&|: see \href{https://unix.stackexchange.com/questions/103920/parallelize-a-bash-for-loop/103922}{here}
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 for {...}; do
   do_something() &
 done
-\end{verbatim}
+\end{lstlisting}
         Mind that this will spawn as many sub-processes as iterations in the loops, no matter the number of available cores
       \item As before, but limiting the number of processes: see \href{https://stackoverflow.com/questions/38774355/how-to-parallelize-for-loop-in-bash-limiting-number-of-processes}{here}
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 num_procs=$1
-num_jobs="\j"  # The prompt escape for number of jobs currently running
+# The prompt escape for number of jobs currently running
+num_jobs="\j"
 for {...}; do
   while (( ${num_jobs@P} >= num_procs )); do
     wait -n
   done
   do_something() &
 done
-\end{verbatim}
+\end{lstlisting}
     \end{itemize}
 \end{itemize}
 
@@ -369,25 +375,25 @@ Commands:
 \begin{itemize}
   \item Common commands may be found \href{https://www.gnu.org/software/sed/manual/sed.html#Common-Commands}{here}, less common ones \href{https://www.gnu.org/software/sed/manual/sed.html#Other-Commands}{here}, the \href{https://www.gnu.org/software/sed/manual/html_node/sed-commands-list.html}{list} from the manual
   \item Search and replace, \verb|s|:
-\begin{verbatim}
-  sed -i "s/<pattern>/<replaced>/" file
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+sed -i "s/<pattern>/<replaced>/" file
+\end{lstlisting}
   \item Replace all the lines matching \verb|pattern| with \verb|Pattern was here| - this works on the entire line, \verb|c <text>| or \verb|c\<newline><text>|:
-\begin{verbatim}
-sed -i "/pattern/c Pattern was here/" file,
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+sed -i "/pattern/c Pattern was here/" file
+\end{lstlisting}
   \item Delete all lines containing \verb|pattern| - this works on the entire line:
-\begin{verbatim}
-sed -i "/pattern/d" file;
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+sed -i "/pattern/d" file
+\end{lstlisting}
   \item Insert before line, \verb|i <text>| or \verb|i\<newline><text>|
-\begin{verbatim}
-sed -i "/pattern/i Next line is pattern/" file,
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+sed -i "/pattern/i Next line is pattern/" file
+\end{lstlisting}
   \item Append after line, \verb|a <text>| or \verb|a\<newline><text>|
-\begin{verbatim}
-sed -i "/pattern/a Previous line was pattern/" file,
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+sed -i "/pattern/a Previous line was pattern/" file
+\end{lstlisting}
   \item Apply multiple commands at the same time:
     \begin{itemize}
       \item Separate them with semicolons: \verb|sed 'cmd1 ; cmd2' file|
@@ -413,35 +419,35 @@ Options and tricks:
       \item The option \verb|--follow-symlinks|, available only with \verb|-i| activated, enables to modify the original file;
     \end{itemize}
   \item Option \verb|-n| avoid printing. This might be used in combination with the command \texttt{p} (print) to have a \texttt{grep}-like results where one can also replace. \href{https://unix.stackexchange.com/a/278377}{E.g.}:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 # Replace foo by FOO (using groups)
 sed -n "s/^.*foo\([0-9]\+\).*$/FOO\1/p" file
-\end{verbatim}
+\end{lstlisting}
   \item If in one line there are more occurrences, only the first one is matched. Appending \texttt{g} will make \texttt{sed} match all the occurrences.
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 sed -i "s/<pattern>/<replaced>/g" file
-\end{verbatim}
+\end{lstlisting}
   \item Character \verb|&| expands to matched string.
   \item Match exactly the word: from regex, \verb|\b| delimits boundaries of the word. Hence, (although \verb|\<word\>| seems to work, as well (\texttt{vim}, anyone?)):
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 $ echo "bar embarassment" | sed "s/\bbar\b/no bar/g"
 no bar embarassment
-\end{verbatim}
+\end{lstlisting}
   \item Parentheses used in regex syntax (for groups \verb|(.)|, repetitions \verb|{.}|) should be escaped by a backslash: e.g. \verb|\(agroup\)|. Access groups content with \verb|\<n>| where \verb|n| is the number of the group. Or, add option \verb|-E|.
   \item Use \texttt{bash} variables: prefer the double-quotes \verb|"| instead of the single ones \verb|'|:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 sed "s/${pattern}/${replaced}/" file
-\end{verbatim}
+\end{lstlisting}
   \item \verb|$| means last line when dealing with ranges, or end of the line when dealing with patterns.
   \item Mind that command \verb|d| erases the entire line, if you want to delete only the pattern, you can replace it with an empty string.
   \item Write at the beginning of the line: match the beginning (special character \verb|^|) and replace. For instance, in \texttt{C} comments all the lines containing \texttt{Comment} (mind that we have to escape character \verb|/|)
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 sed '/Comment/ s/^/\/\//' test.c
-\end{verbatim}
+\end{lstlisting}
   \item Replace only the first occurrence of \verb|pattern|: a bit tricky, find the right range (from line zero to first occurrence) then replace
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 sed '0,/pattern/ s/pattern/new pattern/' file
-\end{verbatim}
+\end{lstlisting}
   \item Replace only the last occurrence of pattern: I'm still working on that. A long and dirty workaround may be to use \verb|tac|, then replace \emph{first} occurrence and finally \verb|tac| again.
 \end{itemize}
 
@@ -474,9 +480,9 @@ Some useful options:
   \item \texttt{-q}: \emph{q}uiet, return just the exit status code (0 or 1 corresponding to, respectively, true or false) according to whether it have found a match or not;
   \item \verb|--include=<pattern>|: consider only files matching \texttt{pattern}. For example for only \TeX{} sources
   \item \verb|--label=<label>|: show matches from \texttt{stdin} as coming from file \texttt{label}. This is nice to have when combining with \texttt{find} (cf.\ \autoref{ssec:find})
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 grep --include=\*.tex -r "O Bella Ciao" .
-\end{verbatim}
+\end{lstlisting}
   \item \verb|--exclude=<pattern>|: do not consider files matching \texttt{pattern};
   \item \verb|--exclude-dir=<dir>|: exclude files in directory \texttt{dir};
 \end{itemize}
@@ -503,12 +509,12 @@ Types:
     \begin{itemize}
       \item Using \texttt{pdfgrep}: just use it as you would use \texttt{grep}
       \item Using \texttt{pdftotext}: convert pdf to text, pipe it, and \texttt{grep} it. By defaults it creates a \texttt{.txt} file, so mind the dash which makes it skip this
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 pdftotext to_search.pdf - | grep pattern
 # Combined with find
-find /path -name '*.pdf' -exec \
-  sh -c 'pdftotext "{}" - | grep -H --label="{}" --color " pattern"' \;
-\end{verbatim}
+find /path -name '*.pdf' -exec sh -c \
+  'pdftotext "{}" - | grep -H --label="{}" --color " pattern"' \;
+\end{lstlisting}
     \end{itemize}
 \end{itemize}
 
@@ -519,15 +525,15 @@ find /path -name '*.pdf' -exec \
 \subsection{\texttt{find}}
 \label{ssec:find}
 It allows to find files in a tree and apply a command to them:
-\begin{verbatim}
-  find [options] <path> <command>
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+find [options] <path> <command>
+\end{lstlisting}
 If no command is given, \texttt{-print} is executed. Some examples and options:
 \begin{itemize}
   \item Check if file \texttt{filename} is in \texttt{mydir} or one of its subdirectories (\texttt{-print} is considered, thus it works similarly to \texttt{ls})
-\begin{verbatim}
-  find <mydir> -name <filename>
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+find <mydir> -name <filename>
+\end{lstlisting}
   \begin{itemize}
     \item In the previous examples, use \verb|-wholename| (instead of simply \verb|-name|) if you provide the path as well
     \item \verb|-regex|: similar to \texttt{name} but one can use regex syntax to write the pattern. The type can be chosen with \verb|-regextype| (ex. \texttt{sed}). Notice that \texttt{find} always prepends \verb|./| to the path so you may want to start your pattern with something like \verb|.*/|
@@ -537,25 +543,25 @@ If no command is given, \texttt{-print} is executed. Some examples and options:
   \item \texttt{!}, \texttt{-not}: negation of the expression that follows. E.g.: \texttt{find . -not -name foo} print all the files in the current directory with a name different than \texttt{foo}.
     \begin{itemize}
       \item Exclude a path:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 find . -name notmyfile -not -path <dir_excl>
-\end{verbatim}
+\end{lstlisting}
         This is somehow too simple and \texttt{find} will still search into the sub-directories of \verb|dir_excl|. You may find other solutions \href{https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command}{here} (the accepted answer with \verb|-prune|may not always work).
     \end{itemize}
   \item \verb|-maxdepth <n>|: limit the tree descent level of the search
   \item Apply a command to all the matching files: e.g.\ run a bash script, grep only certain files
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 find . -name "*.log" -exec script.sh {} \;
 find . -name "*.log" -exec script.sh {} +
 find . -name "*.log" -exec grep -Hn --color "pattern" {} +
-\end{verbatim}
+\end{lstlisting}
     \verb|{}| stands for the matching files; the first version will execute as many calls as the numbers of matching files, the second (tries to) appends all the files in an single list of arguments (hence saving the calls to the script). If you would like to use a pipe in your \texttt{exec} command, use \texttt{sh} like below, or have a look \href{https://stackoverflow.com/questions/307015/how-do-i-include-a-pipe-in-my-linux-find-exec-command}{here}.
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 find . -name "*.log" -exec sh -c "tac {} | grep -m1 pattern" \;
 #
-find /path -name '*.pdf' -exec \
-  sh -c 'pdftotext "{}" - | grep -H --label="{}" --color " pattern"' \;
-\end{verbatim}
+find /path -name '*.pdf' -exec sh -c \
+  'pdftotext "{}" - | grep -H --label="{}" --color " pattern"' \;
+\end{lstlisting}
   \begin{itemize}
     \item Mind that \texttt{find} does not know the content of \texttt{.bashrc} and alike, hence one could not use aliases (its \texttt{ls} command might be stripped-down with respect to what one is used to, you may want to consider adding some user-friendly options).
   \end{itemize}
@@ -579,13 +585,13 @@ find /path -name '*.pdf' -exec \
   \item Basic usage:
     \begin{itemize}
       \item \verb|c|, \verb|-c|, \verb|--create|: create. Remember to put all the files that you want in your archive in one go.
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 tar -cf archived.tar file/to/archive
-\end{verbatim}
+\end{lstlisting}
       \item \verb|x|, \verb|-x|, \verb|--extract|, \verb|--get|: extract
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 tar -xf archived.tar
-\end{verbatim}
+\end{lstlisting}
       \item As you have already understood, \verb|-f| stands for file(name).
     \end{itemize}
   \item Additional options:
@@ -604,18 +610,18 @@ tar -xf archived.tar
       \item \verb|-J|, \verb|xz|
     \end{itemize}
   \item Compress an existing tarball: see \href{https://unix.stackexchange.com/questions/457949/how-to-turn-a-tar-file-to-a-tgz-file}{here}
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 gzip < my_files.tar > my_files.tgz
-\end{verbatim}
+\end{lstlisting}
 \end{itemize}
 
 \subsubsection{\texttt{zip}}
 A cross-platform extension for compressed files is \texttt{zip}.
 \begin{itemize}
   \item To compress simply run
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 zip [options] <compressed_file>.zip <files_to_compress>
-\end{verbatim}
+\end{lstlisting}
     \begin{itemize}
       \item If \verb|<compressed_file>.zip| already exists, files are added
     \end{itemize}
@@ -627,21 +633,21 @@ zip [options] <compressed_file>.zip <files_to_compress>
 
 \subsubsection{\texttt{gzip}}
 \texttt{gzip} is a compression format for Unixes.
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 gzip [options] <compressed_file>.gz <files_to_compress>
-\end{verbatim}
+\end{lstlisting}
 
 \subsubsection{\texttt{7zip}}
 \begin{itemize}
   \item Base command is \texttt{7z*}, it can be installed with \texttt{p7zip}
   \item Create zip
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 7za a <compressed_file>.7z <files_to_compress>
-\end{verbatim}
+\end{lstlisting}
   \item Extract zip: \texttt{command} can be \texttt{e} (extract without directories), or \texttt{x} (with full paths)
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 7za <command> <compressed_file>.7z
-\end{verbatim}
+\end{lstlisting}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -663,27 +669,29 @@ gzip [options] <compressed_file>.gz <files_to_compress>
       \item print the third row: \verb|awk 'NR==3{print;exit}' file.txt|
       \item print lines containing \texttt{apple}: \verb|awk 'BEGIN{print "We eat an"}/apple/' file.txt| (print is implied)
       \item More than one pattern might be used. No particular syntax is needed: nothing, a space or a newline will do the trick
-\begin{verbatim}
-awk '/apple/{print "Found an apple"}/banana/{print "Found a banana"}' infile
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+awk \
+  '/apple/{print "Found apple"}/banana/{print "Found banana"}' \
+  infile
+\end{lstlisting}
     \end{itemize}
   \item Select the \texttt{n}-th field \verb|$<n>|. Remark: it is 1-based (first field is indexed by 1), and \verb|$0| expands to the whole line.
   \item Printing: it is usually achieved by command \texttt{print}. Some notes
     \begin{itemize}
       \item Columns are accessed with a dollar \verb|$|, for variables just use their name
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 awk '{print $NF}' file # Print last column only
 awk -v T=8 'END{print "2 times T = " 2*T}' file
-\end{verbatim}
+\end{lstlisting}
       \item One can use redirection such as \verb|>|, \verb|>>| as explained in \autoref{sec:shell} to write to file. E.g.
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 awk 'BEGIN{print Ciao > "ciao.txt"}' file
-\end{verbatim}
+\end{lstlisting}
       \item \texttt{print} it also prints a new line stamp at the end
       \item \texttt{printf}, very similar to the \texttt{C} function, it can be used to choose the format. Differently from \texttt{print}, it does not insert a new line. E.g. (mind the \verb|\n|)
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 awk '{printf("I want %5.2f bananas\n", 1.652)}' file
-\end{verbatim}
+\end{lstlisting}
     \end{itemize}
   \item Useful options:
     \begin{itemize}
@@ -705,9 +713,9 @@ awk '{printf("I want %5.2f bananas\n", 1.652)}' file
     \begin{itemize}
       \item \href{https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html}{String-Manipulation functions}
       \item Operator "match", \verb|~| (tilde): \verb|<string>~<pattern>| true if \verb|string| matches \verb|pattern|. The negation is \verb|!~|. Hence, the following emulates \texttt{grep }(well, not exactly since we search in the second column only, but you get the idea)
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 awk '$2~/<pattern>/{print $0}' file.txt
-\end{verbatim}
+\end{lstlisting}
     \end{itemize}
 \end{itemize}
 
@@ -720,20 +728,20 @@ awk '$2~/<pattern>/{print $0}' file.txt
   \item \texttt{echo}: print a line to standard output. E.g. \verb|echo "Ciao World"|. It includes a newline at the end. It could be used via piping to provide an input parameter to a command.
     \begin{itemize}
       \item Variables can be used. Suppose you have \verb|what="cute puppy"|, then one can use
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 echo "I want a ${what}"
-\end{verbatim}
+\end{lstlisting}
       \item For redirection to files have a look at \autoref{sec:shell}.
       \item \verb|-n|: do not to insert a new line at the end.
       \item \verb|-e|: interpret a backslashed character, e.g. \verb|\n| will be considered as newline
       \item Overwrite: use \verb|\b| (needs option \verb|-e|) to go back a character. For entire lines, have a look \href{https://stackoverflow.com/questions/11283625/overwrite-last-line-on-terminal}{here}.
     \end{itemize}
   \item \href{https://man7.org/linux/man-pages/man1/script.1.html}{\texttt{script}}: save a shell session (commands and outputs) to a file
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 script session.log
 [commands here]
 exit
-\end{verbatim}
+\end{lstlisting}
     \begin{itemize}
       \item End the recording with \texttt{exit}
       \item \verb|-q|: quiet mode (do not print \texttt{script}-related ``greetings'')
@@ -741,20 +749,20 @@ exit
       \item \verb|-c <cmd>|: record command \verb|cmd| only (without starting an interactive session)
     \end{itemize}
   \item \verb|eval [args]|: \verb|args| are concatenated to build and run a command. Variables can be used:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 cmd="ls"
 echo "I will now $cmd in dir"
 eval $cmd dir
-\end{verbatim}
+\end{lstlisting}
   \item Working with remote servers:
     \begin{itemize}
       \item \texttt{ssh}
         \begin{itemize}
           \item Connect to server: \verb|ssh [opt] [user@]server|. A new session open (a password may be requested). Use option \verb|-X| (or \verb|-Y|) to enable forwarding of the GUI, that is enabling GUI programs on the server
           \item For connections that requires an identification, one may skip the typical ``insert the password'' method by adding a \texttt{ssh} key to the authorized one. See \href{https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server}{here} how:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 ssh-copy-id username@remote_host
-\end{verbatim}
+\end{lstlisting}
             or simply add your public key to \verb|$HOME/.ssh/authorized_keys| of the server
           \item Run command on a server: \verb|ssh [opt] [user@]server cmd| (or \verb|'cmd'|)
         \end{itemize}
@@ -763,9 +771,9 @@ ssh-copy-id username@remote_host
           \item \texttt{scp}: it's the inter-server equivalent of \texttt{cp}, it has basically the same options and usage
             \begin{itemize}
               \item In order to copy hidden files append a dot "\texttt{.}". E.g.:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 scp -r [...] source/. user@server:dest/
-\end{verbatim}
+\end{lstlisting}
                 If \texttt{source} is the current directory it is better to do (incompatibility introduced by 2019 standard): \verb|scp -r [...] $(pwd) user@server:dest/|. However, a good alternative for this kind of needs is \verb|rsync|
             \end{itemize}
           \item \texttt{rsync}: has a syntax similar to \texttt{mv} or \texttt{cp}. As the name suggests, it is a sort of synchronization tool, hence you can customize the effect so that only most recent and freshly edited files are moved. Indeed, it can be use entirely locally, for instance to update a copy / backup. If no destination is provided, \texttt{rsync} will behave similarly to \texttt{ls}.
@@ -774,9 +782,10 @@ scp -r [...] source/. user@server:dest/
               \item \verb|--info=progress2|: progress bar for global transfer (not per file)
               \item \verb|--exclude=<pattern>|: exclude files matching the pattern. \verb|--exclude-from=<file>|: read a file where each line is a pattern, if a file matches one of them, it is excluded
               \item \verb|--include=<pattern>|: it's more a \emph{NEVER EXCLUDE} than an include. For an \emph{include-only}--like process, look \href{https://unix.stackexchange.com/questions/2161/rsync-filter-copying-one-pattern-only}{here}: basically, exclude everything, then include back and include back again the \emph{only}
-\begin{verbatim}
-rsync --include='*.pdf' --include='*/' --exclude='*' src dest
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+rsync --include='*.pdf' --include='*/' --exclude='*' \
+  src dest
+\end{lstlisting}
             \end{itemize}
           \item ATTENTION: \texttt{scp} and \texttt{rsync} load the \texttt{.bashrc} and fail if it produces an output to \texttt{stdout} (for instance, if they contain commands such as \texttt{echo}). The workaround is to move those commands into \texttt{.bash\_profile} (or just send the output to \verb|/dev/null| if it is not important)
         \end{itemize}
@@ -824,12 +833,12 @@ rsync --include='*.pdf' --include='*/' --exclude='*' src dest
       \item \verb|%x|, \verb|%X|: respectively, date and hours according to region setting
     \end{itemize}
   \item Send email from terminal (because, why not. And yes, I have tried it in order to transfer a file from the cluster to my machine): look \href{https://www.tecmint.com/send-email-attachment-from-linux-commandline/}{here}, a quick \href{https://www.interserver.net/tips/kb/linux-mail-command-usage-examples/}{tutorial}.
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 echo "Message Body Here" | \
     mailx -s "Subject Here" -a attachment.txt user@example.com
 echo "Message Body Here" | \
     mail -s "Subject Here" -A attachment.txt user@example.com
-\end{verbatim}
+\end{lstlisting}
     \begin{itemize}
       \item Other useful options:
         \begin{itemize}
@@ -838,15 +847,15 @@ echo "Message Body Here" | \
           \item \verb|-r me@me.me|: sender address
         \end{itemize}
       \item Use file as body of the message: option \verb|-q file.txt|. \textbf{However}, this might not work as expected: if the command finds non-standard charcters, even new-lines (!) instead of using the text it will attach it as a binary file. The following might work (see this \href{https://unix.stackexchange.com/a/522868/502731}{SO discussion}):
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 tr -cd "[:print:]\n" < file.txt | \
     mailx -s "Subject Here" user@example.com
-\end{verbatim}
+\end{lstlisting}
     \end{itemize}
   \item \texttt{wc}: \texttt{shell} command to perform some basic counting operations on a file (mnemonic: \emph{w}ord \emph{c}ount):
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 wc [options] <file>
-\end{verbatim}
+\end{lstlisting}
     \begin{itemize}
       \item \verb|-c|: print number of bytes;
       \item \verb|-w|: print number of words;
@@ -896,10 +905,10 @@ lstopo-no-graphics --output-format txt > topology.txt
   \item \href{https://github.com/DavidFirth/pdfjam#using}{\texttt{pdfjam}}: nice and easy utility to modify \texttt{pdf} files
     \begin{itemize}
       \item Extract and/or merge: Examples of accepted ranges: \texttt{'1,6-9'}, \texttt{'-2,4,6'}
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 pdfjam [options] -- file_1.pdf ['<page_range>'] \
                    [file_2.pdf ['<page_range>'] ...]
-\end{verbatim}
+\end{lstlisting}
       \item Rotate: Commands specified for certain angles are available: \verb!pdf90|180|270 <in.pdf>!
       \item Landscape mode: \verb|--landscape|
       \item Keep size: \verb|--fitpaper true|
@@ -911,10 +920,10 @@ pdfjam [options] -- file_1.pdf ['<page_range>'] \
           \item \texttt{ghostscript} can output in many forms, called \emph{devices} (even OCR!), \href{https://ghostscript.com/docs/9.54.0/Devices.htm}{here's how}
         \end{itemize}
     \end{itemize}
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -dPSFitPage \
    -dFirstPage=2 -dLastPage=5 -o out.pdf in.pdf
-\end{verbatim}
+\end{lstlisting}
   \item Job management:
     \begin{itemize}
       \item \verb|kill [options] <job_ID>|: kill (send \texttt{SIGTERM} to) the job denoted by \verb|<job_ID>|.
@@ -945,10 +954,10 @@ gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -dPSFitPage \
   \item \texttt{time}: run programs and summarize system resource usage (from \texttt{man}). \verb|time my_script.sh|; get the execution time of the script. More insight \href{https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1/556411#556411}{here}.
   \item \texttt{uname}: print system info
   \item ``Safely remove'' disks from command line: use \texttt{udisksctl} as explained \href{https://askubuntu.com/questions/532586/what-is-the-command-line-equivalent-of-safely-remove-drive}{here}:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 udisksctl unmount -b /dev/sdX
 udisksctl power-off -b /dev/sdX
-\end{verbatim}
+\end{lstlisting}
   \item Con\emph{cat}enate files and print to standard output (basically print the content to screen)
     \begin{itemize}
       \item \verb|cat [<opt>] file [file2 [...]]|
@@ -979,9 +988,9 @@ udisksctl power-off -b /dev/sdX
     \end{itemize}
   \item \verb|crontab|: job scheduling. It allows one to regularly run some commands or scripts. Tutorial \href{https://www.adminschoice.com/crontab-quick-reference}{here} or \href{https://www.computerhope.com/unix/ucrontab.htm}{here}.
   \item \texttt{tee}: read from standard input and write to standard output \textbf{\&} files. Useful when you want to save the output of a command to file but you still want to read it on screen. E.g.
-\begin{verbatim}
-  echo "This'll be printed to screen and inside file.txt" | tee file.txt
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+echo "This'll be printed to screen and inside f.txt" | tee f.txt
+\end{lstlisting}
     \begin{itemize}
       \item \verb|-a|: append to file.
       \item Print to screen \& pipe: \verb!./script | tee /dev/tty | ./script_with_pipe!
@@ -1004,9 +1013,9 @@ udisksctl power-off -b /dev/sdX
       \item \verb|-s|: \emph{s}queeze. \verb!echo Maaan | tr -s a e! replaces each sequence of repeated \texttt{a}'s with a single occurrence of \texttt{e}, hence it gives \texttt{Men}.
     \end{itemize}
   \item \texttt{xargs}: use standard output to build commands (you can think of it as a more powerful way of piping). Have a look at some tutorials \href{https://shapeshed.com/unix-xargs/}{here} and \href{https://www.thegeekstuff.com/2013/12/xargs-examples/}{here}. Typical call is (the 0-related flags deal with files with spaces in their names)
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 find . -name foo -print0 | xargs -0 rm
-\end{verbatim}
+\end{lstlisting}
     \begin{itemize}
       \item \texttt{-t}: print the command
       \item \texttt{-p}: prompt a user-confirmation before executing the command
@@ -1015,9 +1024,9 @@ find . -name foo -print0 | xargs -0 rm
       \item \texttt{-a <file>}: read from \texttt{file} instead of standard output
     \end{itemize}
   \item \texttt{cut}: cut out part of the content of the input. Typical call is:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 cut -f 2-5 text.txt
-\end{verbatim}
+\end{lstlisting}
     print only columns (\texttt{f}ields) 2 to 5 of the content of file \verb|text.txt|.
     \begin{itemize}
       \item \verb|-f <list>| (or \verb|--fields|): print only fields in the list
@@ -1041,10 +1050,10 @@ cut -f 2-5 text.txt
     \end{itemize}
   \item Extract from path (considered as a string): \texttt{dirname} (root) and \texttt{basename}. E.g.: consider the following \texttt{path/to/file.txt}. Then \texttt{dirname} returns \texttt{path/to}, whereas \texttt{basename} \texttt{file.txt}.
   \item Convert from HEX to RGB colors from command line
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 hex="11001A"
 printf "%d %d %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2}
-\end{verbatim}
+\end{lstlisting}
   \item \href{https://pandoc.org/}{\texttt{pandoc}}: convert from and to (almost) any markup languages, such as \LaTeX{}, \texttt{markdown}, \texttt{html}, Word, \texttt{reStructured Text}, \texttt{epub}, \texttt{pdf},\ldots
 \end{itemize}
 
@@ -1067,7 +1076,7 @@ Some useful options:
       \item Profiling a subset of the program: one might be interested in profiling only a part of the program, or even only a function (for instance to have results that are not polluted by other functions, to speed up a little bit). This can be done in several ways:
         \begin{itemize}
           \item Add \texttt{callgrind} macros to the code, see \href{https://cta-redmine.irap.omp.eu/projects/gammalib/wiki/How_to_use_valgrind}{here} (use option \verb|--collect-atstart=no|)
-\begin{verbatim}
+\begin{lstlisting}[language=c]
 #include <valgrind/callgrind.h>
 
 int main()
@@ -1080,7 +1089,7 @@ int main()
   CALLGRIND_STOP_INSTRUMENTATION;
   foo2();
 }
-\end{verbatim}
+\end{lstlisting}
           \item Toggle the collection at entry/exit of a function: use options \verb|--collect-atstart=no| \verb|"--toggle-collect=bar1(int, int)"|. It is very picky, hence keep the quotes, put the full signature with arguments separated by a comma and a space; for class methods: \verb|Foo::bar1()|. See \href{https://valgrind-users.narkive.com/2YLNcvE8/callgrind-toggle-collect-on-a-class-function}{here} and \href{https://stackoverflow.com/questions/13688185/callgrind-profile-a-specific-part-of-my-code}{here}
           \item Start the program and activate with \verb|callgrind_control -i on|
         \end{itemize}
@@ -1096,9 +1105,9 @@ int main()
   \item Calling functions such as \texttt{fabs}, \texttt{sin},...: \texttt{((double(*)(double))<foo>)(x)}
   \item Setting watchpoints which stay after the end of the current function:
 \begin{verbatim}
-  $ print pt
-    (double *) 0x75e12
-  $ watch *(double *) 0x75e12
+$ print pt
+  (double *) 0x75e12
+$ watch *(double *) 0x75e12
 \end{verbatim}
   \item Print all current variables: \texttt{info args} (try also \texttt{info locals})
   \item Logging output \href{https://sourceware.org/gdb/onlinedocs/gdb/Logging-Output.html}{here}
@@ -1181,9 +1190,9 @@ For inexperienced users who want to perform simple tasks, such as looking at the
       \item For splitting a commit or complex modifications: follow \href{https://stackoverflow.com/questions/6217156/break-a-previous-commit-into-multiple-commits}{here} (I suggest to \texttt{rebase} to one commit before the one you want to modify).
     \end{itemize}
   \item (Re)set the remote reference (from where git pulls) for the branch \verb|branch_name|
-\begin{verbatim}
-  git branch [<branch_name>] --set-upstream-to new_remote/branch_on_remote
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+git branch [<branch_name>] --set-upstream-to new_remote/remote_branch
+\end{lstlisting}
     If \verb|branch_name| is not provided, the current branch will be used as default;
   \item Working with remote repositories
     \begin{itemize}
@@ -1263,13 +1272,13 @@ For inexperienced users who want to perform simple tasks, such as looking at the
     \end{itemize}
   \item \texttt{git revert SHA1}: cancel the modifications done by commit \texttt{SHA1}. More info on the \href{https://git-scm.com/docs/git-revert}{man page} and \href{https://stackoverflow.com/a/4114122}{this answer}.
   \item Add a file but then ignore it. This is quite a common situation: in a multi-developer project, there is a base configuration file and each dev customize it as they wish. One would like to keep the file into the repo, and also not to follow it. The solution is explained \href{https://stackoverflow.com/questions/3319479/can-i-git-commit-a-file-and-ignore-its-content-changes}{here}: add it then change the index
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 git update-index --assume-unchanged <file>
-\end{verbatim}
+\end{lstlisting}
     To undo:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 git update-index --no-assume-unchanged <file>
-\end{verbatim}
+\end{lstlisting}
   \item \texttt{git log}: show the commit logs. \href{https://git-scm.com/docs/git-log}{Manual}
     \begin{itemize}
       \item \texttt{-<n>}, \texttt{-n <n>}: limit the number of commits to output
@@ -1286,14 +1295,14 @@ git update-index --no-assume-unchanged <file>
         \item \href{https://verdantfox.com/blog/how-to-use-git-pre-commit-hooks-the-hard-way-and-the-easy-way}{An example} for pre-commit hooks. Also, check out the \href{https://github.com/pre-commit/pre-commit-hooks}{\texttt{pre-commit} framework}.
       \end{itemize}
   \item Commit cherry-picking (\href{https://git-scm.com/docs/git-cherry-pick}{manual}): apply a specific commit from another branch
-\begin{verbatim}
-  git cherry-picking <commit>
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+git cherry-picking <commit>
+\end{lstlisting}
     \begin{itemize}
       \item Example: apply to the current branch the third-to-last commit of branch \verb|branch_name|:
-        \begin{verbatim}
-          git cherry-picking <branch_name>~4
-        \end{verbatim}
+\begin{lstlisting}[language=bash]
+git cherry-picking <branch_name>~4
+\end{lstlisting}
     \end{itemize}
   \item Show config:
     \begin{itemize}
@@ -1303,24 +1312,25 @@ git update-index --no-assume-unchanged <file>
       \item Search: \verb|git config [--global] --get-regexp <pattern>|
     \end{itemize}
   \item Aliases: as for bash, one can create custom aliases to shortcut some common commands. In order to to that simply use
-\begin{verbatim}
-$ git config [options] alias.<shortcut> '<cmd>'
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+git config [options] alias.<shortcut> '<cmd>'
+\end{lstlisting}
         for instance
-\begin{verbatim}
-$ git config [--global] alias.pr 'pull ---rebase'
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+git config [--global] alias.pr 'pull ---rebase'
+\end{lstlisting}
   \item Proxy: some info are given \href{https://gist.github.com/evantoli/f8c23a37eb3558ab8765}{here}. Try to simply run (from wherever)
-\begin{verbatim}
-$ git config --global http.proxy <server>:<port>
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+git config --global http.proxy <server>:<port>
+\end{lstlisting}
   \item List of files modified by a commit: from this \href{https://stackoverflow.com/a/424142/12152457}{SO's answer} (see also comments)
-\begin{verbatim}
-$ git diff-tree --no-commit-id --name-only -r <sha> # For scripts
-# try also --name-status (gives info if modified, added, deleted, mode changes)
+\begin{lstlisting}[language=bash]
+git diff-tree --no-commit-id --name-only -r <sha> # For scripts
+# try also --name-status: it gives info if modified, added, deleted,
+# mode changes,...
 # or...
-$ git show --pretty="" --name-only <sha>
-\end{verbatim}
+git show --pretty="" --name-only <sha>
+\end{lstlisting}
   \item List all authors / developers in a project: see \href{https://stackoverflow.com/questions/9597410/list-all-developers-on-a-project-in-git}{here} \verb|git shortlog -sne|
   \item Ignore files from the syncing:
     \begin{itemize}
@@ -1362,18 +1372,18 @@ Users can manage and control a GitLab project via an API. This includes uploadin
   \item The (numeric) ID of the project is necessary, actually, more generally all the URL of the project. It is different from the name of the project. It can be found in the examples \texttt{Preferences > CI/CD > General pipelines > Pipeline triggers}. Keep the URL until the numeric ID.
   \item The complete guide is \href{https://docs.gitlab.com/ee/api/}{here}, but, beware it is huge!
   \item Typically, a request will take the form of a call to the project API via \texttt{curl}, just open a terminal and launch
-\begin{verbatim}
- curl --header "PRIVATE-TOKEN: "<your_token>" \
-      --request POST \
-      --something \
-      "https://example.gitlab.com/api/v4/projects/<ID>/<something>"
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+curl --header "PRIVATE-TOKEN: "<your_token>" \
+     --request POST \
+     --something \
+     "https://example.gitlab.com/api/v4/projects/<ID>/<something>"
+\end{lstlisting}
     where one has to use an access token and the numeric ID recovered in previous points. In what follows, we give what should replace the ``\texttt{something}'' above.
   \item \href{https://docs.gitlab.com/ee/api/projects.html#upload-a-file}{Upload a file} (it can be later used in a release):
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 curl [...] --form "file=@relative/path/to/file.txt \
       "https://example.gitlab.com/api/v4/projects/<ID>/uploads"
-\end{verbatim}
+\end{lstlisting}
     If the uploaded succeeded, the path to the online resource is returned / print to screen.
 \end{itemize}
 
@@ -1719,15 +1729,15 @@ import myMod  # noqa: E402
         \begin{itemize}
           \item \verb|v1='Bob'; v2='Alice'; greet="Hi, {v1}! It's {v2}"|
           \item Braces need to be escaped: e.g.\ \verb|fr'{3}'| gives \verb|3|,  \verb|fr'{{3}}'| gives \verb|{3}|. Moreover, with variables:
-\begin{verbatim}
-test = 'TEST'
-print(f'This is a {test}')
-# This is a TEST
-print(f'This is a {{test}}')
-# This is a {test}
-print(f'This is a {{{test}}}') # 2 for escaping, 1 for variable
-# This is a {TEST}
-\end{verbatim}
+\begin{lstlisting}[language=python]
+test = "TEST"
+print(f"That's a {test}")
+# That's a TEST
+print(f"That's a {{test}}")
+# That's a {test}
+print(f"That's a {{{test}}}") # 2 for escaping, 1 for variable
+# That's a {TEST}
+\end{lstlisting}
         \end{itemize}
       \item Raw-strings: identified by \texttt{r}, the backslash is interpreted as backslash (automatically escaped). For instance, \verb|'\n'| leads to a newline, \verb|r'\n'| leads to \verb|\n|.
       \item Combine \texttt{f}- and \texttt{r}-strings: just use \verb|fr'...'|
@@ -1870,9 +1880,9 @@ class Bcolors:
 print(f'{Bcolors.FAIL}FAILED{Bcolors.ENDC}')
 \end{lstlisting}
   \item Profiling: see \href{https://docs.python.org/3/library/profile.html}{here}, basically use \texttt{cProfile}. One can use it as script to profile another script:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 python -m cProfile script.py
-\end{verbatim}
+\end{lstlisting}
     \begin{itemize}
       \item Options: \verb|-s <stat>| sort by statistic \texttt{stat} (e.g.\ time, number of calls,\ldots), \verb|-o output.log| output file
     \end{itemize}
