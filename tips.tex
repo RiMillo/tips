@@ -1988,9 +1988,12 @@ bar(3,  6,  c=10) # a=3, args=(),    b=6, kwargs={'c': 10}
       \item To go further: \href{https://stackoverflow.com/a/32558710}{here}, \href{https://www.infoworld.com/article/3630372/get-started-with-python-type-hints.html}{here}
       \item Use module \href{https://docs.python.org/3/library/typing.html}{\texttt{typing}}
       \item For built-in structures, in older versions use, e.g., \texttt{Dict}, \texttt{Tuple}, \texttt{List}; otherwise in newer version just standard is accepted, e.g., \verb|dict[str, str]|
+        \begin{itemize}
+          \item For more generic constructions, one can use \texttt{Mapping} and \texttt{Sequence} from \texttt{collections.abc} for, respectively, \texttt{dict} and \texttt{list}
+        \end{itemize}
+      \item \texttt{Any} is the joker value, it's compatible with every type.
       \item For more than one possible types, use \verb|Union|. In recent versions, ``\verb!|!'' (pipe, like in \emph{or}) is accepted as well
       \item For optional arguments that can assume \verb|None| or another type, use \verb|Optional|
-      \item Skip line: add comment \verb|# type: ignore|
       \item An example below
 \begin{lstlisting}[language=python]
 from typing import List, Dict
@@ -2013,8 +2016,119 @@ def fib(n : int, label : str) -> int:
   print(label)
   return a
 \end{lstlisting}
+      \item Aliases and custom types:
+        \begin{itemize}
+          \item define them with \texttt{TypeAlias} (or simply \texttt{type} in python $\geq3.12$)
+\begin{lstlisting}[language=python]
+from typing import TypeAlias
+Vector: TypeAlias = list[float]
+# Actually TypeAlias is not necessary
+Vector = list[float]
+# or in python >= 3.12
+type Vector = list[float]
+\end{lstlisting}
+          \item Above are aliases, but one can create also new type which will be regarded as a subclass of the parent type
+\begin{lstlisting}[language=python]
+from typing import NewType
+UserId = NewType('UserId', int)
+def foo(uid: UserId) -> None:
+  # Do something
+foo(UserId(123))  # OK
+foo(123)  # KO
+\end{lstlisting}
+        \end{itemize}
+      \item Annotating \emph{self} in classes methods: see \href{https://stackoverflow.com/a/33533514}{here}. Basically: in python $\geq3.11$ use \texttt{typing.Self}; in python $\geq3.7$ future annotations; in old python use strings
+\begin{lstlisting}[language=python]
+# python 3.11+
+from typing import Self
+class Foo:
+    def __add__(self: Self, other: Self) -> Self:
+        # In this case, it is better to do something like the
+        # following because one has to be sure to return
+        # _exactly_ the same type as self
+        return type(self)(...)
+# python 3.7+
+from __future__ import annotations
+class Bar
+    def __add__(self: Bar, other: Bar) -> Bar:
+        return ...
+# Old pythons, use string
+class Baz
+    def __add__(self: "Baz", other: "Baz") -> "Baz":
+        return ...
+\end{lstlisting}
+      \item Functions\&Callables: use \texttt{typing.Callable} or \texttt{collections.abc.Callable}
+\begin{lstlisting}[language=python]
+from collections.abs import Callable
+# A function that takes a string and a integer and
+# returns a string
+foo: Callable[[str, int], str]
+\end{lstlisting}
+      \item Generators: use \verb|Generator[YieldType, SendType, ReturnType]|. Typical example:
+\begin{lstlisting}[language=python]
+from collections.abs import Generator
+def infinite_stream(start: int) -> Generator[int, None, None]:
+    while True:
+        yield start
+        start += 1
+# or also
+from collections.abc import Iterator
+def infinite_stream(start: int) -> Iterator[int]:
+    while True:
+        yield start
+        start += 1
+\end{lstlisting}
+      \item Generic functions (sort of template): two ways, one direct, the other relies on \texttt{Typevar}
+\begin{lstlisting}[language=python]
+from collections.abc import Sequence
+# Function is generic over the TypeVar "T"
+def first[T](l: Sequence[T]) -> T:
+    return l[0]
+
+# Second way
+from typing import TypeVar
+# Declare type variable "U"
+U = TypeVar('U')
+# Function is generic over the TypeVar "U"
+def second(l: Sequence[U]) -> U:
+    return l[1]
+\end{lstlisting}
+      \item Type for types: \verb|typing.Type| or simply \verb|type|
+\begin{lstlisting}[language=python]
+a = 3         # Has type ``int``
+b = int       # Has type ``type[int]``
+c = type(a)   # Also has type ``type[int]``
+#
+class User: ...
+class ProUser(User): ...
+class TeamUser(User): ...
+
+def make_new_user(user_class: type[User]) -> User:
+    # ...
+    return user_class()
+
+# OK
+make_new_user(User)
+# OK: type[ProUser] is a subtype of type[User]
+make_new_user(ProUser)
+# Still fine
+make_new_user(TeamUser)
+# Error: expected type[User] but got User
+make_new_user(User())
+# Error: type[int] is not a subtype of type[User]
+make_new_user(int)
+\end{lstlisting}
+      \item \texttt{NoReturn}: use it in functions that never returns, for instance for throwing errors
+\begin{lstlisting}[language=python]
+from typing import NoReturn
+def stop() -> NoReturn:
+    raise RuntimeError('no way')
+\end{lstlisting}
       \item Let us be clear: \texttt{python} basically discards type hints, hence the following won't raise any warnings nor errors: \verb|name : int = 'Ajeje'|
       \item \href{https://mypy.readthedocs.io/en/stable/index.html}{\texttt{mypy}}: write annotations indicating the types of your variables, parameters, and return values, then run \texttt{mypy} to check if your code is coherent (are you assigning a list to a variable that should a dictionary? and so on\ldots). The annotations do not interfere with the code when you are running directly the script.
+        \begin{itemize}
+          \item Skip line from checks: add comment \verb|# type: ignore|
+        \end{itemize}
     \end{itemize}
   \item \texttt{python} is nice, \texttt{C} is better: hence why not \href{https://cython.readthedocs.io/en/latest/index.html}{\texttt{Cython}}?
   \item Dealing with \texttt{zip} files: module \href{https://docs.python.org/3/library/zipfile.html}{\texttt{zipfile}}. See a discussion \href{https://realpython.com/python-zipfile/}{here}. For instance, use without extracting
