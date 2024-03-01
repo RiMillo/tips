@@ -2982,12 +2982,18 @@ foo
           \item {[Deprecated workaround]} However, there seems to be some workarounds, see \href{https://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog}{here} (linking to third-party render) or \href{https://gist.github.com/cyhsutw/d5983d166fb70ff651f027b2aa56ee4e}{here} (write \LaTeX{} code inside a \texttt{jupyter} notebook, for tips about \LaTeX{} and \texttt{jupyter} see \texttt{python} section, \ref{sec:python}, and/or \href{https://jupyterbook.org/content/math.html}{here})
         \end{itemize}
     \end{itemize}
+  \item Render keyboard keys: use \texttt{html} tag \texttt{kbd}: \verb|Select all: <kbd>Ctrl</kbd> + <kbd>A</kbd>|.
+  \item Warning, note, tip,\dots: see \href{https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#alerts}{here} (also \href{https://stackoverflow.com/questions/50544499/how-to-make-a-styled-markdown-admonition-box-in-a-github-gist}{this SO question}). Available keywords: \texttt{NOTE}, \texttt{TIP}, \texttt{IMPORTANT}, \texttt{WARNING}, \texttt{CAUTION}. Every keyword has its own rendering style. Example:
+\begin{verbatim}
+> [!NOTE]
+> Useful information that users should know, even when skimming content.
+\end{verbatim}
   \item \texttt{grip}: \texttt{python}-based script which allows you to have a \texttt{GitHub} rendering of your documents (needs internet to send request for translation to \texttt{GitHub}).
   \item Draw graphs and charts with \href{https://mermaid-js.github.io/mermaid/#/}{\texttt{mermaid}}: all the info about syntax and configuration are in the link
     \begin{itemize}
       \item A \href{https://mermaid-js.github.io/mermaid-live-editor}{live editor}
     \end{itemize}
-  \item Collapsed section: use html tags \texttt{<details>} and \texttt{<summary>}. Tested on \href{https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-collapsed-sections}{GitHub}
+  \item Collapsed section: use \texttt{html} tags \texttt{<details>} and \texttt{<summary>}. Tested on \href{https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-collapsed-sections}{GitHub}
 \begin{verbatim}
 <details>
 
