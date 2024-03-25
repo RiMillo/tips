@@ -69,8 +69,10 @@ There are different version of shells scripting, such as \texttt{bash}, \texttt{
 \subsection{Shell (\texttt{bash}) basics}
 In this section, we cover basic stuff about the shell. For useful terminal commands and tools, see the next sub-sections.
 \begin{itemize}
+  \item Official \href{https://www.gnu.org/software/bash/manual/html_node/index.html}{guide} by GNU itself
   \item Of course I'm not the first to write tips, and certainly not the one who knows the most, so here a couples of tips lists, especially about shortcuts: \href{https://www.techrepublic.com/article/20-terminal-shortcuts-developers-need-to-know/}{here} and \href{https://www.howtogeek.com/howto/ubuntu/keyboard-shortcuts-for-bash-command-shell-for-ubuntu-debian-suse-redhat-linux-etc/}{here} and \href{https://devhints.io/bash}{here}. This \href{https://github.com/jlevy/the-art-of-command-line}{guide} has many tips and seems to be popular on GitHub.
     \begin{itemize}
+      \item Keyword shortcuts: see \href{https://gist.github.com/tuxfight3r/60051ac67c5f0445efee}{here}
       \item Cut \& yank: \texttt{<C-K>} cut (or \emph{k}ill) from cursor to end of line, \texttt{<C-U>} cut from cursor to beginning of line, \texttt{<C-W>} cut (blank-delimited) word just before the cursor, \texttt{<C-Y>} yank (paste).
       \item \texttt{<C-S-E>}: expand alias.
       \item \texttt{<C-R>}: search in the command history while typing.
@@ -102,6 +104,25 @@ echo ${foo}baz
 # Prints barbaz
 \end{lstlisting}
             \end{itemize}
+          \item Indirect expansion, \verb|${!var}| (you can think of it of double extraction): extract the value of the variable with name the value of \verb|var|
+\begin{lstlisting}[language=bash]
+cat="Miao"
+animal="cat"
+echo "The cry of the cat is ${!animal}"
+# The cry of the cat is Miao
+\end{lstlisting}
+        \end{itemize}
+      \item Some variable tricks (\href{https://tldp.org/LDP/abs/html/parameter-substitution.html}{here})
+        \begin{itemize}
+          \item The full list on the \href{https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html}{official guide}
+          \item \verb|${var-default}|: Use \texttt{var} if it is set, otherwise \texttt{default}.
+          \item \verb|${var:-default}|: Use \texttt{var} if it is set \emph{and not} null, otherwise \texttt{default}.
+          \item \verb|${var=default}|: If \texttt{var} is not set, set it to \texttt{default}.
+          \item \verb|${var:=default}|: If \texttt{var} is not set \emph{and not} null, set it to \texttt{default}.
+          \item \verb|${var+alt}|: If \texttt{var} is set, use \texttt{alt}.
+          \item \verb|${var:+alt}|: If \texttt{var} is set \emph{and not} null, use \texttt{alt}.
+          \item \verb|${var?error}|: If \texttt{var} is set, use it, otherwise print \texttt{error} and exit with status 1.
+          \item \verb|${var?error}|: If \texttt{var} is set \emph{and not} null, use it, otherwise print \texttt{error} and exit with status 1.
         \end{itemize}
       \item Scope: the scope of a standard variable is its script. But there are way to change this
         \begin{itemize}
@@ -164,6 +185,43 @@ function foo() {
   second_arg=$2
 }
 \end{lstlisting}
+  \item String manipulation: examples \href{https://tldp.org/LDP/abs/html/string-manipulation.html}{here}
+    \begin{itemize}
+      \item The full list on the \href{https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html}{official guide}
+      \item String length: \verb|${#string}|
+      \item Extract characters from position: \verb|${string:<n>}| from \texttt{n} to end, \verb|${string:<n>:<m>}| from \texttt{n} to \texttt{m}, \verb|${string:(-<n>)}| from end (mind the parentheses)
+      \item Substring removal / replacement
+        \begin{itemize}
+          \item \verb|${string#substring}|: Deletes \emph{shortest} match of \texttt{substring} from \emph{front} of \texttt{string}
+          \item \verb|${string##substring}|: Deletes \emph{longest} match of \texttt{substring} from \emph{front} of \texttt{string}
+          \item \verb|${string%substring}|: Deletes \emph{shortest} match of \texttt{substring} from \emph{back} of \texttt{string}
+          \item \verb|${string%%substring}|: Deletes \emph{longest} match of \texttt{substring} from \emph{back} of \texttt{string}
+          \item \verb|${string/substring/replace}|: Replace \emph{first} match of \texttt{substring} with \texttt{replace}
+          \item \verb|${string//substring/replace}|: Replace \emph{all} matches of \texttt{substring} with \texttt{replace}
+          \item \verb|${string/#substring/replace}|: If \emph{prefix} of \texttt{substring} matches \texttt{substring} replace it with \texttt{replace}
+          \item \verb|${string/%substring/replace}|: If \emph{suffix} of \texttt{substring} matches \texttt{substring} replace it with \texttt{replace}
+        \end{itemize}
+      \item Case
+        \begin{itemize}
+          \item \verb|${string^}|: \emph{First} letter uppercase
+          \item \verb|${string^h}|: \emph{First} letter uppercase \emph{only if} it's a ``h''
+          \item \verb|${string^^}|: \emph{All} letters uppercase
+          \item \verb|${string^^[ht]}|: \emph{All} ``h'' and ``t'' uppercase
+          \item \verb|${string,}|, \verb|${string,,}|, \ldots: As above but lowercase
+          \item \verb|${string~}|, \verb|${string~~}|, \ldots: As above but invert case
+        \end{itemize}
+      \item Split: use \texttt{read} with appropriate separator
+\begin{lstlisting}[language=bash]
+macedonia="banana:yellow,apple:red,orange:orange"
+# Split on "," and put it into an array
+IFS="," read -a fruits << $macedonia
+for fruit in ${fruits[@]}; do
+  # Split on ":" and put it into an array
+  IFS=":" read -a frt_clr << $fruit
+  echo "The fruit ${frt_clr[0]} is ${frt_clr[1]}"
+done
+\end{lstlisting}
+    \end{itemize}
   \item Default applications: often we don't know the name of the programs that we use, for instance, for opening a pdf. Here some of them
     \begin{itemize}
       \item \texttt{evince} for pdf.
@@ -774,6 +832,11 @@ awk '{printf("I want %5.2f bananas\n", 1.652)}' file
       \item \verb|FILENAME|: should I explain?
       \item \verb|ENVIRON|: array with environment variables (e.g.\ try \verb|ENVIRON["USER"]|).
     \end{itemize}
+  \item Built-in functions:
+    \begin{itemize}
+      \item \verb|toupper(.)|, \verb|tolower(.)|: Upper-, lowercase
+      \item \verb|cos(.)|, \verb|sin(.)|, \verb|atan2(.)|, \verb|sqrt(.)|, \verb|exp(.)|, \verb|log(.)|, \verb|rand(.)|,
+    \end{itemize}
   \item Tricks:
     \begin{itemize}
       \item \href{https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html}{String-Manipulation functions}
@@ -1076,6 +1139,7 @@ echo "This'll be printed to screen and inside f.txt" | tee f.txt
       \item \verb!echo Maaan | tr a e!: change \texttt{a}'s into \texttt{e}'s, hence the result is \texttt{Meeen}.
       \item \verb|-d|: \emph{d}elete. \verb!echo Maaan | tr -d a! gives \texttt{Mn}
       \item \verb|-s|: \emph{s}queeze. \verb!echo Maaan | tr -s a e! replaces each sequence of repeated \texttt{a}'s with a single occurrence of \texttt{e}, hence it gives \texttt{Men}.
+      \item Change case: \verb!echo "$str" | tr "[:lower:]" "[:upper]"!
     \end{itemize}
   \item \texttt{xargs}: use standard output to build commands (you can think of it as a more powerful way of piping). Have a look at some tutorials \href{https://shapeshed.com/unix-xargs/}{here} and \href{https://www.thegeekstuff.com/2013/12/xargs-examples/}{here}. Typical call is (the 0-related flags deal with files with spaces in their names)
 \begin{lstlisting}[language=bash]
@@ -1327,6 +1391,7 @@ git branch [<branch_name>] --set-upstream-to new_remote/remote_branch
       \item Delete a stash without applying it: \texttt{git stash drop}
         \begin{itemize}
           \item See above to choose a specific stash
+          \item Abort a popping: sometimes the stash is not what you remember, in that case abort wit \verb|git reset --merge|
         \end{itemize}
     \end{itemize}
   \item List files followed by \texttt{git}: \verb|git ls-tree <SHA1>|. Advised options:
@@ -1351,7 +1416,8 @@ git update-index --no-assume-unchanged <file>
       \item \verb|--until=<date>|, \verb|--before=<date>|: show commits older than \texttt{date}
       \item \verb|-L <start>,<end>:<file>|: show commits which modified the zone of \texttt{file} delimited by the line numbers \texttt{start} and \texttt{end}
       \item \verb|-L:<function>:<file>|: show commits which modified function \texttt{function} of \texttt{file}
-      \item \verb!--<path>|<path/to/filename>!: show commits which modified the files in \texttt{path} (resp.\ the file \verb|path/to/filename|). To be put after all other options;
+      \item \verb|--name-only|: show only files modified by commit
+      \item \verb!-- <path>|<path/to/filename>!: show commits which modified the files in \texttt{path} (resp.\ the file \verb|path/to/filename|). To be put after all other options;
       \item \verb|--pretty[=<format>]|, \verb|--format=<format>|: customize the format of your output. You may want to choose predefined styles, then \texttt{format} can be chosen in \texttt{oneline}, \texttt{short}, \texttt{medium}, \texttt{full}, \texttt{fuller}, ...
     \end{itemize}
   \item \href{https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks}{\texttt{git} hooks}: hooks are scripts that are automatically triggered before/after certain events (e.g., commit, checkout, push)
