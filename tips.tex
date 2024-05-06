@@ -696,6 +696,7 @@ find /path -name '*.pdf' -exec sh -c \
     \begin{itemize}
       \item \texttt{-delete} calls \texttt{rm} under the hood, in fact it is practically equivalent to \texttt{-exec rm}. Hence it will fail if one tries to delete directory. In this case, use the long way: \verb|-exec rm -r {} \;|. You may add \verb|-prune| to avoid some warnings/errors. Moreover, one may add quote around braces to avoid errors with names that contains whitespaces.
     \end{itemize}
+  \item Filter on file-age: \verb|-mtime N|, selects all files older than \verb|N| days.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1266,6 +1267,8 @@ For inexperienced users who want to perform simple tasks, such as looking at the
   \item \verb|git add <file_name>|: move the modifications in \verb|file_name| to commit stage (that is, they will be include in the next commit)
     \begin{itemize}
       \item The option \texttt{-p}, aka cherry-picking, splits the \verb|file_name| into chucks, so that you can choose which modifications are to be staged. For each of them, you will have to tell \texttt{git} what to do with it: if it is to keep, answer \texttt{y}; if not, \texttt{n}. Other answers are possible, for example use \texttt{s} (for split) reduce the chunk size / split the current chunk into sub-chunks. \href{https://stackoverflow.com/questions/1122210/can-i-modify-git-adds-hunk-size}{Here} you can find the meaning of all of the possible answers. This could be done easily with \texttt{git-cola}.
+      \item \verb|git add -A| or \verb|git add .|: stage \emph{all} files, even the new ones (not yet tracked).
+      \item \verb|git add -u| or \verb|git add --update|: stage \emph{all tracked} files but skip new ones
     \end{itemize}
   \item \texttt{git commit}: creates a new commit with the staged modifications. This operation is easily done in \texttt{git-cola}.
     \begin{itemize}
@@ -1408,6 +1411,10 @@ git update-index --assume-unchanged <file>
     To undo:
 \begin{lstlisting}[language=bash]
 git update-index --no-assume-unchanged <file>
+\end{lstlisting}
+  \item \texttt{git} and \texttt{chmod} / file permissions: one can change the permissions of a file followed by \texttt{git} with, for instance:
+\begin{lstlisting}[language=bash]
+git update-index --chmod=+x <file>
 \end{lstlisting}
   \item \texttt{git log}: show the commit logs. \href{https://git-scm.com/docs/git-log}{Manual}
     \begin{itemize}
