@@ -1823,14 +1823,75 @@ int res = add_10(5) // 15
   \item \texttt{pip}: allows you to download and update python libraries
     \begin{itemize}
       \item Typical call: \verb|pip install <package>|. Add options \verb!--upgrade|-U! to upgrade. In recent versions, \verb|python3 -m pip [...]| is advised.
+        \begin{itemize}
+          \item For the sake of brevity, below we will often use \texttt{pip} instead of the form with \texttt{python}
+        \end{itemize}
+      \item Select a specific version of the package: \verb|python3 -m pip install package==6.66|
+      \item Selecting the sources: \texttt{pip} can handle several types of sources
+        \begin{itemize}
+          \item The first is of course \texttt{PyPI}, that is the open, online data-base where the great majority of packages are published. In this case, one just need to pass the name of the package
+\begin{lstlisting}[language=bash]
+pip install numpy
+\end{lstlisting}
+          \item One can also tell \texttt{pip} to look for a package in an online \texttt{git} repository.
+            \begin{itemize}
+              \item Two ways are accepted: either by http or by SSH.
+              \item Use the same addresses used for cloning.
+              \item \textbf{Warning}: when using SSH, replace the colon ``\texttt{:}'' after the server name by a simple slash ``\texttt{/}'', see example below
+              \item If the repository is protected and using http, credential are asked.
+            \end{itemize}
+\begin{lstlisting}[language=bash]
+# https
+pip install git+https://github.com/foo/bar.git
+# SSH
+pip install git+ssh://git@github.com/foo/bar.git
+# hhtps abd specify a branch
+pip install git+https://github.com/foo/bar.git@my_branch
+\end{lstlisting}
+          \item When one has the sources, just provide the path.
+\begin{lstlisting}[language=bash]
+cd /path/to/my_package
+# Mind the dot at the end
+pip install .
+\end{lstlisting}
+        \end{itemize}
+      \item Extras: sometimes packages have extras. Example: package \texttt{foo} can be installed by itself, with a GUI and/or with a complementary series of developer packages. One or more extras can be put inside brackets. For the sake of simplicity, we supposed the extras are called \texttt{gui} and \texttt{dev}
+\begin{lstlisting}[language=bash]
+pip install foo           # foo only
+pip install foo[gui]      # foo with GUI
+pip install foo[dev]      # foo with dev environment
+pip install foo[gui,dev]  # foo with both GUI and dev
+pip install foo[all]      # foo with all extras
+\end{lstlisting}
+        \begin{itemize}
+          \item When installing from \texttt{git} or from sources:
+\begin{lstlisting}[language=bash]
+pip install ".[gui]"
+pip install "foo[gui] @ git+https://github.com/foo/bar.git"
+\end{lstlisting}
+        \end{itemize}
       \item One may add a configuration file, see \href{https://pip.pypa.io/en/stable/topics/configuration/}{here}
       \item You'll need access to some directories, thus it is advised to have a local install: pass option \verb|--user|.
+      \item Choose installation prefix: \verb|--target <install_dir>|. All the necessary dependencies will be installed in the given directory even if, for instance, they are already installed in the usual path.
+      \item Skip dependencies: \verb|--no-deps|
+        \begin{itemize}
+          \item \emph{Why this is useful.} Imagine you want to install a package with some dependencies in a custom path; suppose also that all the dependencies are already installed in the reference path (say, \texttt{.local}). Without \verb|--no-deps| all the dependencies will be installed in the custom path, even if they are already available, thing that one may want to avoid.
+        \end{itemize}
+      \item When installing a custom package (e.g., developed by ourselves), you may want to use option \verb|-e|. That enables \emph{editable} mode: roughly speaking, instead of copying the package in the target directory, \texttt{pip} will create links so that if you modify the package, the changes are considered. More info \href{https://setuptools.pypa.io/en/latest/userguide/development_mode.html}{here}.
+\begin{lstlisting}[language=bash]
+pip install -e .
+\end{lstlisting}
       \item Proxy: pass the option \verb|--proxy=user@server.dom:port|. However, it might not work if some dependencies have to be downloaded as well. In that case, try exporting the shell variables \verb|HTTP_PROXY=<proxy>| and \verb|HTTPS_PROXY=<proxy>|. It might be helpful to add a line in the configuration file as explained \href{https://stackoverflow.com/questions/43473041/how-to-configure-pip-per-config-file-to-use-a-proxy-with-authentification}{here}
       \item Get list of outdated packages: \verb|pip list --outdated|.
       \item Get a list of currently installed packages with versions: \verb|pip freeze > [file.txt]|
       \item Install from a requirements file (see freezing just above): \verb|pip install -r [file.txt]|
       \item When installing/upgrading problems may occur with older versions of the \texttt{C} compiler, \texttt{GCC}: try and force \texttt{C99} standard by setting \texttt{CFLAGS} before installing: \verb|export CFLAGS='-std=c99'|
-      \item Select a specific version of the package: \verb|python3 -m pip install package==6.66|
+    \end{itemize}
+  \item Packaging a module: this will enable your package to be installed by, say, \texttt{pip}
+    \begin{itemize}
+      \item \href{https://packaging.python.org/en/latest/tutorials/packaging-projects/}{The official tutorial}
+      \item The advised way nowadays is to do the setup via a \texttt{pyproject.toml}, file that can also be used to configuring other tools for, for instance, format and linting. Some guidelines for \href{https://packaging.python.org/en/latest/guides/writing-pyproject-toml}{writing such a file}
+      \item Common backends are: \href{https://hatch.pypa.io/dev/why/#build-backend}{\texttt{hatchling}}, \href{https://setuptools.pypa.io/en/latest/index.html}{\texttt{setuptools}}, \href{https://pdm-project.org/en/latest/}{\texttt{PDM}}
     \end{itemize}
   \item A nice \href{https://medium.com/@anushkhabajpai/top-data-science-cheat-sheets-ml-dl-python-r-sql-maths-statistics-5239d4568225}{post} with cheat-sheets for several \texttt{python} libraries (as well as \texttt{R} and ML)
   \item Load custom modules: one takes advantage of \verb|sys.path| which is a list of directories where \texttt{python} looks for module. Suppose that you want to import module \texttt{myMod} which is in \texttt{/path/to}, then a typical call would be
@@ -1923,16 +1984,32 @@ except Exception:
       \item \verb|locals()| always returns a dictionary of the current namespace. Basically, as above but with \emph{local} scope.
       \item \verb|vars()| returns either a dictionary of the current namespace (if called with no argument, equivalent to \verb|locals()|) or the dictionary of the argument (that is, let \verb|a| be an instance of a class, then \verb|vars(a)| would provide all the attributes, members and/or method, of \verb|a|).
     \end{itemize}
-  \item The underscore: see \href{https://dbader.org/blog/meaning-of-underscores-in-python}{here}
   \item Unpacking operators: \verb|*| iterable unpacking, and \verb|**| dictionary unpacking, see \href{https://geekflare.com/python-unpacking-operators/}{here}
-  \item ``\verb|_|'': placeholder for unused arguments / returns
+  \item Underscore and naming convention: see \href{https://dbader.org/blog/meaning-of-underscores-in-python}{here} and \href{https://realpython.com/python-double-underscore/}{here}. Here is the gist of it:
     \begin{itemize}
-      \item It can be unpacked with \verb|*| (see above)
+      \item Plain ``\verb|_|'': placeholder for unused arguments / returns
+\begin{lstlisting}[language=python]
+lst = [1 for _ in range(3)]  # = [1, 1, 1]
+\end{lstlisting}
+        \begin{itemize}
+          \item It can be unpacked with \verb|*| (see above)
 \begin{lstlisting}[language=python]
 a = [1, 2, 3, 4, 5]
 first, *_, last = a
 print(first, last) # 1 5
 \end{lstlisting}
+        \end{itemize}
+      \item \emph{One} leading underscore, \verb|_var|: Naming convention indicating a name is meant for internal use. Generally not enforced by the Python interpreter (except in wildcard imports) and meant as a hint to the programmer only.
+      \item \emph{One} trailing underscore, \verb|var_|: Avoid naming conflicts.
+      \item \emph{Double} leading underscore, \verb|__var|: Triggers name mangling when used in a class context. Enforced by the Python interpreter. The name of the class is added in order to avoid the variable being overridden by inheritance.
+\begin{lstlisting}[language=python]
+>>> class Test:
+>>>     def __init__(self):
+>>>         self.__foo
+>>> dir(Test())
+['_Test__foo']  # Plus others
+\end{lstlisting}
+      \item \emph{Double} leading \emph{and} trailing underscore, \verb|__var__|: Name mangling is not triggered. However, this convention is reserved to special methods, e.g., \verb|__init__|, \verb|__call__|
     \end{itemize}
   \item \href{https://wiki.python.org/moin/Generators}{Generators}: Generator functions allow you to declare a function that behaves like an iterator, i.e.\ it can be used in a for loop. This is faster than creating lists on purpose. Brief \href{https://www.programiz.com/python-programming/generator}{intro}. Generators do not \emph{return}, they \emph{yield}. An example
 \begin{lstlisting}[language=python]
@@ -2062,6 +2139,8 @@ bar(3,  6,  c=10) # a=3, args=(),    b=6, kwargs={'c': 10}
       \item For optional arguments that can assume \verb|None| or another type, use \verb|Optional|
       \item An example below
 \begin{lstlisting}[language=python]
+# The following is deprecated in > 3.10,
+# just use plain list, dict
 from typing import List, Dict
 # Variables: the followings are equivalent
 n: int = 10
@@ -2406,64 +2485,6 @@ plt.loglog(...)
       \item \texttt{statsmodels}: regressions.
       \item \href{https://seaborn.pydata.org/introduction.html}{\texttt{seaborn}}: powerful data visualization tool.
     \end{itemize}
-  \item \texttt{re}: \href{https://docs.python.org/3/library/re.html}{regex'ing}
-    \begin{itemize}
-      \item Main functions:
-        \begin{itemize}
-          \item \verb|re.search(pattern, string)|: Search \emph{anywhere} in the string.
-          \item \verb|re.match(pattern, string)|: Search at the \emph{beginning} of the string.
-          \item \verb|re.fullmatch(pattern, string)|: The \emph{whole} string should math the pattern.
-          \item \verb|re.sub(pattern, repl, string)|: Replace the pattern with the alternative text.
-          \item The functions take a key argument for flags. E.g.:
-\begin{lstlisting}[language=python]
-# Case-insensitive
-re.search(ptrn, string, flag=re.I)
-# Multi-line
-re.search(ptrn, string, flag=re.M)
-\end{lstlisting}
-        \end{itemize}
-      \item One can compile a regex in advance, then use the usual functions:
-\begin{lstlisting}[language=python]
-foo_re = re.compile("foo")
-foo_re.search("Foo foo bar")
-\end{lstlisting}
-      \item \verb|re.escape(pattern)|: escape all the ambiguous characters
-\begin{lstlisting}[language=python]
-foo_re = re.compile(re.escape("/foo.bar"))
-\end{lstlisting}
-      \item Matches\&Groups: The above-mentioned function return a \emph{match} object
-        \begin{itemize}
-          \item Access full match and groups with brackets
-\begin{lstlisting}[language=python]
-m = re.match(r"(\w+) (\w+)", "Isaac Newton, physicist")
-m[0]  # The entire match
-# 'Isaac Newton'
-m[1]  # The first parenthesized subgroup.
-\end{lstlisting}
-          \item Access groups with group ad-hoc function:
-\begin{lstlisting}[language=python]
-m.group(0)  # The entire match
-# 'Isaac Newton'
-m.group(1)  # The first parenthesized subgroup.
-# 'Isaac'
-m.group(1, 2)  # Multiple arguments give us a tuple.
-# ('Isaac', 'Newton')
-\end{lstlisting}
-          \item Access groups with names: one should use a special constructor \texttt{(?P<foo>pattern)}.
-\begin{lstlisting}[language=python]
-m = re.match(
-  r"(?P<name>\w+) (?P<surname>\w+)",
-  "Isaac Newton, physicist",
-)
-m.group("name")
-# 'Isaac'
-m.group("surname")
-# 'Newton'
-\end{lstlisting}
-          \item All the groups as tuple: \verb|m.groups(default=None)| (default value is for groups that did not participate to the match).
-          \item All the groups as dict: \verb|m.groupdict(default=None)|, to use in case where one gave name to a group (see \texttt{name} and \texttt{surname} above).
-        \end{itemize}
-    \end{itemize}
 \end{itemize}
 
 \subsection{Data structures}
@@ -2783,6 +2804,16 @@ print(a.boolean) # True (last one prevails)
 \end{lstlisting}
 \end{itemize}
 
+\subsection{\texttt{os}}
+Some useful members and functions of \texttt{os}:
+\begin{itemize}
+  \item \texttt{os.pardir}: when used in paths, what stands for parent directory, that is, ``\texttt{..}''
+  \item \texttt{os.sep}: when used in paths, what is used for separating directories, e.g., in Unix ``\texttt{/}''
+  \item \texttt{os.pathsep}: when used in paths, what is used for separating each parts of search paths (e.g., \texttt{PATH}), e.g., in Unix ``\texttt{:}''
+  \item \texttt{os.linesep}: what signifies line termination, e.g., ``\verb|\n|'' in Unix and ``\verb|\r\n|'' on Windows
+  \item \texttt{os.path.join}: join paths together
+\end{itemize}
+
 \subsection{\texttt{pathlib}}
 \href{https://docs.python.org/3/library/pathlib.html}{\texttt{pathlib}} and \texttt{Path}: filesystem paths. Similarities and differences w.r.t.\ \texttt{os} module \href{https://docs.python.org/3/library/pathlib.html#correspondence-to-tools-in-the-os-module}{here}. Examples below
 \begin{lstlisting}[language=python]
@@ -2796,7 +2827,10 @@ Path.cwd(), Path.home()
 foo.exists(), foo.is_dir(), foo.is_file(), foo.is_symlink()
 # Properties
 foo.parts  # ("path", "to", "foo.py")
-foo.name  # foo.py
+foo.name  # foo.py == os.path.basename == bash basename
+foo.parent  # path/to == os.path.dirname == bash dirname
+foo.parent.parent  # path
+foo.parents[1]  # path, as above
 foo.suffix  # .py
 tgz = Path("t.tar.gz")
 tgz.suffix  # ".gz"
@@ -2831,6 +2865,67 @@ for root, dirs, files in Path("dir").walk():
 # Dir "dir/foo" contains sub-dirs ["toto"] and files ["bar.py"]
 # Dir "dir/foo/toto" contains sub-dirs [] and files []
 \end{lstlisting}
+
+\subsection{\texttt{re}, regex'ing}
+Base notions and various tips:
+\begin{itemize}
+  \item \href{https://docs.python.org/3/library/re.html}{Official page}
+  \item Main functions:
+    \begin{itemize}
+      \item \verb|re.search(pattern, string)|: Search \emph{anywhere} in the string.
+      \item \verb|re.match(pattern, string)|: Search at the \emph{beginning} of the string.
+      \item \verb|re.fullmatch(pattern, string)|: The \emph{whole} string should math the pattern.
+      \item \verb|re.sub(pattern, repl, string)|: Replace the pattern with the alternative text.
+      \item The functions take a key argument for flags. E.g.:
+\begin{lstlisting}[language=python]
+# Case-insensitive
+re.search(ptrn, string, flag=re.I)
+# Multi-line
+re.search(ptrn, string, flag=re.M)
+\end{lstlisting}
+    \end{itemize}
+  \item One can compile a regex in advance, then use the usual functions:
+\begin{lstlisting}[language=python]
+foo_re = re.compile("foo")
+foo_re.search("Foo foo bar")
+\end{lstlisting}
+  \item \verb|re.escape(pattern)|: escape all the ambiguous characters
+\begin{lstlisting}[language=python]
+foo_re = re.compile(re.escape("/foo.bar"))
+\end{lstlisting}
+  \item Matches\&Groups: The above-mentioned function return a \emph{match} object
+    \begin{itemize}
+      \item Access full match and groups with brackets
+\begin{lstlisting}[language=python]
+m = re.match(r"(\w+) (\w+)", "Isaac Newton, physicist")
+m[0]  # The entire match
+# 'Isaac Newton'
+m[1]  # The first parenthesized subgroup.
+\end{lstlisting}
+      \item Access groups with group ad-hoc function:
+\begin{lstlisting}[language=python]
+m.group(0)  # The entire match
+# 'Isaac Newton'
+m.group(1)  # The first parenthesized subgroup.
+# 'Isaac'
+m.group(1, 2)  # Multiple arguments give us a tuple.
+# ('Isaac', 'Newton')
+\end{lstlisting}
+      \item Access groups with names: one should use a special constructor \texttt{(?P<foo>pattern)} (yes, angle brackets \texttt{<...>} are necessary).
+\begin{lstlisting}[language=python]
+m = re.match(
+r"(?P<name>\w+), (?P<surname>\w+)",
+"Isaac Newton, physicist",
+)
+m.group("name")
+# 'Isaac'
+m.group("surname")
+# 'Newton'
+\end{lstlisting}
+      \item All the groups as tuple: \verb|m.groups(default=None)| (default value is for groups that did not participate to the match).
+      \item All the groups as dict: \verb|m.groupdict(default=None)|, to use in case where one gave name to a group (see \texttt{name} and \texttt{surname} above).
+    \end{itemize}
+\end{itemize}
 
 \subsection{Files\&Co}
 Open'n'Close
