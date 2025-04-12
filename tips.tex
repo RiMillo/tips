@@ -32,11 +32,13 @@
   basicstyle=\ttfamily,
   keywordstyle=\color{lGreenRT},
 }
+\usepackage{minted}  % For Rust
 \usepackage[normalem]{ulem}
 
 \usepackage{hyperref}
 
 \usepackage[inline]{enumitem}
+\setlistdepth{9}
 %
 \begin{document}
 
@@ -3212,6 +3214,97 @@ Now comes the real part about using \texttt{sphinx}. I am no wiz, I just figured
   \item Now, if you asked for the \texttt{Makefile}, you just need to run \verb|make html| (or \texttt{latexpdf}, or anything that pleases you) and your doc is generated in the \verb|[]_build| directory.
   \item That's it.
 \end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\texttt{Rust}}
+\label{sec:rust}
+\begin{itemize}
+  \item Some docs: \href{https://doc.rust-lang.org/book/title-page.html}{official \texttt{Rust} book}, \href{https://github.com/nrc/r4cppp/tree/master}{a guide for \texttt{C++} developers}
+  \item Installation: \href{https://www.rust-lang.org/tools/install}{see here}. By default, the command will install also the doc, which is quite heavy and consists in thousands of files. One can ask for a \href{https://github.com/rust-lang/rustup/issues/998#issuecomment-542332509}{\emph{minimal} installation} (otherwise, one can \href{https://github.com/rust-lang/rustup/issues/998#issuecomment-542363707}{remove it afterwards})
+\begin{lstlisting}[language=bash]
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+  sh -s -- -y --profile minimal --default-toolchain stable
+\end{lstlisting}
+  \item Variables
+    \begin{itemize}
+      \item Declared with keyword \mint{Rust}|let|
+      \item Can be typed (annotated) or not: \mint{Rust}|let x: u32 = 5;| unsigned 32-bit integer
+      \item Immutable by default. To make it mutable \mint{Rust}|let mut x: u32 = 5;|
+      \item Shadowing: one can re-declare a variable, even immutable ones and even with a different type. In this case the previous is ``deleted''
+\begin{minted}{Rust}
+let x = 5;
+let x = x * 2;
+\end{minted}
+    \end{itemize}
+  \item Functions
+\begin{minted}{Rust}
+fn plus_two(x : isize) -> isize {
+  x + 2
+}
+\end{minted}
+    \begin{itemize}
+      \item They do not need the \texttt{return} keyword if the last line of the function already ``returns'' a value
+      \item Return type declared with \texttt{->}. Omit everything or use \texttt{-> ()} for void (``()'' is the void type)
+    \end{itemize}
+  \item Constants: defined with \mint{Rust}|const|
+    \begin{itemize}
+      \item Differently from immutable variables:
+        \begin{itemize}
+          \item must be typed (annotated) from the declaration.
+          \item must be set only to a constant expression.
+        \end{itemize}
+    \end{itemize}
+  \item Pointers
+    \begin{itemize}
+      \item Owning (unique) pointers
+        \begin{itemize}
+          \item \verb|let x: Box<i32> = Box::new(75);|
+          \item Freed automatically when they go out of scope
+          \item Mutability of the data follows the mutability of the pointer: if one is mutable the other is, too.
+          \item If passed as argument or assigned to variable, they can no longer be accessed
+\begin{minted}{Rust}
+fn bar(y: Box<isize>) { }
+
+fn foo() {
+    let x = Box::new(75);
+    bar(x);
+    // x can no longer be accessed
+    // let z = *x;   // Error.
+}
+\end{minted}
+          \item Method calls automatically dereference, so there is no need for a \texttt{->} operator or to use \texttt{*} for method calls. For instance, assuming type \texttt{Foo} has method \texttt{foo()} the following is possible:
+\begin{minted}{Rust}
+fn bar(x: Box<Foo>, y: Box<Box<Box<Box<Foo>>>>) {
+    x.foo();
+    y.foo();
+}
+\end{minted}
+        \end{itemize}
+      \item Borrowed pointers
+        \begin{itemize}
+          \item Defined with \verb|&|.
+            It does not allocate memory: one can only create a \emph{borrowed} reference to an existing value.
+            When it goes out of scope, no memory is deleted.
+          \item This might be used to replace \texttt{C++} references for function arguments.
+          \item Mutable borrowed references are unique.
+          \item Differently than unique pointers, the mutableness of reference and value are not linked: we can a have an immutable reference to mutable data.
+          \item If a mutable value is borrowed, it becomes immutable for the duration of the borrow. Once the borrowed pointer goes out of scope, the value can be mutated again. This is in contrast to unique pointers, which once moved can never be used again.
+          \item Unlike \texttt{C++}, \texttt{Rust} won't automatically reference a value for you. So if a function takes a parameter by reference, the caller must reference the actual parameter. However, pointer types will automatically be converted to a reference
+        \end{itemize}
+      \item Data types
+        \begin{itemize}
+          \item Structs: similar to a \texttt{C++} struct but \emph{without} methods
+\begin{minted}{Rust}
+struct S {
+    field1: i32,
+    field2: SomeOtherStruct,  // Ending comma can be omitted
+}
+\end{minted}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
