@@ -1815,6 +1815,69 @@ int res = add_10(5) // 15
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\texttt{CMake}}
+\verb|CMake| is a software build system, that is, a tool that help you build your projects, especially if they are written in \verb|C[++]|.
+
+An \href{https://cmake.org/cmake/help/latest/manual/cmake.1.html}{introduction} and a \href{https://cmake.org/cmake/help/latest/guide/tutorial/index.html}{tutorial} are available online.
+
+The standard ``configure-make-install'' framework translates in \verb|CMake| terms to
+\begin{lstlisting}[language=bash]
+cmake [options] <path-to-source>
+make
+make install
+\end{lstlisting}
+where one typically still relies on good old \texttt{make}. However, one can also use
+\begin{lstlisting}[language=bash]
+cmake [options] <path-to-source>
+cmake --build .
+cmake --install .
+\end{lstlisting}
+
+Configuration options (that is, those that can be passed to plain \texttt{cmake}):
+\begin{itemize}
+  \item Define variables: \verb|-D var=value| or \verb|-D var:type=value|, e.g.: \verb|-DFOO:STRING=bar|, \verb|-DPIPPO=2|
+  \item Prefix: \verb|-D CMAKE_INSTALL_PREFIX=path|, or, in recent versions, \verb|--install-prefix path|
+\end{itemize}
+
+Building options:
+\begin{itemize}
+  \item \verb|-j <N>|: equivalent of the namesake \texttt{make} option for number of (parallel) jobs
+  \item \verb|--clean-first|
+  \item \verb|-t <target>|, \verb|--target <target>|: build only recipe \verb|target|
+\end{itemize}
+
+Install options:
+\begin{itemize}
+  \item \verb|--prefix <dir>|: Override \verb|CMAKE_INSTALL_PREFIX|
+\end{itemize}
+
+A developer tells \texttt{CMake} what to do by writing a \texttt{CMakeLists.txt} file. Typically one defines the project, where the sources are, which additional libraries have to be included and/or linked,\ldots A custom language has been developed.
+\begin{itemize}
+  \item Commands and variables are case-INsensitive
+  \item \href{https://cmake.org/cmake/help/latest/manual/cmake-commands.7.html}{All commands}
+  \item Conditional statements: \verb|if()|, \verb|elseif()|, \verb|else()| \verb|endif()|
+  \item Loops: \verb|foreach()| and \verb|endforeach()|, \verb|while()| and \verb|endwhile()|, \verb|break()|, \verb|continue()|
+  \item Functions: \verb|function()| and \verb|endfunction()|, \verb|macro()| and \verb|endmacro()|
+\begin{verbatim}
+# Define
+function(foo bar baz)
+  # ...
+endfunction()
+# Call
+foo("bar" "baz")
+\end{verbatim}
+  \item Variables:
+    \begin{itemize}
+      \item Define custom ones with \verb|[un]set()|: \verb|set(<variable> <value>[... <type> <docstring>])|
+      \item Some are \href{https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html}{already} \href{https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html}{defined}. E.g.: \verb|PROJECT_NAME|, \verb|CMAKE_BUILD_TYPE|
+      \item Call \verb|include(GNUInstallDirs)| to use variables such as \verb!CMAKE_INSTALL_LIBDIR|INCLUDEDIR!
+    \end{itemize}
+  \item Options: \verb|option(<variable> "<help_text>" [value])|. They can be set by the user at configure time with the \verb|-D| handle
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%      SECTION      %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texttt{python}}
 \label{sec:python}
 (I used to be better with \texttt{python} but I don't use it so much now, so these tips here are not many nor much useful. I'm sorry. If you agree, please contribute!)
