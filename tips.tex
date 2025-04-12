@@ -3327,6 +3327,9 @@ pandoc --from=markdown --to=html -o out.html in.md
     \href{https://agea.github.io/tutorial.md/}{tutorial} and
     \href{https://enterprise.github.com/downloads/en/markdown-cheatsheet.pdf}{cheat sheet again}.
   \item Special text: \textit{italic} \verb|*italic*| or \verb|_italic_|; \textbf{bold} \verb|**bold**| or \verb|__italic__|; code / \texttt{typewriter} \verb|`typewriter`| (backticks); \sout{strikethrough} \verb|~strikethrough~| or \verb|~~strikethrough~~|
+    \begin{itemize}
+      \item Superscript: \texttt{html}-tag \verb|1<sup>st</sup>|. Subscript: same with tag \texttt{sub}
+    \end{itemize}
   \item Links: e.g.\ \verb|[Shown label](https://link.to)|
     \begin{itemize}
       \item One can even link sections of the current file (notice: all lowercase letters, blanks converted into dashes):
@@ -3335,6 +3338,28 @@ pandoc --from=markdown --to=html -o out.html in.md
 Here is a section.
 # Section Two
 Here is a [link](#section-one) to the previous section.
+\end{verbatim}
+      \item Alternative:
+\begin{verbatim}
+A [text][id].
+
+[id]: https://url.com "The title"
+\end{verbatim}
+      \item \href{https://github.blog/changelog/2021-09-30-footnotes-now-supported-in-markdown-fields/}{Footnotes}:
+\begin{verbatim}
+A simple footnote[^1]. Some text after.
+
+[^1]: The long footnote
+\end{verbatim}
+      \item Bibliography: with standard syntax (plus a bit of \texttt{html}), see \href{https://stackoverflow.com/questions/26587527/cite-a-paper-using-github-markdown-syntax}{here}
+\begin{verbatim}
+"...the **go to** statement should be abolished..." [[1]](#1).
+
+## References
+<a id="1">[1]</a>
+Dijkstra, E. W. (1968).
+Go to statement considered harmful.
+Communications of the ACM, 11(3), 147-148.
 \end{verbatim}
     \end{itemize}
   \item Images: similar to links, prepend a ``!'': \verb|![Alternative description text](path/to/img.png)|
