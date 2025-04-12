@@ -1885,8 +1885,16 @@ foo("bar" "baz")
   \item Debugging, info \href{https://docs.python.org/2/library/pdb.html}{here}: \texttt{python -m pdb script.py}. Commands are similar to \texttt{gdb} (\ref{sec:gdb}).
   \item Virtual environments: have look \href{https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/}{here} or \href{https://docs.python.org/3/tutorial/venv.html}{here}.
     \begin{enumerate}
-      \item Create: \verb|python3 -m venv <env_name>|. The argument \verb|env_name| is arbitrary: let's fix it to \verb|test|
+      \item Create: \verb|python3 -m venv <env_name>|. The argument \verb|env_name| is arbitrary: below, we'll use \verb|test|
       \item Activate: \verb|source test/bin/activate|. From now on the python version of the virtual element is loaded, you may check this with \verb|which python|. Hence, for instance, \verb|pip| will install packages in the virtual environment only
+      \item If needed, install any desired module as usual (see \texttt{pip} below).
+        \begin{itemize}
+          \item \textbf{Remarks:} mind that \texttt{venv} will try install everything, even those modules that are already in your \verb|$HOME/.local/lib/pythonX.Y/site-packages|.
+            However, if you want to reuse them, use the dedicated option when creating the environment
+\begin{lstlisting}[language=bash]
+python3 -m venv --system-site-packages <env_name>
+\end{lstlisting}
+        \end{itemize}
       \item Deactivate: \verb|deactivate|
       \item Remove: just \verb|rm -rf <env_name>|
     \end{enumerate}
@@ -2196,155 +2204,6 @@ bar(3,  6,5,c=10) # a=3, args=(5,),  b=6, kwargs={'c': 10}
 bar(3,  6,  c=10) # a=3, args=(),    b=6, kwargs={'c': 10}
 \end{lstlisting}
     \end{itemize}
-  \item Type hints: one can provide types to variable, arguments and return values of a function. These hints \textbf{won't} be used by \texttt{python} (e.g.\ it isn't \texttt{C}). Type hints are for developers and for IDEs: basically they make the code simpler to read (very useful when developing code to which other user will interface) and help IDEs to infer types of objects in order to offer better prediction.
-    \begin{itemize}
-      \item To go further: \href{https://stackoverflow.com/a/32558710}{here}, \href{https://www.infoworld.com/article/3630372/get-started-with-python-type-hints.html}{here}
-      \item Use module \href{https://docs.python.org/3/library/typing.html}{\texttt{typing}}
-      \item For built-in structures, in older versions use, e.g., \texttt{Dict}, \texttt{Tuple}, \texttt{List}; otherwise in newer version just standard is accepted, e.g., \verb|dict[str, str]|
-        \begin{itemize}
-          \item For more generic constructions, one can use \texttt{Mapping} and \texttt{Sequence} from \texttt{collections.abc} for, respectively, \texttt{dict} and \texttt{list}
-        \end{itemize}
-      \item \texttt{Any} is the joker value, it's compatible with every type.
-      \item For more than one possible types, use \verb|Union|. In recent versions, ``\verb!|!'' (pipe, like in \emph{or}) is accepted as well
-      \item For optional arguments that can assume \verb|None| or another type, use \verb|Optional|
-      \item An example below
-\begin{lstlisting}[language=python]
-# The following is deprecated in > 3.10,
-# just use plain list, dict
-from typing import List, Dict
-# Variables: the followings are equivalent
-n: int = 10
-#
-n: int
-n = 10
-#
-n = 10 # type: int # Another comment
-#
-l : List[int] = list(range(5))
-#
-d : Dict[str, int] = {'Brazil': 5, "Italy": 4, "France": 2}
-# Functions
-def fib(n : int, label : str) -> int:
-  a, b = 0, 1
-  while b < n:
-    a, b = b, a + b
-  print(label)
-  return a
-\end{lstlisting}
-      \item Aliases and custom types:
-        \begin{itemize}
-          \item define them with \texttt{TypeAlias} (or simply \texttt{type} in python $\geq3.12$)
-\begin{lstlisting}[language=python]
-from typing import TypeAlias
-Vector: TypeAlias = list[float]
-# Actually TypeAlias is not necessary
-Vector = list[float]
-# or in python >= 3.12
-type Vector = list[float]
-\end{lstlisting}
-          \item Above are aliases, but one can create also new type which will be regarded as a subclass of the parent type
-\begin{lstlisting}[language=python]
-from typing import NewType
-UserId = NewType('UserId', int)
-def foo(uid: UserId) -> None:
-  # Do something
-foo(UserId(123))  # OK
-foo(123)  # KO
-\end{lstlisting}
-        \end{itemize}
-      \item Annotating \emph{self} in classes methods: see \href{https://stackoverflow.com/a/33533514}{here}. Basically: in python $\geq3.11$ use \texttt{typing.Self}; in python $\geq3.7$ future annotations; in old python use strings
-\begin{lstlisting}[language=python]
-# python 3.11+
-from typing import Self
-class Foo:
-    def __add__(self: Self, other: Self) -> Self:
-        # In this case, it is better to do something like the
-        # following because one has to be sure to return
-        # _exactly_ the same type as self
-        return type(self)(...)
-# python 3.7+
-from __future__ import annotations
-class Bar
-    def __add__(self: Bar, other: Bar) -> Bar:
-        return ...
-# Old pythons, use string
-class Baz
-    def __add__(self: "Baz", other: "Baz") -> "Baz":
-        return ...
-\end{lstlisting}
-      \item Functions\&Callables: use \texttt{typing.Callable} or \texttt{collections.abc.Callable}
-\begin{lstlisting}[language=python]
-from collections.abs import Callable
-# A function that takes a string and a integer and
-# returns a string
-foo: Callable[[str, int], str]
-\end{lstlisting}
-      \item Generators: use \verb|Generator[YieldType, SendType, ReturnType]|. Typical example:
-\begin{lstlisting}[language=python]
-from collections.abs import Generator
-def infinite_stream(start: int) -> Generator[int, None, None]:
-    while True:
-        yield start
-        start += 1
-# or also
-from collections.abc import Iterator
-def infinite_stream(start: int) -> Iterator[int]:
-    while True:
-        yield start
-        start += 1
-\end{lstlisting}
-      \item Generic functions (sort of template): two ways, one direct, the other relies on \texttt{Typevar}
-\begin{lstlisting}[language=python]
-from collections.abc import Sequence
-# Function is generic over the TypeVar "T"
-def first[T](l: Sequence[T]) -> T:
-    return l[0]
-
-# Second way
-from typing import TypeVar
-# Declare type variable "U"
-U = TypeVar('U')
-# Function is generic over the TypeVar "U"
-def second(l: Sequence[U]) -> U:
-    return l[1]
-\end{lstlisting}
-      \item Type for types: \verb|typing.Type| or simply \verb|type|
-\begin{lstlisting}[language=python]
-a = 3         # Has type ``int``
-b = int       # Has type ``type[int]``
-c = type(a)   # Also has type ``type[int]``
-#
-class User: ...
-class ProUser(User): ...
-class TeamUser(User): ...
-
-def make_new_user(user_class: type[User]) -> User:
-    # ...
-    return user_class()
-
-# OK
-make_new_user(User)
-# OK: type[ProUser] is a subtype of type[User]
-make_new_user(ProUser)
-# Still fine
-make_new_user(TeamUser)
-# Error: expected type[User] but got User
-make_new_user(User())
-# Error: type[int] is not a subtype of type[User]
-make_new_user(int)
-\end{lstlisting}
-      \item \texttt{NoReturn}: use it in functions that never returns, for instance for throwing errors
-\begin{lstlisting}[language=python]
-from typing import NoReturn
-def stop() -> NoReturn:
-    raise RuntimeError('no way')
-\end{lstlisting}
-      \item Let us be clear: \texttt{python} basically discards type hints, hence the following won't raise any warnings nor errors: \verb|name : int = 'Ajeje'|
-      \item \href{https://mypy.readthedocs.io/en/stable/index.html}{\texttt{mypy}}: write annotations indicating the types of your variables, parameters, and return values, then run \texttt{mypy} to check if your code is coherent (are you assigning a list to a variable that should a dictionary? and so on\ldots). The annotations do not interfere with the code when you are running directly the script.
-        \begin{itemize}
-          \item Skip line from checks: add comment \verb|# type: ignore|
-        \end{itemize}
-    \end{itemize}
   \item \texttt{python} is nice, \texttt{C} is better: hence why not \href{https://cython.readthedocs.io/en/latest/index.html}{\texttt{Cython}}?
   \item Dealing with \texttt{zip} files: module \href{https://docs.python.org/3/library/zipfile.html}{\texttt{zipfile}}. See a discussion \href{https://realpython.com/python-zipfile/}{here}. For instance, use without extracting
 \begin{lstlisting}[language=python]
@@ -2358,26 +2217,104 @@ with zipfile.ZipFile('my_file.zip', mode='r') as archive:
   \item Run shell commands from \texttt{python} script
     \begin{itemize}
       \item \verb|os.system('echo Ciao')|
-      \item It is advised to used the \href{https://docs.python.org/3/library/subprocess.html#subprocess.Popen.communicate}{\texttt{subprocess}} module and its \texttt{run} function or the more flexible \texttt{Popen} class
+      \item It is advised to used the \href{https://docs.python.org/3/library/subprocess.html}{\texttt{subprocess}} module and its \texttt{run} function or the more flexible \texttt{Popen} class
         \begin{itemize}
-          \item The argument is a list of strings which joined form the command
+          \item One should provide a list of strings which, joined, form the command.
+            One might use \href{https://docs.python.org/3/library/shlex.html}{\texttt{shlex}} to avoid errors
 \begin{verbatim}
 list_dir = subprocess.Popen(["ls", "-l"])
+# or
+list_dir = subprocess.Popen(shlex.split("ls -l"))
 \end{verbatim}
-          \item Mind that, differently from \verb|os.system|, \texttt{subprocess} does not wait for the command to finish, hence the python script continues. In order to wait use the \texttt{wait} method.
-\begin{verbatim}
-list_dir = subprocess.Popen(["ls", "-l"])
-list_dir.wait()
-\end{verbatim}
+          \item Other arguments:
+            \begin{itemize}
+              \item \texttt{cwd}: working directory, otherwise the current one
+              \item \texttt{env}: a dictionary to be used as system environment.
+                For instance, to update to \texttt{PATH}
+\begin{lstlisting}[language=python]
+import os
+mod_env = os.environ.copy()
+mod_env["PATH"] += os.pathsep + "/path/to/foo"
+subprocess.Poen(["echo", "$PATH"], env=mod_env)
+\end{lstlisting}
+              \item \texttt{shell}: whether to run the command through the shell.
+                That is to say, with true, \verb|Popen(["ls"])| calls \verb|/bin/sh -c ls| (notice the call to default shell).
+                Default is false.
+              \item \texttt{stdin}, \texttt{stdout}, \texttt{stderr}: specify the executed program’s standard input, standard output and standard error file handles, respectively.
+                Valid values are \texttt{None}, \texttt{PIPE}, \texttt{DEVNULL} (constants defined in the module), an existing file descriptor (a positive integer), and an existing file object with a valid file descriptor.
+                With the default settings of \texttt{None}, no redirection will occur.
+                \texttt{PIPE} indicates that a new pipe to the child should be created.
+                \texttt{DEVNULL} indicates that the special file \texttt{os.devnull} will be used.
+                Additionally, \texttt{stderr} can be \texttt{STDOUT}, which indicates that the \texttt{stderr} data from the child process should be captured into the same file handle as for \texttt{stdout}.
+                See below for examples.
+              \item If \texttt{encoding} or \texttt{errors} are specified, or \texttt{text} (also known as \texttt{universal\_newlines}) is true, the file objects \texttt{stdin}, \texttt{stdout} and \texttt{stderr} will be opened in text mode using the encoding and errors specified in the call or the defaults for \texttt{io.TextIOWrapper}.
+            \end{itemize}
           \item These \href{https://stackoverflow.com/questions/13332268/how-to-use-subprocess-command-with-pipes}{two} \href{https://stackoverflow.com/questions/295459/how-do-i-use-subprocess-popen-to-connect-multiple-processes-by-pipes}{examples} address the piping. For instance, one can store the output in a \texttt{PIPE} object so that it can be fed to a second command
 \begin{verbatim}
 ps = subprocess.Popen(('ps', '-A'), stdout=subprocess.PIPE)
 output = subprocess.check_output(('grep', 'process_name'), stdin=ps.stdout)
 \end{verbatim}
+          \item Mind that, differently from \verb|os.system|, \texttt{subprocess} does not wait for the command to finish, hence the python script continues.
+            In order to wait use the \texttt{wait} method.
+            Another way to obtain that is to use \texttt{subprocess.run}, see below.
+\begin{verbatim}
+list_dir = subprocess.Popen(["ls", "-l"])
+list_dir.wait()
+\end{verbatim}
+        \end{itemize}
+      \item \texttt{subprocess.run}: similar to \texttt{Popen} but directly run the command and wait for its completion.
+        \begin{itemize}
+          \item Arguments:
+            \begin{itemize}
+              \item All those of \texttt{Popen}
+              \item \texttt{capture\_stdout}: store the output (better to use this in combination with \texttt{text=True})
+\begin{lstlisting}[language=python]
+# cmd = [...]
+res = subproces.run(cmd, capture_output=True, text=True)
+# Add .decode() in text=False
+print("STDOUT:", res.stdout)
+print("STDERR:", res.stderr)
+\end{lstlisting}
+              \item \texttt{check}: whether to check if the command completes. If not, it raises a \texttt{python} exception
+            \end{itemize}
         \end{itemize}
     \end{itemize}
-  \item \href{https://numpy.org/doc/stable/index.html}{\texttt{numpy}}
+  \item \href{https://numpy.org/doc/stable/index.html}{\texttt{numpy}} (In the examples below we suppose it has been loaded as \texttt{np})
     \begin{itemize}
+      \item Products:
+        \begin{itemize}
+          \item An \href{https://mkang32.github.io/python/2020/08/30/numpy-matmul.html}{introduction}
+          \item The usual \emph{star} product, ``\texttt{*}'', alias of \texttt{np.multiply}, acts element-wise
+\begin{lstlisting}[language=python]
+a = numpy.array([1, 2, 3])
+b = numpy.array([4, 5, 6])
+a * b  # Gives [4, 10, 18]
+\end{lstlisting}
+          \item \href{https://numpy.org/doc/stable/reference/generated/numpy.dot.html}{\texttt{np.dot}}
+            \begin{itemize}
+              \item For 1D arrays, it is the usual dot (or inner) product. One can also use \texttt{np.inner}
+\begin{lstlisting}[language=python]
+numpy.dot(a, b)  # Gives 32
+# or
+a.dot(b)
+\end{lstlisting}
+              \item For 2D arrays, it is the usual matrix-matrix or matrix-vector product
+\begin{lstlisting}[language=python]
+A = np.random.rand((2,2))
+assert np.allclose(A, np.dot(A, np.eye(2)))
+\end{lstlisting}
+              \item In higher dimensions, if \texttt{a} is an $N$-D array and \texttt{b} is an $M$-D array (where $M\geq2$), it is a sum product over the last axis of \texttt{a} and the second-to-last axis of \texttt{b}: $dot(a, b)[i,j,k,m] = sum(a[i,j,:] * b[k,:,m])$
+            \end{itemize}
+          \item Operator \texttt{at}, ``\verb|@|'', alias of \texttt{np.matmul} is the usual matrix-matrix or matrix-vector product
+\begin{lstlisting}[language=python]
+A = np.random.rand((2,2))
+assert np.allclose(A, A @ np.eye(2))
+\end{lstlisting}
+          \item \href{https://numpy.org/doc/stable/reference/generated/numpy.outer.html}{\texttt{np.outer}}: outer product of two vector $(outer(a, b))_{ij} = a_i b_j$
+          \item \href{https://numpy.org/doc/stable/reference/generated/numpy.einsum.html#numpy.einsum}{\texttt{np.einsum}}: Evaluates the Einstein summation convention on the operands
+          \item \href{https://numpy.org/doc/stable/reference/generated/numpy.vdot.html}{\texttt{np.vdot}}: dot product for arrays but with complex conjugate
+          \item \href{https://numpy.org/doc/stable/reference/generated/numpy.tensordot.html}{\texttt{np.tensordot}}: dot product for tensors
+        \end{itemize}
       \item \texttt{numpy} and the \texttt{axis} keyword
         \begin{itemize}
           \item TL;DR: \verb|axis=0| acts over a column, \verb|axis=1| over a row. Hence,
@@ -2554,6 +2491,25 @@ plt.loglog(...)
       \item \texttt{scipy.stats}: hypothesis testing and all the basics.
       \item \texttt{statsmodels}: regressions.
       \item \href{https://seaborn.pydata.org/introduction.html}{\texttt{seaborn}}: powerful data visualization tool.
+    \end{itemize}
+  \item Do you know about \texttt{module}, as the command used to manage optional programs and modification of environment via modulefiles?
+    There exists a python wrapper around it, so that you can use it.
+    \begin{itemize}
+      \item \href{https://modules.readthedocs.io/en/latest/module.html#examples-of-initialization}{An initialization} for python is needed:
+\begin{lstlisting}[language=python]
+import os
+exec(open("/usr/share/Modules/init/python.py").read(), globals())
+\end{lstlisting}
+      \item After that, you can use it as always.
+        Hence, the following call will update the environment according to the chosen module
+\begin{lstlisting}[language=python]
+module("load", "my_package")
+\end{lstlisting}
+      \item The actual command are run in a subprocess, hence, it won't be possible to keep the output (at least, I couldn't).
+        That is, running the line below will print to screen but you won't be able to captured it
+\begin{lstlisting}[language=python]
+module("show", "my_package")
+\end{lstlisting}
     \end{itemize}
 \end{itemize}
 
@@ -3032,6 +2988,157 @@ Writing
     \end{itemize}
 \end{itemize}
 
+\subsection{Type hints}
+One can provide types to variable, arguments and return values of a function. These hints \textbf{won't} be used by \texttt{python} (e.g.\ it isn't \texttt{C}). Type hints are for developers and for IDEs: basically they make the code simpler to read (very useful when developing code to which other user will interface) and help IDEs to infer types of objects in order to offer better prediction.
+\begin{itemize}
+  \item To go further: \href{https://stackoverflow.com/a/32558710}{here}, \href{https://www.infoworld.com/article/3630372/get-started-with-python-type-hints.html}{here}
+  \item Use module \href{https://docs.python.org/3/library/typing.html}{\texttt{typing}}
+  \item For built-in structures, in older versions use, e.g., \texttt{Dict}, \texttt{Tuple}, \texttt{List}; otherwise in newer version just standard is accepted, e.g., \verb|dict[str, str]|
+    \begin{itemize}
+      \item For more generic constructions, one can use \texttt{Mapping} and \texttt{Sequence} from \texttt{collections.abc} for, respectively, \texttt{dict} and \texttt{list}
+    \end{itemize}
+  \item \texttt{Any} is the joker value, it's compatible with every type.
+  \item For more than one possible types, use \verb|Union|. In recent versions, ``\verb!|!'' (pipe, like in \emph{or}) is accepted as well
+  \item For optional arguments that can assume \verb|None| or another type, use \verb|Optional|
+  \item An example below
+\begin{lstlisting}[language=python]
+# The following is deprecated in > 3.10,
+# just use plain list, dict
+from typing import List, Dict
+# Variables: the followings are equivalent
+n: int = 10
+#
+n: int
+n = 10
+#
+n = 10 # type: int # Another comment
+#
+l : List[int] = list(range(5))
+#
+d : Dict[str, int] = {'Brazil': 5, "Italy": 4, "France": 2}
+# Functions
+def fib(n : int, label : str) -> int:
+a, b = 0, 1
+while b < n:
+a, b = b, a + b
+print(label)
+return a
+\end{lstlisting}
+  \item Aliases and custom types:
+    \begin{itemize}
+      \item define them with \texttt{TypeAlias} (or simply \texttt{type} in python $\geq3.12$)
+\begin{lstlisting}[language=python]
+from typing import TypeAlias
+Vector: TypeAlias = list[float]
+# Actually TypeAlias is not necessary
+Vector = list[float]
+# or in python >= 3.12
+type Vector = list[float]
+\end{lstlisting}
+      \item Above are aliases, but one can create also new type which will be regarded as a subclass of the parent type
+\begin{lstlisting}[language=python]
+from typing import NewType
+UserId = NewType('UserId', int)
+def foo(uid: UserId) -> None:
+# Do something
+foo(UserId(123))  # OK
+foo(123)  # KO
+\end{lstlisting}
+    \end{itemize}
+  \item Annotating \emph{self} in classes methods: see \href{https://stackoverflow.com/a/33533514}{here}. Basically: in python $\geq3.11$ use \texttt{typing.Self}; in python $\geq3.7$ future annotations; in old python use strings
+\begin{lstlisting}[language=python]
+# python 3.11+
+from typing import Self
+class Foo:
+def __add__(self: Self, other: Self) -> Self:
+    # In this case, it is better to do something like the
+    # following because one has to be sure to return
+    # _exactly_ the same type as self
+    return type(self)(...)
+# python 3.7+
+from __future__ import annotations
+class Bar
+def __add__(self: Bar, other: Bar) -> Bar:
+    return ...
+# Old pythons, use string
+class Baz
+def __add__(self: "Baz", other: "Baz") -> "Baz":
+    return ...
+\end{lstlisting}
+  \item Functions\&Callables: use \texttt{typing.Callable} or \texttt{collections.abc.Callable}
+\begin{lstlisting}[language=python]
+from collections.abs import Callable
+# A function that takes a string and a integer and
+# returns a string
+foo: Callable[[str, int], str]
+\end{lstlisting}
+  \item Generators: use \verb|Generator[YieldType, SendType, ReturnType]|. Typical example:
+\begin{lstlisting}[language=python]
+from collections.abs import Generator
+def infinite_stream(start: int) -> Generator[int, None, None]:
+while True:
+    yield start
+    start += 1
+# or also
+from collections.abc import Iterator
+def infinite_stream(start: int) -> Iterator[int]:
+while True:
+    yield start
+    start += 1
+\end{lstlisting}
+  \item Generic functions (sort of template): two ways, one direct, the other relies on \texttt{Typevar}
+\begin{lstlisting}[language=python]
+from collections.abc import Sequence
+# Function is generic over the TypeVar "T"
+def first[T](l: Sequence[T]) -> T:
+return l[0]
+
+# Second way
+from typing import TypeVar
+# Declare type variable "U"
+U = TypeVar('U')
+# Function is generic over the TypeVar "U"
+def second(l: Sequence[U]) -> U:
+return l[1]
+\end{lstlisting}
+  \item Type for types: \verb|typing.Type| or simply \verb|type|
+\begin{lstlisting}[language=python]
+a = 3         # Has type ``int``
+b = int       # Has type ``type[int]``
+c = type(a)   # Also has type ``type[int]``
+#
+class User: ...
+class ProUser(User): ...
+class TeamUser(User): ...
+
+def make_new_user(user_class: type[User]) -> User:
+# ...
+return user_class()
+
+# OK
+make_new_user(User)
+# OK: type[ProUser] is a subtype of type[User]
+make_new_user(ProUser)
+# Still fine
+make_new_user(TeamUser)
+# Error: expected type[User] but got User
+make_new_user(User())
+# Error: type[int] is not a subtype of type[User]
+make_new_user(int)
+\end{lstlisting}
+  \item \texttt{NoReturn}: use it in functions that never returns, for instance for throwing errors
+\begin{lstlisting}[language=python]
+from typing import NoReturn
+def stop() -> NoReturn:
+raise RuntimeError('no way')
+\end{lstlisting}
+  \item Let us be clear: \texttt{python} basically discards type hints, hence the following won't raise any warnings nor errors: \verb|name : int = 'Ajeje'|
+  \item \href{https://mypy.readthedocs.io/en/stable/index.html}{\texttt{mypy}}: write annotations indicating the types of your variables, parameters, and return values, then run \texttt{mypy} to check if your code is coherent (are you assigning a list to a variable that should a dictionary? and so on\ldots). The annotations do not interfere with the code when you are running directly the script.
+    \begin{itemize}
+      \item Skip line from checks: add comment \verb|# type: ignore|
+    \end{itemize}
+\end{itemize}
+
 \subsection{Working with \texttt{jupyter} notebooks}
 \begin{itemize}
   \item \texttt{jupyter-lab}: advanced browser-based (it uses a browser, but no need to be online) environment for editing and running notebooks
@@ -3058,6 +3165,7 @@ Writing
           \item Add \verb|%%matplotlib widget| at the beginning of the selected code-cell
           \item Needs dependency \texttt{ipympl}
         \end{itemize}
+      \item \verb|%%bash|: run in \texttt{bash} all the commands in the cell
     \end{itemize}
   \item Download images:
     \begin{itemize}
