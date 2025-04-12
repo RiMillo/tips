@@ -142,7 +142,7 @@ export -n foo
         \begin{itemize}
           \item \verb|$#|: number of arguments passed to the script
           \item \verb|$<n>|: argument \texttt{n}. It is 1-based, in fact \verb|$0| expands to shell / script's name
-          \item \verb|$@|: all arguments. You can use it in a list: \verb|for arg in "${@}"|. When quoted, it extends to singularly quoted arguments: \verb|"$@"| expands to \verb|"$1" "$2"|\ldots
+          \item \verb|$@|: all arguments. You can use it in a list: \verb|for arg in "${@}"|. When quoted, it extends to singularly quoted arguments: \verb|"$@"| expands to \verb|"$1" "$2"|\ldots \verb|${@:2}| all arguments starting from the second. \verb|${@:2:4}| arguments from the second to the fourth.
           \item \verb|$*|: all arguments. It is similar to \verb|$@|, however, when quoted, it extends to all arguments quoted inside the same quotes: \verb|"$*"| expands to \verb|"$1 $2 ..."|
           \item \verb|$!|: expands to the last run process's ID
           \item \verb|$?|: return value of last command. You can store it \verb|ret_val=$?| or use it directly
@@ -602,18 +602,18 @@ Some useful options:
   \item \texttt{-L}, \verb|--files-without-matches|: \emph{L}ist only the file names in which no match is found;
   \item \texttt{-q}: \emph{q}uiet, return just the exit status code (0 or 1 corresponding to, respectively, true or false) according to whether it have found a match or not;
   \item \verb|--include=<pattern>|: consider only files matching \texttt{pattern}. For example for only \TeX{} sources
-  \item \verb|--label=<label>|: show matches from \texttt{stdin} as coming from file \texttt{label}. This is nice to have when combining with \texttt{find} (cf.\ \autoref{ssec:find})
 \begin{lstlisting}[language=bash]
 grep --include=\*.tex -r "O Bella Ciao" .
 \end{lstlisting}
   \item \verb|--exclude=<pattern>|: do not consider files matching \texttt{pattern};
   \item \verb|--exclude-dir=<dir>|: exclude files in directory \texttt{dir};
+  \item \verb|--label=<label>|: show matches from \texttt{stdin} as coming from file \texttt{label}. This is nice to have when combining with \texttt{find} (cf.\ \autoref{ssec:find})
 \end{itemize}
 
 Tricks:
 \begin{itemize}
   \item Start from the end: \verb!tac <files> | grep [options] <pattern>! (Add a pipe to \texttt{tac} to recover the original order).
-  \item Print even if the match is not found \verb!grep -E '^|<pattern>' <file>!. Special character \verb|^| means "beginning of the line", hence it is always found. Why should one use it? with the option \verb|--color| (usually enabled by default) \verb|grep| highlights the matches. Here, the command find the beginning of the line, which cannot be highlighted, hence it prints the line, if it finds the pattern as well it will highlight it.
+  \item Print even if the match is not found \verb!grep -E '^|<pattern>' <file>! (or \verb!'^\|<pattern>' <file>! and no \verb|-E| option). Special character \verb|^| means "beginning of the line", hence it is always found. Why should one use it? With the option \verb|--color| (usually enabled by default) \verb|grep| highlights the matches. Here, the command find the beginning of the line, which cannot be highlighted, hence it prints the line, if it finds the pattern as well it will highlight it.
   \item Non-greedy: add ``\texttt{?}'' after quantifier: e.g.\ \verb|^.*?}| *everything until first closing brace.
 \end{itemize}
 
