@@ -1,5 +1,7 @@
 # Avoid compiled pdf. Manually, sigh
 tips.pdf
+# Avoid Sphinx products
+_build/
 # Taken from https://github.com/github/gitignore
 #
 # We use: TeX.gitignore and Vim.gitignore
