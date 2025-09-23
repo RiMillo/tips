@@ -24,7 +24,8 @@ or sometimes
 * Of course I'm not the first to write tips, and certainly not the one who knows the most, so here a couples of tips lists, especially about shortcuts: [here](https://www.techrepublic.com/article/20-terminal-shortcuts-developers-need-to-know/) and [here](https://www.howtogeek.com/howto/ubuntu/keyboard-shortcuts-for-bash-command-shell-for-ubuntu-debian-suse-redhat-linux-etc/) and [here](https://devhints.io/bash).
     This [guide](https://github.com/jlevy/the-art-of-command-line) has many tips and seems to be popular on GitHub.
 
-    * Keyword shortcuts: see [here](https://gist.github.com/tuxfight3r/60051ac67c5f0445efee)
+    * Keyword shortcuts: see [here](https://gist.github.com/tuxfight3r/60051ac67c5f0445efee).
+        Or get it directly from `man` as suggested [here](https://askubuntu.com/questions/444708/is-there-any-manual-to-get-the-list-of-bash-shortcut-keys): `man bash | grep "(.-.*)$" -A1`.
     * Cut & yank: <kbd>Ctrl</kbd> + <kbd>K</kbd> cut (or *k*ill) from cursor to end of line, <kbd>Ctrl</kbd> + <kbd>U</kbd> cut from cursor to beginning of line, <kbd>Ctrl</kbd> + <kbd>W</kbd> cut (blank-delimited) word just before the cursor, <kbd>Ctrl</kbd> + <kbd>Y</kbd> yank (paste).
 
     * <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd>: expand alias.
