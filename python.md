@@ -538,94 +538,6 @@ If you agree, please contribute!)
       * `check`: whether to check if the command completes.
         If not, it raises a `python` exception
 
-* [`numpy`](https://numpy.org/doc/stable/index.html) (In the examples below we suppose it has been loaded as `np`)
-
-  * Products:
-
-    * An [introduction](https://mkang32.github.io/python/2020/08/30/numpy-matmul.html)
-
-    * The usual *star* product, “`*`”, alias of `np.multiply`, acts element-wise
-
-      ``` python
-      a = numpy.array([1, 2, 3])
-      b = numpy.array([4, 5, 6])
-      a * b  # Gives [4, 10, 18]
-      ```
-
-    * [`np.dot`](https://numpy.org/doc/stable/reference/generated/numpy.dot.html)
-
-      * For 1D arrays, it is the usual dot (or inner) product.
-        One can also use `np.inner`
-
-        ``` python
-        numpy.dot(a, b)  # Gives 32
-        # or
-        a.dot(b)
-        ```
-
-      * For 2D arrays, it is the usual matrix-matrix or matrix-vector product
-
-        ``` python
-        A = np.random.rand((2,2))
-        assert np.allclose(A, np.dot(A, np.eye(2)))
-        ```
-
-      * In higher dimensions, if `a` is an $`N`$-D array and `b` is an $`M`$-D array (where $`M\geq2`$), it is a sum product over the last axis of `a` and the second-to-last axis of `b`: $`dot(a, b)[i,j,k,m] = sum(a[i,j,:] * b[k,:,m])`$
-
-    * Operator `at`, “`@`”, alias of `np.matmul` is the usual matrix-matrix or matrix-vector product
-
-      ``` python
-      A = np.random.rand((2,2))
-      assert np.allclose(A, A @ np.eye(2))
-      ```
-
-    * [`np.outer`](https://numpy.org/doc/stable/reference/generated/numpy.outer.html): outer product of two vector $`(outer(a, b))_{ij} = a_i b_j`$
-
-    * [`np.einsum`](https://numpy.org/doc/stable/reference/generated/numpy.einsum.html#numpy.einsum): Evaluates the Einstein summation convention on the operands
-
-    * [`np.vdot`](https://numpy.org/doc/stable/reference/generated/numpy.vdot.html): dot product for arrays but with complex conjugate
-
-    * [`np.tensordot`](https://numpy.org/doc/stable/reference/generated/numpy.tensordot.html): dot product for tensors
-
-  * `numpy` and the `axis` keyword
-
-    * TL;DR: `axis=0` acts over a column, `axis=1` over a row. Hence,
-
-      ``` python
-      x=numpy.ones([3,4])
-      x.sum(axis=0) # Gives [3, 3, 3, 3]
-      x.sum(axis=1) # Gives [4, 4, 4]
-      ```
-
-    * The value of `axis` indicate on which dimension the operation is done (in a certain sense, which direction collapses after the
-      operation).
-
-    * The value correspond to the index of the direction in the result of `size()`, for instance.
-        Think about it: above `x` was a 3-rows and 4-columns matrix.
-        Then, `x.size() # =(3,4)`
-
-  * From matrix to array:
-
-    * `flatten` returns a copy
-
-    * `ravel` does it in place
-
-  * `numpy` and memory: here is an interesting [article](https://pythonspeed.com/articles/numpy-memory-views/)
-
-  * To complete the above item, see the [official doc](https://numpy.org/doc/stable/user/basics.copies.html) about views and copies
-
-  * Sorting & alike
-
-    * Get a indexes with `np.argmin` and `np.argsort`
-
-  * Types
-
-    * Change type with `.astype(<type>)`.
-        It usually copy the array, hence allocating memory, however one can avoid this by adding arguments `copy=False`
-
-    * A `np` array can have type string, however all the elements have to have the same length.
-        If it is not the case, one may try generic type `object`
-
 * [`functools`](https://docs.python.org/3/library/functools.html): functions for callable objects (e.g. functions)
 
   * `partial(foo, *args, **kwargs)`: Return a new partial object which when called will behave like `foo` called with the positional arguments `args` and keyword arguments `kwargs`.
@@ -738,51 +650,6 @@ If you agree, please contribute!)
   * [`threading`](https://docs.python.org/3/library/threading.html) module.
 
   * [`asyncio`](https://docs.python.org/3/library/asyncio.html) module.
-
-* `matplotlib`
-
-  * An example showing the basics
-
-    ``` python
-    x  = np.linspace(0,1,20)
-    y1 = 2*x + 1
-    y2 = x**2
-    plt.plot(x, y1, marker="o", color = "red", linestyle='dashed')
-    plt.plot(x, y2, marker="*", color = "green") # Same plot
-    plt.legend([r"$y=2*x+1$", r"$y=x^2$"])
-    # or directly, then just called legend
-    plt.plot(x, y1, label=r"$y=2*x+1$")
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.title(r"Title with LaTeX $\alpha$")
-    plt.tight_layout()
-    plt.savefig("myfig.jpg", dpi=400) # dpi ~ quality
-    # or
-    plt.savefig("myfig.png", dpi=400, transparent=True)
-    # consider also...
-    plt.semilogx(...)
-    plt.semilogy(...)
-    plt.loglog(...)
-    ```
-
-  * List of accepted key for `rcParams` [here](https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.rcParams)
-
-  * `matplotlib.ion()` switch the interaction with the plot on, so that `plt.plot()` is not blocking and the plot can be kept and redrawn multiple times.
-    This of course works in a plot environment, if you use it on a script the plot will disappear as soon as the script reaches its end.
-
-  * Equal unit-length for x and y-axis: `plt.gca().set_aspect('equal', adjustable = 'box')`
-
-  * Remove axis (no axis, no ticks, no labels, etc): `ax.axis('off')`
-
-  * Every names color [here](https://matplotlib.org/stable/gallery/color/named_colors.html)
-
-  * 3D plots.
-    A nice introduction can be found [here](https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html).
-    To activate 3D-plotting (scatter, surface, mesh plot or any other) the axis should be called with `projection='3d'` which should be imported as follows: `from mpl_toolkits import mplot3d`
-
-  * Interactive plots: [legend picking](https://matplotlib.org/stable/gallery/event_handling/legend_picking.html), [grids moving with the mouse](https://matplotlib.org/stable/gallery/event_handling/cursor_demo.html), in general, checkout the whole [event handling](https://matplotlib.org/stable/gallery/event_handling/index.html) session
-
-* Argument parsing: [`argparse`](https://docs.python.org/3/library/argparse.html#module-argparse)
 
 * Working with datasets:
 
@@ -1410,6 +1277,179 @@ Writing
 * Write a list of strings: `f.writlines(l)`
 
   * It does NOT automatically add the newline after each string
+
+## `numpy`
+
+In the examples below, we suppose it has been loaded with `import numpy as np`.
+
+* [Online doc](https://numpy.org/doc/stable/index.html)
+
+* Products:
+
+    * An [introduction](https://mkang32.github.io/python/2020/08/30/numpy-matmul.html)
+
+    * The usual *star* product, “`*`”, alias of `np.multiply`, acts element-wise
+
+      ``` python
+      a = numpy.array([1, 2, 3])
+      b = numpy.array([4, 5, 6])
+      a * b  # Gives [4, 10, 18]
+      ```
+
+    * [`np.dot`](https://numpy.org/doc/stable/reference/generated/numpy.dot.html)
+
+      * For 1D arrays, it is the usual dot (or inner) product.
+        One can also use `np.inner`
+
+        ``` python
+        numpy.dot(a, b)  # Gives 32
+        # or
+        a.dot(b)
+        ```
+
+      * For 2D arrays, it is the usual matrix-matrix or matrix-vector product
+
+        ``` python
+        A = np.random.rand((2,2))
+        assert np.allclose(A, np.dot(A, np.eye(2)))
+        ```
+
+      * In higher dimensions, if `a` is an $`N`$-D array and `b` is an $`M`$-D array (where $`M\geq2`$), it is a sum product over the last axis of `a` and the second-to-last axis of `b`: $`dot(a, b)[i,j,k,m] = sum(a[i,j,:] * b[k,:,m])`$
+
+    * Operator `at`, “`@`”, alias of `np.matmul` is the usual matrix-matrix or matrix-vector product
+
+      ``` python
+      A = np.random.rand((2,2))
+      assert np.allclose(A, A @ np.eye(2))
+      ```
+
+    * [`np.outer`](https://numpy.org/doc/stable/reference/generated/numpy.outer.html): outer product of two vector $`(outer(a, b))_{ij} = a_i b_j`$
+
+    * [`np.einsum`](https://numpy.org/doc/stable/reference/generated/numpy.einsum.html#numpy.einsum): Evaluates the Einstein summation convention on the operands
+
+    * [`np.vdot`](https://numpy.org/doc/stable/reference/generated/numpy.vdot.html): dot product for arrays but with complex conjugate
+
+    * [`np.tensordot`](https://numpy.org/doc/stable/reference/generated/numpy.tensordot.html): dot product for tensors
+
+* `numpy` and the `axis` keyword
+
+    * TL;DR: `axis=0` acts over a column, `axis=1` over a row. Hence,
+
+      ``` python
+      x=numpy.ones([3,4])
+      x.sum(axis=0) # Gives [3, 3, 3, 3]
+      x.sum(axis=1) # Gives [4, 4, 4]
+      ```
+
+    * The value of `axis` indicate on which dimension the operation is done (in a certain sense, which direction collapses after the
+      operation).
+
+    * The value correspond to the index of the direction in the result of `size()`, for instance.
+        Think about it: above `x` was a 3-rows and 4-columns matrix.
+        Then, `x.size() # =(3,4)`
+
+* From matrix to array:
+
+    * `flatten` returns a copy
+
+    * `ravel` does it in place
+
+* `numpy` and memory: here is an interesting [article](https://pythonspeed.com/articles/numpy-memory-views/) and the [official doc](https://numpy.org/doc/stable/user/basics.copies.html) about views and copies
+
+* Sorting, searching, & alike
+
+    * [Online doc](https://numpy.org/doc/stable/reference/routines.sort.html)
+
+    * Get a indexes with `np.argmin` and `np.argsort`
+
+* Types
+
+    * Change type with `.astype(<type>)`.
+        It usually copy the array, hence allocating memory, however one can avoid this by adding arguments `copy=False`
+
+    * A `np` array can have type string, however all the elements have to have the same length.
+        If it is not the case, one may try generic type `object`
+
+* Masks & alike
+
+    * [`np.where(cond, [x, y])`](https://numpy.org/doc/stable/reference/generated/numpy.where.html):
+        * If `x` and `y` are given, return `x` where `cond` is true, `y` otherwise.
+
+            ```python
+            clipped_to_zero = np.where(A < 0, 0, A)
+            ```
+
+        * If `x` and `y` are omitted, it returns the indices of where the condition is met.
+            However, the doc says that in this case it is preferable to use `np.asarray(condition).nonzero()`.
+
+    * Masked arrays module, a.k.a., [`np.ma`](https://numpy.org/doc/stable/reference/routines.ma.html): like arrays, but with an associated (boolean) mask to filter some values out.
+        Example: `masked_negative = np.ma.masked_where(A < 0, A)`
+
+## `matplotlib`
+
+In the examples below, we suppose it has been loaded with `import matplotlib.pyplot as plt`.
+
+* [Online doc](https://matplotlib.org/stable/index.html).
+
+* An example showing the basics
+
+    ``` python
+    x  = np.linspace(0,1,20)
+    y1 = 2*x + 1
+    y2 = x**2
+    plt.plot(x, y1, marker="o", color = "red", linestyle='dashed')
+    plt.plot(x, y2, marker="*", color = "green") # Same plot
+    plt.legend([r"$y=2*x+1$", r"$y=x^2$"])
+    # or directly, then just called legend
+    plt.plot(x, y1, label=r"$y=2*x+1$")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title(r"Title with LaTeX $\alpha$")
+    plt.tight_layout()
+    plt.savefig("myfig.jpg", dpi=400) # dpi ~ quality
+    # or
+    plt.savefig("myfig.png", dpi=400, transparent=True)
+    # consider also...
+    plt.semilogx(...)
+    plt.semilogy(...)
+    plt.loglog(...)
+    ```
+
+* List of accepted key for `rcParams` [here](https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.rcParams)
+
+* `matplotlib.ion()` switch the interaction with the plot on, so that `plt.plot()` is not blocking and the plot can be kept and redrawn multiple times.
+This of course works in a plot environment, if you use it on a script the plot will disappear as soon as the script reaches its end.
+
+* Equal unit-length for x and y-axis: `plt.gca().set_aspect('equal', adjustable = 'box')`
+
+* Remove axis (no axis, no ticks, no labels, etc): `ax.axis('off')`
+
+* Every names color [here](https://matplotlib.org/stable/gallery/color/named_colors.html)
+
+* Colorbar: `plt.colorbar(label='Label')`.
+
+* Show images or 2D fields: `plt.imshow(mat)`.
+    * `mat` can be:
+        * Of size `(M, N)`, then values are mapped using colormap.
+        * Of size `(M, N, 3)`, then values are considered RGB (0-1 float or 0-255 int) and showed accordingly.
+        * Of size `(M, N, 4)`, then values are considered RGBA (0-1 float or 0-255 int) and showed accordingly.
+
+    * If you want to filter out data, check out masked array in [`numpy`](#numpy) or use transparency / `alpha`:
+        ```python
+        only_positive = np.where(mat >= 0, 1, 0)
+        plt.imshow(mat, alpha=only_positive)
+        ```
+
+* See matrix structure (for instance, to show the sparsity of a matrix: `plt.spy(mat)`.
+    Play with `markersize`, `precision` (threshold for filtered-out values),...
+
+* 3D plots.
+A nice introduction can be found [here](https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html).
+To activate 3D-plotting (scatter, surface, mesh plot or any other) the axis should be called with `projection='3d'` which should be imported as follows: `from mpl_toolkits import mplot3d`
+
+* For mesh-like plots, check out `tripcolor`.
+
+* Interactive plots: [legend picking](https://matplotlib.org/stable/gallery/event_handling/legend_picking.html), [grids moving with the mouse](https://matplotlib.org/stable/gallery/event_handling/cursor_demo.html), in general, checkout the whole [event handling](https://matplotlib.org/stable/gallery/event_handling/index.html) session
 
 ## Type hints
 
