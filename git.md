@@ -192,11 +192,11 @@ You may want to have a look at this question which has more than 8 million views
     The state will be restored to `HEAD` (possibly the staged changes remain).
     Of course, one can recover them afterwards.
 
-    * Stash modifications: `git stash`
+    * Push modifications: `git stash [push]` (`push` can be omitted since it is the sub-command by default)
 
         * Stashes are just like commit, hence one can give a message, use `-m 'Message'`
 
-        * By default, it stashes all the modifications on any files in the `git` view.
+        * By default, it stashes all the modifications on any files in the `git` view, that is, all files followed by `git` but not those whiwh are untracked.
             One can select a specific file `git stash -- file.txt`
 
     * Recover a stash: `git stash pop`
@@ -210,6 +210,9 @@ You may want to have a look at this question which has more than 8 million views
         * See above to choose a specific stash
 
         * Abort a popping: sometimes the stash is not what you remember, in that case abort wit `git reset --merge`
+
+    * List all available stashes: `git stash list`.
+        That's when the `-m "Message"` mentioned above when pushing stashes comes in handy.
 
 * List files followed by `git`: `git ls-tree <SHA1>`.
     Advised options:
@@ -381,6 +384,28 @@ You may want to have a look at this question which has more than 8 million views
     WARNING: it is highly advised not to rewrite the history of a published repository, since collaborators that already had the sources, will certainly have issues since their history does not correspond anymore.
     Hence, do not use it lightly and only on not-yet published repositories / branches.
 
+* Clean (downloaded) remote branches which do not exist any more on remote: see this [SO answer](https://stackoverflow.com/questions/3184555/cleaning-up-old-remote-git-branches):
+
+    ```bash
+    # Any of the following
+    # You might add --dry-run to test only
+    git branch -r -d origin/devel
+    git remote prune origin
+    git fetch origin --prune
+    ```
+
+* Copy one branch onto another.
+    Imagine you have a branch `local_dev` which follows remote branch `master`.
+    Now, you want to create a new branch `new_local_dev`, based on remote branch `develop`, and apply all the unmerged (w.r.t. `master` commits of `local_dev`.
+
+    ```bash
+    # Checkout develop and create new branch from it
+    git checkout develop
+    git checkout -b new_local_dev
+    # Cherry-pick the difference between master and local_dev
+    git cherry-pick $(git log --reverse --format=%H master..local_dev)
+    ```
+
 ## GitLab API
 
 Users can manage and control a GitLab project via an API.
@@ -395,6 +420,9 @@ This includes uploading files, creating commits / tags / release / branches, tri
     It can be found in the examples `Preferences > CI/CD > General pipelines > Pipeline triggers`.
     Keep the URL until the numeric ID.
 
+    * Actually, instead of the ID, one can use the html-safe name of the repo itself.
+        That is, for `https://gitlab.com/foo/bar`, one retains the name `foo/bar`, converts it to html `foo%2Fbar`, and it can be used as ID.
+
 * The complete guide is [here](https://docs.gitlab.com/ee/api/), but, beware it is huge!
 
 * Typically, a request will take the form of a call to the project API via `curl`, just open a terminal and launch
@@ -406,7 +434,7 @@ This includes uploading files, creating commits / tags / release / branches, tri
          "https://example.gitlab.com/api/v4/projects/<ID>/<something>"
     ```
 
-    where one has to use an access token and the numeric ID recovered in previous points.
+    where one has to use an access token and the ID recovered in previous points.
     In what follows, we give what should replace the “`something`” above.
 
 * [Upload a file](https://docs.gitlab.com/ee/api/projects.html#upload-a-file) (it can be later used in a release):
