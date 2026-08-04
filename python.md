@@ -1200,7 +1200,7 @@ Base notions and various tips:
   foo_re = re.compile(re.escape("/foo.bar"))
   ```
 
-* Matches&Groups: The above-mentioned function return a *match* object
+* Matches&Groups: The above-mentioned functions return a *match* object
 
   * Access full match and groups with brackets
 
@@ -1239,6 +1239,13 @@ Base notions and various tips:
 
   * All the groups as dict: `m.groupdict(default=None)`, to use in case where one gave name to a group (see `name` and `surname` above).
 
+* Lookahead: They match at every position but do **NOT** consume any of the string
+
+  * Positive: `(?={pattern})`.
+    For example, `Isaac (?=Asimov)` will match `Isaac ` only if it’s followed by `Asimov`.
+  * Negative: `(?!{pattern})`.
+    For example, `Isaac (?!Asimov)` will match `Isaac ` only if it’s _not_ followed by `Asimov`.
+
 ## Files&Co
 
 Open’n’Close
@@ -1246,8 +1253,8 @@ Open’n’Close
 * Open: `f = open('path/to/file.txt', 'w')`
 
   * The second argument is the mode.
-    For instance, `w` for writing (creates file if it doesn’t exist), `a` for appending (creates file if it doesn’t exist), `r` for reading (error if file doesn’t exist), `x` for creating a file (error if file already exists), `t` for using text mode (default) or `b` for using binary mode.
-    For instance, for reading in binary use `'rt'`
+    For instance, `w` for writing (creates file if it doesn't exist), `a` for appending (creates file if it doesn't exist), `r` for reading (error if file doesn't exist), `x` for creating a file (error if file already exists), `t` for using text mode (default) or `b` for using binary mode.
+    For instance, for reading in binary use `'rt'`.
 
 * Close `f.close()`
 
