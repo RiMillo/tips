@@ -406,6 +406,29 @@ You may want to have a look at this question which has more than 8 million views
     git cherry-pick $(git log --reverse --format=%H master..local_dev)
     ```
 
+## Working with forks
+
+When contributing to a large open-source project for which you don't have the right to push to, the usual framework is:
+
+1. [Fork the project](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/fork-a-repo), i.e., copy it to your personal GitHub (because it's almost always GitHub) space.
+2. Clone the fork, create a branch, work on it, and push it.
+3. Once you go online to open the PR, mind to choose the "base repository" as the original one, not your fork.
+    See [the doc](https://docs.github.com/en/pull-requests/how-tos/create-pull-requests/creating-a-pull-request-from-a-fork).
+
+Other tips:
+
+* On a local clone of the fork, you may also [add the origin](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/configuring-a-remote-repository-for-a-fork), here called, `upstream`: `git remote add upstream https://github.com/ORIGINAL-OWNER/PROJECT.git`.
+* To [sync the fork](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/syncing-a-fork), fetch the upstream (see above), and merge it:
+
+    ```bash
+    git fetch upstream
+    git checkout main
+    git merge upstream/main
+    ```
+
+* To [checkout a PR](https://docs.github.com/en/pull-requests/how-tos/review-pull-requests/checking-out-pull-requests-locally) locally, fetch it with it's ID number. E.g., for PR 1234: `git fetch upstreams pull/1234/head:<BRANCH_NAME>`.
+    You might want to use that to set it as upstream of your local branch: `git branch --set-upstream-to=<BRANCH_NAME>`.
+
 ## GitLab API
 
 Users can manage and control a GitLab project via an API.
