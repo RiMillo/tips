@@ -1215,7 +1215,20 @@ A tutorial is given [here](https://www.tutorialspoint.com/awk/index.htm).
 
       * This command sets the permissions, hence is equivalent to the usage of `=` from the previous format
 
-      * To obtain `-rwxr-xr--` one should use 754
+      * To obtain `- rwx r-x r--` one should use 754
+
+      * Full correspondences
+
+        | Number | Extended number | Permissions |
+        | ---    | ---             | ---         |
+        | 0      | 000             | ---         |
+        | 1      | 001             | --x         |
+        | 2      | 010             | -w-         |
+        | 3      | 011             | -wx         |
+        | 4      | 100             | r--         |
+        | 5      | 101             | r-x         |
+        | 6      | 110             | rw-         |
+        | 7      | 111             | rwx         |
 
 * Download with command line: `wget` and `curl`
 
