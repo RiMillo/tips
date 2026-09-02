@@ -384,19 +384,30 @@ You may want to have a look at this question which has more than 8 million views
     WARNING: it is highly advised not to rewrite the history of a published repository, since collaborators that already had the sources, will certainly have issues since their history does not correspond anymore.
     Hence, do not use it lightly and only on not-yet published repositories / branches.
 
-* Clean (downloaded) remote branches which do not exist any more on remote: see this [SO answer](https://stackoverflow.com/questions/3184555/cleaning-up-old-remote-git-branches):
+* Housekeeping
+
+    * Clean (downloaded) remote branches which do not exist any more on remote: see this [SO answer](https://stackoverflow.com/questions/3184555/cleaning-up-old-remote-git-branches):
+
+        ```bash
+        # Any of the following
+        # You might add --dry-run to test only
+        git branch -r -d origin/devel
+        git remote prune origin
+        git fetch origin --prune
+        ```
+
+    * Garbage collector, a.k.a., [`git gc`](https://git-scm.com/docs/git-gc):  Cleanup unnecessary files and optimize the local repository.
+    * Maintenance, [`git maintenance`](https://git-scm.com/docs/git-maintenance): Run tasks to optimize Git repository data.
+    * More thorough clean: mark everything as expired and then garbage-collect aggressively everything (don't worry, this is safe, nothing from your history will be lost)
 
     ```bash
-    # Any of the following
-    # You might add --dry-run to test only
-    git branch -r -d origin/devel
-    git remote prune origin
-    git fetch origin --prune
+    git reflog expire --expire=now --all
+    git gc --aggressive --prune=now
     ```
 
 * Copy one branch onto another.
     Imagine you have a branch `local_dev` which follows remote branch `master`.
-    Now, you want to create a new branch `new_local_dev`, based on remote branch `develop`, and apply all the unmerged (w.r.t. `master` commits of `local_dev`.
+    Now, you want to create a new branch `new_local_dev`, based on remote branch `develop`, and apply all the unmerged (w.r.t. `master` commits of `local_dev`).
 
     ```bash
     # Checkout develop and create new branch from it
