@@ -177,7 +177,7 @@ You may want to have a look at this question which has more than 8 million views
 
 * Get current branch: `git branch --show-current`
 
-* [Merge](https://git-scm.com/docs/git-merge) a branch: `git merge [options] <to_merge>` incorporate all the commits of `o_merge` onto the current branch.
+* [Merge](https://git-scm.com/docs/git-merge) a branch: `git merge [options] <to_merge>` incorporate all the commits of `to_merge` onto the current branch.
     Some info also on [`GitHub`](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-request-merges).
 
     * If the history of the current and to-be-merged branch split, then an additional, automatically-generated commit is added (it is usually called “Merge branch \[...\]”).
@@ -186,6 +186,16 @@ You may want to have a look at this question which has more than 8 million views
     * It `branch_to_merge` has more than one commits, use `--squash` to merge all its commits without, however, committing the changes into the current branch.
 
 * Rebasing: see [here](https://git-scm.com/book/en/v2/Git-Branching-Rebasing)
+    * Notice the usage of `--onto`.
+        Consider this situation: `BranchA` branched from `master`, `BranchB` branched from `BranchA`.
+        Now, you want to rebase `BranchB` so that it branches from `master`.
+        Use:
+
+        ```bash
+        git rebase --onto master BranchA BranchB
+        ```
+
+        This means: "Take `BranchB`, figure out the patches since it diverged from the `BranchA`, and replay these patches in `BranchB` as if it was based directly off `master` branch instead.".
 
 * Stashing: sometimes modifications are not yet ready for a commit but you have to go checkout another branch and `git` won’t let you because of the modifications.
     That’s where stashing comes in: it’s a heap, a space where one can put modifications without them being in the official history.
